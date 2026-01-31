@@ -1,4 +1,23 @@
+"use client";
+
 export default function SellPage() {
+  const handleSubmit = (e) => {
+    e.preventDefault(); // VERY IMPORTANT
+    const formData = new FormData(e.target);
+
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      address: formData.get("address"),
+      propertyType: formData.get("propertyType"),
+      notes: formData.get("notes"),
+    };
+
+    console.log("SUBMIT FIRED ✅", data);
+
+    alert("Listing request submitted (beta). Check console for data.");
+  };
+
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-24">
@@ -61,14 +80,16 @@ export default function SellPage() {
             will be contacted to complete onboarding and listing setup.
           </p>
 
-          <form className="mt-8 space-y-6">
+          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Full Name
               </label>
               <input
+                name="name"
                 type="text"
                 placeholder="John Doe"
+                required
                 className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
               />
             </div>
@@ -78,8 +99,10 @@ export default function SellPage() {
                 Email Address
               </label>
               <input
+                name="email"
                 type="email"
                 placeholder="john@example.com"
+                required
                 className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
               />
             </div>
@@ -89,8 +112,10 @@ export default function SellPage() {
                 Property Address
               </label>
               <input
+                name="address"
                 type="text"
                 placeholder="123 Main St, City, State"
+                required
                 className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
               />
             </div>
@@ -99,7 +124,12 @@ export default function SellPage() {
               <label className="block text-sm font-medium text-gray-700">
                 Property Type
               </label>
-              <select className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400">
+              <select
+                name="propertyType"
+                required
+                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
+              >
+                <option value="">Select one</option>
                 <option>Single-Family</option>
                 <option>Multi-Family</option>
                 <option>Condominium</option>
@@ -113,6 +143,7 @@ export default function SellPage() {
                 Notes (optional)
               </label>
               <textarea
+                name="notes"
                 rows={4}
                 placeholder="Briefly describe the property or any relevant details."
                 className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
@@ -120,7 +151,7 @@ export default function SellPage() {
             </div>
 
             <button
-              type="button"
+              type="submit"
               className="w-full mt-4 py-4 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
             >
               Submit Listing Request
