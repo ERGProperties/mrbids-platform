@@ -1,9 +1,12 @@
 "use client";
 
+import React from "react";
+
 export default function SellPage() {
-  const handleSubmit = (e) => {
-    e.preventDefault(); // VERY IMPORTANT
-    const formData = new FormData(e.target);
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
 
     const data = {
       name: formData.get("name"),
@@ -14,7 +17,6 @@ export default function SellPage() {
     };
 
     console.log("SUBMIT FIRED ✅", data);
-
     alert("Listing request submitted (beta). Check console for data.");
   };
 
@@ -45,28 +47,6 @@ export default function SellPage() {
             <li>✔ Transparent auction mechanics with admin oversight</li>
             <li>✔ Funds flow directly to licensed escrow</li>
           </ul>
-
-          <p className="mt-6 text-xs text-gray-500">
-            Listings are curated to ensure quality and buyer confidence.
-          </p>
-        </div>
-
-        {/* SELLER REQUIREMENTS */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Seller Requirements
-          </h2>
-
-          <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-            To protect all participants, sellers must meet basic
-            eligibility standards prior to auction approval.
-          </p>
-
-          <ul className="mt-6 space-y-3 text-sm text-gray-600">
-            <li>✔ Proof of ownership or authority to sell</li>
-            <li>✔ Clear or resolvable title</li>
-            <li>✔ Agreement to auction rules and disclosures</li>
-          </ul>
         </div>
 
         {/* SELLER FORM */}
@@ -88,9 +68,8 @@ export default function SellPage() {
               <input
                 name="name"
                 type="text"
-                placeholder="John Doe"
                 required
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
+                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
               />
             </div>
 
@@ -101,9 +80,8 @@ export default function SellPage() {
               <input
                 name="email"
                 type="email"
-                placeholder="john@example.com"
                 required
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
+                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
               />
             </div>
 
@@ -114,9 +92,8 @@ export default function SellPage() {
               <input
                 name="address"
                 type="text"
-                placeholder="123 Main St, City, State"
                 required
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
+                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
               />
             </div>
 
@@ -127,7 +104,7 @@ export default function SellPage() {
               <select
                 name="propertyType"
                 required
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
+                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
               >
                 <option value="">Select one</option>
                 <option>Single-Family</option>
@@ -145,8 +122,7 @@ export default function SellPage() {
               <textarea
                 name="notes"
                 rows={4}
-                placeholder="Briefly describe the property or any relevant details."
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-gray-400"
+                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
               />
             </div>
 
@@ -158,13 +134,6 @@ export default function SellPage() {
             </button>
           </form>
         </div>
-
-        {/* FOOTNOTE */}
-        <p className="mt-12 text-xs text-gray-400 leading-relaxed">
-          MrBids reserves the right to approve, modify, or decline
-          listing requests at its discretion. Submission does not
-          constitute a listing agreement.
-        </p>
       </div>
     </main>
   );
