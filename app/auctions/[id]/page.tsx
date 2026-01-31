@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
+
 type AuctionStatus = "upcoming" | "live" | "ended";
 
 export default function AuctionPage() {
-  // 🔧 DEMO STATE — change this to preview variants
-  const status: AuctionStatus = "live";
-  // try: "upcoming" | "live" | "ended"
+  // Demo state — safe for production builds
+  const [status] = useState<AuctionStatus>("live");
+  // Change to: "upcoming" | "live" | "ended" to preview states
 
   return (
     <main className="bg-gray-50 min-h-screen">
@@ -13,7 +15,7 @@ export default function AuctionPage() {
 
         {/* LEFT COLUMN */}
         <div className="lg:col-span-2">
-          {/* STATUS HEADER */}
+          {/* STATUS + TITLE */}
           <div className="mb-10">
             {status === "live" && (
               <div className="flex items-center gap-4 mb-4">
@@ -57,12 +59,12 @@ export default function AuctionPage() {
             </p>
           </div>
 
-          {/* IMAGE */}
+          {/* IMAGE PLACEHOLDER */}
           <div className="bg-white border border-gray-200 rounded-2xl h-80 flex items-center justify-center text-gray-400">
             Property images coming soon
           </div>
 
-          {/* DESCRIPTION */}
+          {/* PROPERTY OVERVIEW */}
           <div className="mt-12 bg-white border border-gray-200 rounded-2xl p-8">
             <h2 className="text-lg font-semibold text-gray-900">
               Property Overview
@@ -75,11 +77,24 @@ export default function AuctionPage() {
               verified buyers only.
             </p>
           </div>
+
+          {/* BUYER ELIGIBILITY */}
+          <div className="mt-12 bg-white border border-gray-200 rounded-2xl p-8">
+            <h2 className="text-lg font-semibold text-gray-900">
+              Buyer Eligibility
+            </h2>
+
+            <ul className="mt-6 space-y-3 text-sm text-gray-600">
+              <li>✔ Government-issued ID verification</li>
+              <li>✔ Proof of funds or financing capability</li>
+              <li>✔ Agreement to binding auction terms</li>
+            </ul>
+          </div>
         </div>
 
-        {/* RIGHT COLUMN — STATE-AWARE PANEL */}
+        {/* RIGHT COLUMN — BID / STATUS PANEL */}
         <aside className="bg-white border border-gray-200 rounded-2xl p-8 h-fit sticky top-32">
-          {/* UPCOMING */}
+
           {status === "upcoming" && (
             <>
               <p className="text-sm text-gray-600 mb-6">
@@ -96,7 +111,6 @@ export default function AuctionPage() {
             </>
           )}
 
-          {/* LIVE */}
           {status === "live" && (
             <>
               <div className="mb-8">
@@ -133,7 +147,6 @@ export default function AuctionPage() {
             </>
           )}
 
-          {/* ENDED */}
           {status === "ended" && (
             <>
               <div className="mb-6">
