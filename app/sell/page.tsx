@@ -1,138 +1,97 @@
-"use client";
+import type { Metadata } from "next";
+import Link from "next/link";
 
-import React from "react";
+export const metadata: Metadata = {
+  title: "Sell a Property | MrBids",
+  description:
+    "Request access to sell property through seller-direct real estate auctions on the MrBids private marketplace.",
+};
 
 export default function SellPage() {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-
-    const data = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      address: formData.get("address"),
-      propertyType: formData.get("propertyType"),
-      notes: formData.get("notes"),
-    };
-
-    console.log("SUBMIT FIRED ✅", data);
-    alert("Listing request submitted (beta). Check console for data.");
-  };
-
   return (
     <main className="bg-gray-50 min-h-screen">
-      <div className="max-w-3xl mx-auto px-6 py-24">
+      <div className="max-w-3xl mx-auto px-6 py-32">
         {/* HEADER */}
-        <div className="mb-14">
+        <div className="mb-16">
           <h1 className="text-4xl font-semibold text-gray-900">
-            Sell a Property via Auction
+            Sell Through a Seller-Direct Auction
           </h1>
           <p className="mt-6 text-lg text-gray-600 leading-relaxed">
-            MrBids offers a controlled, seller-direct auction process
-            designed to attract verified buyers and transparent price
-            discovery.
+            MrBids allows property owners to request access, submit
+            properties for review, and test market demand through
+            transparent auctions — while retaining full control over
+            pricing, timing, and acceptance.
           </p>
         </div>
 
-        {/* WHY AUCTION */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
+        {/* VALUE PROPS */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-14">
           <h2 className="text-lg font-semibold text-gray-900">
-            Why List on MrBids
+            Why Sell on MrBids
           </h2>
 
           <ul className="mt-6 space-y-4 text-sm text-gray-600">
-            <li>✔ Retain control over reserve pricing and acceptance</li>
-            <li>✔ Access a pool of verified, qualified buyers</li>
-            <li>✔ Transparent auction mechanics with admin oversight</li>
-            <li>✔ Funds flow directly to licensed escrow</li>
+            <li>✔ Seller-controlled reserve pricing</li>
+            <li>✔ Listings reviewed before publishing</li>
+            <li>✔ Verified buyers only</li>
+            <li>✔ Transparent, auditable bidding</li>
+            <li>✔ No obligation to accept any bid</li>
           </ul>
+
+          <p className="mt-6 text-xs text-gray-500">
+            MrBids is a technology platform and does not act as a broker,
+            agent, or escrow holder.
+          </p>
         </div>
 
-        {/* SELLER FORM */}
+        {/* PROCESS */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-14">
+          <h2 className="text-lg font-semibold text-gray-900">
+            How the Seller Process Works
+          </h2>
+
+          <ol className="mt-6 space-y-4 text-sm text-gray-600 list-decimal list-inside">
+            <li>Request access to the platform</li>
+            <li>Complete your seller profile</li>
+            <li>Submit property details for review</li>
+            <li>Approved listings go live to verified buyers</li>
+          </ol>
+
+          <p className="mt-6 text-sm text-gray-600">
+            For common questions, review the{" "}
+            <Link href="/faq" className="text-gray-900 underline">
+              Seller FAQ
+            </Link>.
+          </p>
+        </div>
+
+        {/* CTA */}
         <div className="bg-white border border-gray-200 rounded-2xl p-8">
           <h2 className="text-lg font-semibold text-gray-900">
-            Submit a Listing Request
+            Request Seller Access
           </h2>
 
           <p className="mt-4 text-sm text-gray-600">
-            Submission does not guarantee acceptance. Approved sellers
-            will be contacted to complete onboarding and listing setup.
+            Requesting access allows you to submit properties, track
+            review status, and manage future listings. All listings are
+            reviewed prior to being published.
           </p>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
-              <input
-                name="name"
-                type="text"
-                required
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <input
-                name="email"
-                type="email"
-                required
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Property Address
-              </label>
-              <input
-                name="address"
-                type="text"
-                required
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Property Type
-              </label>
-              <select
-                name="propertyType"
-                required
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
-              >
-                <option value="">Select one</option>
-                <option>Single-Family</option>
-                <option>Multi-Family</option>
-                <option>Condominium</option>
-                <option>Land</option>
-                <option>Commercial</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Notes (optional)
-              </label>
-              <textarea
-                name="notes"
-                rows={4}
-                className="mt-2 w-full border border-gray-300 rounded-xl px-4 py-3 text-sm"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full mt-4 py-4 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
+          <div className="mt-8">
+            <Link
+              href="/account-required"
+              className="w-full block text-center px-8 py-4 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
             >
-              Submit Listing Request
-            </button>
-          </form>
+              Request Seller Access
+            </Link>
+          </div>
+
+          <p className="mt-6 text-xs text-gray-500">
+            Questions? Contact{" "}
+            <a href="mailto:support@mrbids.com" className="underline">
+              support@mrbids.com
+            </a>.
+          </p>
         </div>
       </div>
     </main>

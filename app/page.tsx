@@ -2,7 +2,7 @@ export default function HomePage() {
   return (
     <main className="bg-gradient-to-b from-gray-50 to-white">
       {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 pt-36 pb-40">
+      <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
         <div className="max-w-3xl">
           <p className="text-sm font-medium text-gray-500 mb-6 tracking-wide">
             A Private Marketplace for Real Assets
@@ -15,22 +15,18 @@ export default function HomePage() {
           </h1>
 
           <p className="mt-8 text-xl text-gray-600 leading-relaxed">
-  MrBids is a private, seller-direct auction marketplace designed
-  for verified buyers and institutional-grade transactions.
-</p>
-
+            MrBids is a private, seller-direct auction marketplace designed
+            for verified buyers and institutional-grade transactions.
+          </p>
 
           {/* BUTTONS */}
-          <div className="mt-14 flex items-center">
+          <div className="mt-14 flex items-center gap-10">
             <a
               href="/auctions"
               className="px-10 py-5 bg-black text-white rounded-full text-base font-medium transition shadow-sm hover:bg-gray-900 hover:shadow-md"
             >
-              Browse Live Auctions
+              Browse Auctions
             </a>
-
-            {/* HARD SPACING */}
-            <div className="w-14" />
 
             <a
               href="/sell"
@@ -46,18 +42,43 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CREDIBILITY BAND */}
+      {/* TRUST STRIP */}
       <section className="border-t border-b border-gray-100 bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-sm text-gray-500">
-            Designed for professional investors, asset managers, and property operators.
-          </p>
+        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-10 text-center">
+          <div>
+            <p className="text-sm font-semibold text-gray-900">
+              Licensed Escrow
+            </p>
+            <p className="mt-2 text-xs text-gray-500">
+              Funds flow through third-party licensed escrow providers.
+            </p>
+          </div>
 
-          <div className="flex items-center gap-10 text-xs uppercase tracking-widest text-gray-400">
-            <span>Institutional Buyers</span>
-            <span>Licensed Escrow</span>
-            <span>Admin Oversight</span>
-            <span>Audit Trail</span>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">
+              Verified Participants
+            </p>
+            <p className="mt-2 text-xs text-gray-500">
+              Buyers and sellers are reviewed prior to participation.
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-gray-900">
+              Admin Oversight
+            </p>
+            <p className="mt-2 text-xs text-gray-500">
+              Auctions are monitored to ensure compliance and fairness.
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-gray-900">
+              Audit Trail
+            </p>
+            <p className="mt-2 text-xs text-gray-500">
+              Every bid and action is recorded and preserved.
+            </p>
           </div>
         </div>
       </section>
@@ -67,20 +88,20 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 py-28 grid grid-cols-1 md:grid-cols-4 gap-20">
           {[
             {
-              title: "Verified Participants",
-              desc: "All buyers undergo identity and capital verification prior to bidding.",
+              title: "Verified Buyers",
+              desc: "All buyers undergo identity and access review prior to bidding.",
             },
             {
-              title: "Escrow-Controlled Funds",
-              desc: "Transactions are structured to move directly into licensed escrow.",
+              title: "Seller Control",
+              desc: "Sellers define reserve pricing and retain acceptance authority.",
             },
             {
-              title: "Permanent Audit Trail",
-              desc: "Every bid, action, and outcome is recorded and preserved.",
+              title: "Transparent Auctions",
+              desc: "Bids are visible, time-stamped, and auditable.",
             },
             {
               title: "Human Oversight",
-              desc: "Auctions are actively monitored to ensure compliance and fairness.",
+              desc: "Every auction is actively monitored by platform administrators.",
             },
           ].map((item) => (
             <div key={item.title}>
