@@ -1,66 +1,87 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Live Auctions | MrBids",
   description:
-    "Browse live and upcoming seller-direct real estate auctions on MrBids. Access is limited to verified buyers.",
-  openGraph: {
-    title: "Live Real Estate Auctions | MrBids",
-    description:
-      "Explore seller-direct real estate auctions available to verified buyers on the MrBids platform.",
-    url: "https://mrbids.com/auctions",
-    siteName: "MrBids",
-    type: "website",
-  },
+    "Browse seller-direct real estate auctions on the MrBids private marketplace.",
 };
 
 export default function AuctionsPage() {
   return (
     <main className="bg-gray-50 min-h-screen">
-      <div className="max-w-5xl mx-auto px-6 py-32">
+      <div className="max-w-6xl mx-auto px-6 py-32">
         {/* HEADER */}
-        <div className="mb-20">
+        <div className="mb-16">
           <h1 className="text-4xl font-semibold text-gray-900">
             Live Auctions
           </h1>
-          <p className="mt-6 text-lg text-gray-600 leading-relaxed">
-            Browse seller-direct real estate auctions available to
-            verified buyers on the MrBids platform.
+          <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-3xl">
+            MrBids features seller-direct real estate auctions with
+            transparent bidding, verified participants, and seller-
+            controlled outcomes. Access to live auctions may be limited
+            during the private marketplace phase.
           </p>
+        </div>
+
+        {/* SAMPLE AUCTION PREVIEW */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-16">
+          <div className="flex flex-col md:flex-row justify-between gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gray-400">
+                Sample Listing
+              </p>
+              <h2 className="mt-3 text-2xl font-semibold text-gray-900">
+                123 Example Street, Phoenix, AZ
+              </h2>
+              <p className="mt-3 text-sm text-gray-600">
+                Single-Family • 3 Bed • 2 Bath • 1,850 SF
+              </p>
+              <p className="mt-4 text-sm text-gray-600 max-w-xl">
+                This sample auction demonstrates how seller-direct
+                auctions are structured on MrBids. Actual listings will
+                be reviewed and approved prior to launch.
+              </p>
+            </div>
+
+            <div className="flex items-center">
+              <Link
+                href="/auctions/sample"
+                className="inline-block px-8 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
+              >
+                View Sample Auction
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* EMPTY STATE */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center">
-          <h2 className="text-xl font-semibold text-gray-900">
-            No Live Auctions at the Moment
-          </h2>
-
-          <p className="mt-4 text-sm text-gray-600 max-w-md mx-auto">
-            Auctions are released on a rolling basis and may be limited
-            during private marketplace rollout. Please check back soon
-            or contact us for early access.
+        <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-12 text-center">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Additional Auctions Coming Soon
+          </h3>
+          <p className="mt-4 text-sm text-gray-600 max-w-xl mx-auto">
+            Live auctions will appear here as they are approved and
+            launched. Buyer access may be limited during the private
+            marketplace phase.
           </p>
 
-          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-            <a
-              href="/buyer-dashboard"
-              className="px-8 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
+          <div className="mt-8">
+            <Link
+              href="/join"
+              className="inline-block px-8 py-3 border border-gray-300 rounded-full text-sm font-medium hover:border-gray-400 transition"
             >
-              Buyer Access Info
-            </a>
-
-            <a
-              href="mailto:support@mrbids.com"
-              className="px-8 py-3 border border-gray-300 rounded-full text-sm font-medium hover:border-gray-400 transition"
-            >
-              Contact Support
-            </a>
+              Request Buyer Access
+            </Link>
           </div>
-
-          <p className="mt-8 text-xs text-gray-400">
-            Access may be restricted to approved buyers.
-          </p>
         </div>
+
+        {/* FOOTNOTE */}
+        <p className="mt-14 text-xs text-gray-400 leading-relaxed max-w-3xl">
+          MrBids is a technology platform and does not act as a broker,
+          agent, or escrow holder. Participation in auctions is subject
+          to approval and auction-specific terms.
+        </p>
       </div>
     </main>
   );
