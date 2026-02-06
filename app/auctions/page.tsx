@@ -1,115 +1,97 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Live Auctions | MrBids",
-  description:
-    "Browse seller-direct real estate auctions on the MrBids private marketplace.",
+  title: "Auctions | MrBids",
+  description: "Browse live and completed real estate auctions on MrBids.",
 };
 
+// 🔒 AUCTION END TIMES (centralized, explicit)
+const AUCTIONS = [
+  {
+    id: "2210-mckenzie-ave-waco",
+    title: "2210 McKenzie Ave",
+    location: "Waco, TX",
+    href: "/auctions/2210-mckenzie-ave-waco",
+    endTime: new Date("2026-02-15T17:00:00-06:00"),
+    startingBid: "$100,000",
+  },
+];
+
 export default function AuctionsPage() {
+  const now = Date.now();
+
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-32">
         {/* HEADER */}
-        <div className="mb-16">
+        <div className="mb-14">
           <h1 className="text-4xl font-semibold text-gray-900">
-            Live Auctions
+            Auctions
           </h1>
-          <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-3xl">
-            MrBids features seller-direct real estate auctions with
-            transparent bidding, verified participants, and seller-
-            controlled outcomes.
+          <p className="mt-6 text-lg text-gray-600">
+            Seller-direct real estate auctions with transparent terms and
+            controlled participation.
           </p>
         </div>
 
-        {/* LIVE AUCTION */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
-          <div className="flex flex-col md:flex-row justify-between gap-6">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-gray-400">
-                Live Auction
-              </p>
-              <h2 className="mt-3 text-2xl font-semibold text-gray-900">
-                2210 McKenzie Ave, Waco, TX
-              </h2>
-              <p className="mt-3 text-sm text-gray-600">
-                Residential Property • Waco, Texas
-              </p>
-              <p className="mt-4 text-sm text-gray-600 max-w-xl">
-                This property is currently being offered through a
-                seller-direct auction as part of the MrBids private
-                pilot.
-              </p>
-            </div>
+        {/* AUCTIONS LIST */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {AUCTIONS.map((auction) => {
+            const isClosed = now >= auction.endTime.getTime();
 
-            <div className="flex items-center">
-              <Link
-                href="/auctions/2210-mckenzie-ave-waco"
-                className="inline-block px-8 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
+            return (
+              <div
+                key={auction.id}
+                className="bg-white border border-gray-200 rounded-2xl p-8 flex flex-col justify-between"
               >
-                View Auction
-              </Link>
-            </div>
-          </div>
+                <div>
+                  {/* STATUS BADGE */}
+                  <div className="mb-4">
+                    {isClosed ? (
+                      <span className="inline-block text-xs font-medium uppercase tracking-widest px-3 py-1 rounded-full bg-gray-100 text-gray-600">
+                        Auction Closed
+                      </span>
+                    ) : (
+                      <span className="inline-block text-xs font-medium uppercase tracking-widest px-3 py-1 rounded-full bg-green-100 text-green-700">
+                        Live Auction
+                      </span>
+                    )}
+                  </div>
+
+                  {/* TITLE */}
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {auction.title}
+                  </h2>
+                  <p className="mt-2 text-sm text-gray-600">
+                    {auction.location}
+                  </p>
+
+                  {/* DETAILS */}
+                  <p className="mt-6 text-sm text-gray-600">
+                    Starting Bid:{" "}
+                    <span className="font-medium text-gray-900">
+                      {auction.startingBid}
+                    </span>
+                  </p>
+                </div>
+
+                {/* CTA */}
+                <div className="mt-8">
+                  <a
+                    href={
+                      isClosed
+                        ? `${auction.href}/result`
+                        : auction.href
+                    }
+                    className="inline-block w-full text-center px-6 py-3 rounded-full text-sm font-medium border border-gray-300 hover:border-gray-400 transition"
+                  >
+                    {isClosed ? "View Auction Result" : "View Auction"}
+                  </a>
+                </div>
+              </div>
+            );
+          })}
         </div>
-
-        {/* SAMPLE AUCTION */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-16">
-          <div className="flex flex-col md:flex-row justify-between gap-6">
-            <div>
-              <p className="text-xs uppercase tracking-widest text-gray-400">
-                Sample Listing
-              </p>
-              <h2 className="mt-3 text-2xl font-semibold text-gray-900">
-                Example Auction Format
-              </h2>
-              <p className="mt-3 text-sm text-gray-600">
-                Demonstration Only
-              </p>
-              <p className="mt-4 text-sm text-gray-600 max-w-xl">
-                This sample auction demonstrates how seller-direct
-                auctions are structured on MrBids.
-              </p>
-            </div>
-
-            <div className="flex items-center">
-              <Link
-                href="/auctions/sample"
-                className="inline-block px-8 py-3 border border-gray-300 rounded-full text-sm font-medium hover:border-gray-400 transition"
-              >
-                View Sample Auction
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* EMPTY STATE */}
-        <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-12 text-center">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Additional Auctions Coming Soon
-          </h3>
-          <p className="mt-4 text-sm text-gray-600 max-w-xl mx-auto">
-            Auctions are released on a rolling basis as part of the
-            private marketplace pilot.
-          </p>
-
-          <div className="mt-8">
-            <Link
-              href="/join"
-              className="inline-block px-8 py-3 border border-gray-300 rounded-full text-sm font-medium hover:border-gray-400 transition"
-            >
-              Request Buyer Access
-            </Link>
-          </div>
-        </div>
-
-        {/* FOOTNOTE */}
-        <p className="mt-14 text-xs text-gray-400 leading-relaxed max-w-3xl">
-          MrBids is a technology platform and does not act as a broker,
-          agent, or escrow holder. Participation is subject to platform
-          approval and auction-specific terms.
-        </p>
       </div>
     </main>
   );
