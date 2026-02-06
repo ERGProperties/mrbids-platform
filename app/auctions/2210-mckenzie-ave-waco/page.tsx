@@ -214,6 +214,50 @@ export default function LiveAuction2210McKenzie() {
           </div>
         </div>
 
+        {/* HOW BIDDING WORKS */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
+          <h3 className="text-lg font-semibold text-gray-900 text-center">
+            How Bidding Works
+          </h3>
+
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-gray-600">
+            <div className="text-center">
+              <div className="mx-auto mb-4 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-900">
+                1
+              </div>
+              <p className="font-medium text-gray-900">Request Buyer Access</p>
+              <p className="mt-2">
+                Buyers must request and receive approval prior to
+                participating in any auction.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="mx-auto mb-4 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-900">
+                2
+              </div>
+              <p className="font-medium text-gray-900">Submit a Bid</p>
+              <p className="mt-2">
+                Approved buyers submit bids in stated increments before
+                the auction close time.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="mx-auto mb-4 h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-900">
+                3
+              </div>
+              <p className="font-medium text-gray-900">
+                Seller Reviews & Accepts
+              </p>
+              <p className="mt-2">
+                The seller reviews auction activity and retains full
+                discretion over bid acceptance.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* CTA */}
         <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <h2 className="text-lg font-semibold text-gray-900">
