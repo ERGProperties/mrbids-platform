@@ -19,12 +19,42 @@ export default function AuctionsPage() {
           <p className="mt-6 text-lg text-gray-600 leading-relaxed max-w-3xl">
             MrBids features seller-direct real estate auctions with
             transparent bidding, verified participants, and seller-
-            controlled outcomes. Access to live auctions may be limited
-            during the private marketplace phase.
+            controlled outcomes.
           </p>
         </div>
 
-        {/* SAMPLE AUCTION PREVIEW */}
+        {/* LIVE AUCTION */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
+          <div className="flex flex-col md:flex-row justify-between gap-6">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gray-400">
+                Live Auction
+              </p>
+              <h2 className="mt-3 text-2xl font-semibold text-gray-900">
+                2210 McKenzie Ave, Waco, TX
+              </h2>
+              <p className="mt-3 text-sm text-gray-600">
+                Residential Property • Waco, Texas
+              </p>
+              <p className="mt-4 text-sm text-gray-600 max-w-xl">
+                This property is currently being offered through a
+                seller-direct auction as part of the MrBids private
+                pilot.
+              </p>
+            </div>
+
+            <div className="flex items-center">
+              <Link
+                href="/auctions/2210-mckenzie-ave-waco"
+                className="inline-block px-8 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
+              >
+                View Auction
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* SAMPLE AUCTION */}
         <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-16">
           <div className="flex flex-col md:flex-row justify-between gap-6">
             <div>
@@ -32,22 +62,21 @@ export default function AuctionsPage() {
                 Sample Listing
               </p>
               <h2 className="mt-3 text-2xl font-semibold text-gray-900">
-                123 Example Street, Phoenix, AZ
+                Example Auction Format
               </h2>
               <p className="mt-3 text-sm text-gray-600">
-                Single-Family • 3 Bed • 2 Bath • 1,850 SF
+                Demonstration Only
               </p>
               <p className="mt-4 text-sm text-gray-600 max-w-xl">
                 This sample auction demonstrates how seller-direct
-                auctions are structured on MrBids. Actual listings will
-                be reviewed and approved prior to launch.
+                auctions are structured on MrBids.
               </p>
             </div>
 
             <div className="flex items-center">
               <Link
                 href="/auctions/sample"
-                className="inline-block px-8 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
+                className="inline-block px-8 py-3 border border-gray-300 rounded-full text-sm font-medium hover:border-gray-400 transition"
               >
                 View Sample Auction
               </Link>
@@ -61,9 +90,8 @@ export default function AuctionsPage() {
             Additional Auctions Coming Soon
           </h3>
           <p className="mt-4 text-sm text-gray-600 max-w-xl mx-auto">
-            Live auctions will appear here as they are approved and
-            launched. Buyer access may be limited during the private
-            marketplace phase.
+            Auctions are released on a rolling basis as part of the
+            private marketplace pilot.
           </p>
 
           <div className="mt-8">
@@ -79,8 +107,8 @@ export default function AuctionsPage() {
         {/* FOOTNOTE */}
         <p className="mt-14 text-xs text-gray-400 leading-relaxed max-w-3xl">
           MrBids is a technology platform and does not act as a broker,
-          agent, or escrow holder. Participation in auctions is subject
-          to approval and auction-specific terms.
+          agent, or escrow holder. Participation is subject to platform
+          approval and auction-specific terms.
         </p>
       </div>
     </main>
