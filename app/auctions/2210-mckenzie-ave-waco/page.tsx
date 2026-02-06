@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const AUCTION_END = new Date("2026-02-15T17:00:00-06:00");
 
 export default function LiveAuction2210McKenzie() {
-  // ⛔ SERVER-SIDE CHECK
+  // ⛔ SERVER-SIDE AUCTION CLOSE CHECK
   if (Date.now() >= AUCTION_END.getTime()) {
     redirect("/auctions/2210-mckenzie-ave-waco/result");
   }
@@ -130,7 +130,8 @@ export default function LiveAuction2210McKenzie() {
               The property requires a full rehabilitation. Interior
               finishes, mechanical systems, and exterior components
               should be evaluated by buyers as part of their due
-              diligence.
+              diligence. This opportunity is best suited for experienced
+              investors or renovation-focused buyers.
             </p>
 
             <p>
@@ -138,6 +139,78 @@ export default function LiveAuction2210McKenzie() {
               (ARV) of $230,000. This estimate is for reference only and
               is not a guarantee of value.
             </p>
+
+            <p>
+              The seller retains full discretion over bid acceptance.
+              A reserve price has been set but is not publicly disclosed.
+            </p>
+          </div>
+        </div>
+
+        {/* PROPERTY FACTS + AUCTION TERMS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8">
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">
+              Property Facts
+            </h3>
+
+            <ul className="mt-6 space-y-3 text-sm text-gray-600">
+              <li>• Property Type: Single-Family</li>
+              <li>• Bedrooms: 3</li>
+              <li>• Bathrooms: 2</li>
+              <li>• Square Footage: 1,606 SF</li>
+              <li>• Lot Size: 0.19 Acres</li>
+              <li>• Year Built: 1926</li>
+              <li>• Occupancy: Vacant</li>
+            </ul>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-8">
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">
+              Auction Terms
+            </h3>
+
+            <ul className="mt-6 space-y-3 text-sm text-gray-600">
+              <li>• Property sold as-is</li>
+              <li>• Minimum bid increments of $5,000</li>
+              <li>• Seller retains bid acceptance control</li>
+              <li>• No obligation to accept any offer</li>
+              <li>• Buyer approval required</li>
+              <li>• Funds flow through licensed escrow</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* CREDIBILITY SIGNALS */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm text-gray-600">
+            <div>
+              <p className="font-medium text-gray-900">Verified Buyers</p>
+              <p className="mt-1">
+                Buyer access is reviewed prior to participation.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-medium text-gray-900">Seller Control</p>
+              <p className="mt-1">
+                Seller retains full discretion over bid acceptance.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-medium text-gray-900">Licensed Escrow</p>
+              <p className="mt-1">
+                Funds are structured to flow through licensed escrow.
+              </p>
+            </div>
+
+            <div>
+              <p className="font-medium text-gray-900">Audit Trail</p>
+              <p className="mt-1">
+                Auction activity is logged and preserved.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -160,6 +233,13 @@ export default function LiveAuction2210McKenzie() {
             </a>
           </div>
         </div>
+
+        {/* FOOTNOTE */}
+        <p className="mt-12 text-xs text-gray-400 leading-relaxed">
+          Auction closes automatically at the stated date and time.
+          Late bids will not be accepted. All information is provided
+          for general reference only and is subject to buyer due diligence.
+        </p>
       </div>
     </main>
   );
