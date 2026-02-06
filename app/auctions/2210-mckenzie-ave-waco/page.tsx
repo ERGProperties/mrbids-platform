@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import Countdown from "./Countdown";
 
 export const metadata: Metadata = {
   title: "Live Auction — 2210 McKenzie Ave, Waco TX | MrBids",
   description:
-    "Seller-direct real estate auction featuring a residential property in Waco, Texas.",
+    "Seller-direct real estate auction featuring a full-rehab residential property in Waco, Texas.",
 };
 
 export default function LiveAuction2210McKenzie() {
@@ -34,22 +35,20 @@ export default function LiveAuction2210McKenzie() {
             Live Auction
           </p>
           <h1 className="mt-4 text-4xl font-semibold text-gray-900">
-            2210 McKenzie Ave, Waco, TX
+            2210 McKenzie Ave, Waco, TX 76708
           </h1>
           <p className="mt-4 text-lg text-gray-600">
-            Residential Property • Waco, Texas
+            Single-Family Residence • Full Rehab Opportunity
           </p>
         </div>
 
         {/* AUCTION STATUS */}
-        <div className="mb-12 bg-white border border-gray-200 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mb-12 bg-white border border-gray-200 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
             <p className="text-sm font-medium text-gray-900">
               Auction Status
             </p>
-            <p className="mt-2 text-sm text-gray-600">
-              Live
-            </p>
+            <p className="mt-2 text-sm text-gray-600">Live</p>
           </div>
 
           <div>
@@ -57,16 +56,23 @@ export default function LiveAuction2210McKenzie() {
               Auction Ends
             </p>
             <p className="mt-2 text-sm text-gray-600">
-              To Be Announced
+              Feb 15, 2026 • 5:00 PM CT
             </p>
           </div>
 
           <div>
             <p className="text-sm font-medium text-gray-900">
-              Reserve Price
+              Time Remaining
+            </p>
+            <Countdown />
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-gray-900">
+              Seller ARV (Post-Rehab)
             </p>
             <p className="mt-2 text-sm text-gray-600">
-              Not Publicly Disclosed
+              $230,000 (Seller Estimate)
             </p>
           </div>
         </div>
@@ -101,16 +107,25 @@ export default function LiveAuction2210McKenzie() {
 
           <div className="mt-6 space-y-4 text-sm text-gray-600 leading-relaxed">
             <p>
-              2210 McKenzie Ave is a residential property located in Waco,
-              Texas. The property is being offered through a private,
-              seller-direct auction as part of the MrBids pilot program.
+              2210 McKenzie Ave is a single-family residential property
+              located in Waco, Texas. The property is being offered
+              through a seller-direct auction as part of the MrBids
+              private seller pilot.
             </p>
 
             <p>
-              The home features a traditional layout with multiple living
-              spaces and bedrooms. The property may appeal to owner-
-              occupants or investors depending on individual objectives
-              and due diligence.
+              The property requires a full rehabilitation. Interior
+              finishes, mechanical systems, and exterior components
+              should be evaluated by buyers as part of their due
+              diligence. This offering is best suited for experienced
+              investors or renovation-focused buyers.
+            </p>
+
+            <p>
+              The seller has provided an estimated after-repair value
+              (ARV) of $230,000. This estimate is for reference only and
+              is not a guarantee of value. Buyers are encouraged to
+              perform independent analysis.
             </p>
 
             <p>
@@ -121,18 +136,21 @@ export default function LiveAuction2210McKenzie() {
           </div>
         </div>
 
-        {/* DETAILS */}
+        {/* PROPERTY FACTS + AUCTION TERMS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <div className="bg-white border border-gray-200 rounded-2xl p-8">
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">
-              Property Details
+              Property Facts
             </h3>
 
             <ul className="mt-6 space-y-3 text-sm text-gray-600">
-              <li>• Property Type: Residential</li>
-              <li>• City: Waco</li>
-              <li>• State: Texas</li>
-              <li>• Occupancy: To Be Verified</li>
+              <li>• Property Type: Single-Family</li>
+              <li>• Bedrooms: 3</li>
+              <li>• Bathrooms: 2</li>
+              <li>• Square Footage: Approx. 1,606 SF</li>
+              <li>• Lot Size: Approx. 0.19 Acres</li>
+              <li>• Year Built: 1926</li>
+              <li>• Occupancy: Vacant</li>
             </ul>
           </div>
 
@@ -142,6 +160,7 @@ export default function LiveAuction2210McKenzie() {
             </h3>
 
             <ul className="mt-6 space-y-3 text-sm text-gray-600">
+              <li>• Property sold as-is</li>
               <li>• Seller retains bid acceptance control</li>
               <li>• No obligation to accept any offer</li>
               <li>• Buyer approval required</li>
@@ -172,10 +191,12 @@ export default function LiveAuction2210McKenzie() {
 
         {/* FOOTNOTE */}
         <p className="mt-12 text-xs text-gray-400 leading-relaxed">
-          This listing is part of the MrBids private seller pilot and does
-          not constitute an offer, solicitation, or guarantee of sale.
+          Auction closes automatically at the stated date and time.
+          Late bids will not be accepted. All information is provided
+          for general reference only and is subject to buyer due diligence.
         </p>
       </div>
     </main>
   );
 }
+
