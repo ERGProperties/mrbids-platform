@@ -43,28 +43,34 @@ export default function LiveAuction2210McKenzie() {
         </div>
 
         {/* AUCTION STATUS */}
-        <div className="mb-12 bg-white border border-gray-200 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="mb-12 bg-white border border-gray-200 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-6 gap-6">
           <div>
-            <p className="text-sm font-medium text-gray-900">
-              Auction Status
-            </p>
+            <p className="text-sm font-medium text-gray-900">Auction Status</p>
             <p className="mt-2 text-sm text-gray-600">Live</p>
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-900">
-              Auction Ends
-            </p>
+            <p className="text-sm font-medium text-gray-900">Auction Ends</p>
             <p className="mt-2 text-sm text-gray-600">
               Feb 15, 2026 • 5:00 PM CT
             </p>
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-900">
-              Time Remaining
-            </p>
+            <p className="text-sm font-medium text-gray-900">Time Remaining</p>
             <Countdown />
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-gray-900">Starting Bid</p>
+            <p className="mt-2 text-sm text-gray-600">$100,000</p>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-gray-900">
+              Bid Increment
+            </p>
+            <p className="mt-2 text-sm text-gray-600">$5,000</p>
           </div>
 
           <div>
@@ -124,14 +130,14 @@ export default function LiveAuction2210McKenzie() {
             <p>
               The seller has provided an estimated after-repair value
               (ARV) of $230,000. This estimate is for reference only and
-              is not a guarantee of value. Buyers are encouraged to
-              perform independent analysis.
+              is not a guarantee of value.
             </p>
 
             <p>
               The seller retains full discretion over bid acceptance and
               is under no obligation to accept any offer submitted during
-              the auction.
+              the auction. A reserve price has been set but is not
+              publicly disclosed.
             </p>
           </div>
         </div>
@@ -147,8 +153,8 @@ export default function LiveAuction2210McKenzie() {
               <li>• Property Type: Single-Family</li>
               <li>• Bedrooms: 3</li>
               <li>• Bathrooms: 2</li>
-              <li>• Square Footage: Approx. 1,606 SF</li>
-              <li>• Lot Size: Approx. 0.19 Acres</li>
+              <li>• Square Footage: 1,606 SF</li>
+              <li>• Lot Size: 0.19 Acres</li>
               <li>• Year Built: 1926</li>
               <li>• Occupancy: Vacant</li>
             </ul>
@@ -161,6 +167,7 @@ export default function LiveAuction2210McKenzie() {
 
             <ul className="mt-6 space-y-3 text-sm text-gray-600">
               <li>• Property sold as-is</li>
+              <li>• Minimum bid increments of $5,000</li>
               <li>• Seller retains bid acceptance control</li>
               <li>• No obligation to accept any offer</li>
               <li>• Buyer approval required</li>
