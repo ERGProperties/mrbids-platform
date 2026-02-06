@@ -6,6 +6,14 @@ export const metadata: Metadata = {
     "Auction outcome for 2210 McKenzie Ave, Waco TX on the MrBids seller-direct auction platform.",
 };
 
+/**
+ * RESULT STATE OPTIONS:
+ * - "under_contract"
+ * - "sold"
+ * - "no_sale"
+ */
+const RESULT_STATE: "under_contract" | "sold" | "no_sale" = "under_contract";
+
 export default function AuctionResult2210McKenzie() {
   return (
     <main className="bg-gray-50 min-h-screen">
@@ -20,16 +28,61 @@ export default function AuctionResult2210McKenzie() {
           </h1>
         </div>
 
-        {/* RESULT STATUS */}
+        {/* STATUS CARD */}
         <div className="bg-white border border-gray-200 rounded-2xl p-10 mb-12 text-center">
-          <h2 className="text-2xl font-semibold text-gray-900">
-            Auction Closed
-          </h2>
+          {RESULT_STATE === "under_contract" && (
+            <>
+              <span className="inline-block mb-4 px-4 py-1 text-xs font-medium uppercase tracking-widest rounded-full bg-yellow-100 text-yellow-800">
+                Under Contract
+              </span>
 
-          <p className="mt-6 text-lg text-gray-600">
-            The auction for this property has officially concluded.
-          </p>
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Auction Concluded — Property Under Contract
+              </h2>
 
+              <p className="mt-6 text-lg text-gray-600">
+                The auction has concluded and the seller has entered
+                into contract with a buyer as a result of the auction
+                process.
+              </p>
+            </>
+          )}
+
+          {RESULT_STATE === "sold" && (
+            <>
+              <span className="inline-block mb-4 px-4 py-1 text-xs font-medium uppercase tracking-widest rounded-full bg-green-100 text-green-800">
+                Sold
+              </span>
+
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Property Sold
+              </h2>
+
+              <p className="mt-6 text-lg text-gray-600">
+                This property was successfully sold through the MrBids
+                seller-direct auction platform.
+              </p>
+            </>
+          )}
+
+          {RESULT_STATE === "no_sale" && (
+            <>
+              <span className="inline-block mb-4 px-4 py-1 text-xs font-medium uppercase tracking-widest rounded-full bg-gray-100 text-gray-600">
+                Auction Closed
+              </span>
+
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Auction Closed — No Sale
+              </h2>
+
+              <p className="mt-6 text-lg text-gray-600">
+                The auction has concluded. The seller elected not to
+                accept any offers submitted during the auction period.
+              </p>
+            </>
+          )}
+
+          {/* AUCTION DETAILS */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm text-gray-600">
             <div>
               <p className="font-medium text-gray-900">Auction Ended</p>
@@ -48,24 +101,23 @@ export default function AuctionResult2210McKenzie() {
           </div>
         </div>
 
-        {/* OUTCOME MESSAGE */}
+        {/* EXPLANATION */}
         <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
           <h3 className="text-lg font-semibold text-gray-900">
-            Outcome
+            About This Auction
           </h3>
 
           <div className="mt-6 space-y-4 text-sm text-gray-600 leading-relaxed">
             <p>
-              The seller is currently reviewing auction activity and
-              engaging with interested parties. The property may move
-              forward under contract, be countered, or be relisted
-              based on seller discretion.
+              MrBids auctions are seller-direct. Sellers retain full
+              discretion over bid acceptance and are under no obligation
+              to accept any offer submitted during an auction.
             </p>
 
             <p>
-              MrBids auctions are seller-direct. The seller retains full
-              control over bid acceptance and is under no obligation to
-              accept any offer submitted during the auction.
+              Auction outcomes may include a sale, a negotiated
+              agreement, or no transaction depending on seller objectives
+              and market response.
             </p>
           </div>
         </div>
@@ -73,12 +125,12 @@ export default function AuctionResult2210McKenzie() {
         {/* NEXT STEPS */}
         <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <h3 className="text-lg font-semibold text-gray-900">
-            Interested in Similar Opportunities?
+            Looking for Similar Opportunities?
           </h3>
 
           <p className="mt-4 text-sm text-gray-600">
-            New auctions are added periodically. Buyer access is required
-            to participate.
+            Browse current auctions or request buyer access to
+            participate in upcoming listings.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
@@ -100,8 +152,8 @@ export default function AuctionResult2210McKenzie() {
 
         {/* FOOTNOTE */}
         <p className="mt-12 text-xs text-gray-400 leading-relaxed text-center">
-          Auction results and outcomes are provided for informational
-          purposes only and do not constitute an offer or guarantee.
+          Auction results are provided for informational purposes only
+          and do not constitute an offer or guarantee.
         </p>
       </div>
     </main>
