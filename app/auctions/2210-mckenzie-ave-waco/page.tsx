@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import Countdown from "./Countdown";
 
 export const metadata: Metadata = {
@@ -7,7 +8,15 @@ export const metadata: Metadata = {
     "Seller-direct real estate auction featuring a full-rehab residential property in Waco, Texas.",
 };
 
+// 🔒 LOCKED AUCTION END (Central Time)
+const AUCTION_END = new Date("2026-02-15T17:00:00-06:00");
+
 export default function LiveAuction2210McKenzie() {
+  // ⛔ SERVER-SIDE CHECK
+  if (Date.now() >= AUCTION_END.getTime()) {
+    redirect("/auctions/2210-mckenzie-ave-waco/result");
+  }
+
   const photos = [
     "01-curbside.jpg",
     "02-front.jpg",
@@ -67,9 +76,7 @@ export default function LiveAuction2210McKenzie() {
           </div>
 
           <div>
-            <p className="text-sm font-medium text-gray-900">
-              Bid Increment
-            </p>
+            <p className="text-sm font-medium text-gray-900">Bid Increment</p>
             <p className="mt-2 text-sm text-gray-600">$5,000</p>
           </div>
 
@@ -123,8 +130,7 @@ export default function LiveAuction2210McKenzie() {
               The property requires a full rehabilitation. Interior
               finishes, mechanical systems, and exterior components
               should be evaluated by buyers as part of their due
-              diligence. This offering is best suited for experienced
-              investors or renovation-focused buyers.
+              diligence.
             </p>
 
             <p>
@@ -132,47 +138,6 @@ export default function LiveAuction2210McKenzie() {
               (ARV) of $230,000. This estimate is for reference only and
               is not a guarantee of value.
             </p>
-
-            <p>
-              The seller retains full discretion over bid acceptance and
-              is under no obligation to accept any offer submitted during
-              the auction. A reserve price has been set but is not
-              publicly disclosed.
-            </p>
-          </div>
-        </div>
-
-        {/* PROPERTY FACTS + AUCTION TERMS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <div className="bg-white border border-gray-200 rounded-2xl p-8">
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">
-              Property Facts
-            </h3>
-
-            <ul className="mt-6 space-y-3 text-sm text-gray-600">
-              <li>• Property Type: Single-Family</li>
-              <li>• Bedrooms: 3</li>
-              <li>• Bathrooms: 2</li>
-              <li>• Square Footage: 1,606 SF</li>
-              <li>• Lot Size: 0.19 Acres</li>
-              <li>• Year Built: 1926</li>
-              <li>• Occupancy: Vacant</li>
-            </ul>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-2xl p-8">
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">
-              Auction Terms
-            </h3>
-
-            <ul className="mt-6 space-y-3 text-sm text-gray-600">
-              <li>• Property sold as-is</li>
-              <li>• Minimum bid increments of $5,000</li>
-              <li>• Seller retains bid acceptance control</li>
-              <li>• No obligation to accept any offer</li>
-              <li>• Buyer approval required</li>
-              <li>• Funds flow through licensed escrow</li>
-            </ul>
           </div>
         </div>
 
@@ -195,13 +160,6 @@ export default function LiveAuction2210McKenzie() {
             </a>
           </div>
         </div>
-
-        {/* FOOTNOTE */}
-        <p className="mt-12 text-xs text-gray-400 leading-relaxed">
-          Auction closes automatically at the stated date and time.
-          Late bids will not be accepted. All information is provided
-          for general reference only and is subject to buyer due diligence.
-        </p>
       </div>
     </main>
   );
