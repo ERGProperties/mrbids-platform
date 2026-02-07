@@ -1,12 +1,21 @@
+export type AuctionStatus = "live" | "closed";
+export type AuctionResult = "under_contract" | "sold" | "no_sale" | null;
+
 export type Auction = {
   slug: string;
   title: string;
   address: string;
   cityState: string;
+
+  // 🔐 ADMIN CONTROLS
+  status: AuctionStatus;       // live or closed
+  result: AuctionResult;       // result page state
+
   endTime: string;
   startingBid: string;
   bidIncrement: string;
   arv: string;
+
   facts: {
     beds: number;
     baths: number;
@@ -14,6 +23,7 @@ export type Auction = {
     lot: string;
     year: number;
   };
+
   photos: string[];
 };
 
@@ -23,10 +33,16 @@ export const auctions: Auction[] = [
     title: "2210 McKenzie Ave",
     address: "2210 McKenzie Ave",
     cityState: "Waco, TX 76708",
+
+    // 🔐 ADMIN TOGGLES
+    status: "live",                // ← change to "closed"
+    result: "under_contract",      // ← sold | no_sale | null
+
     endTime: "2026-02-15T17:00:00-06:00",
     startingBid: "$100,000",
     bidIncrement: "$5,000",
     arv: "$230,000",
+
     facts: {
       beds: 3,
       baths: 2,
@@ -34,6 +50,7 @@ export const auctions: Auction[] = [
       lot: "0.19 Acres",
       year: 1926,
     },
+
     photos: [
       "01-curbside.jpg",
       "02-front.jpg",

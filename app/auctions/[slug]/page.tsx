@@ -10,11 +10,12 @@ export default function AuctionPage({
   const auction = auctions.find((a) => a.slug === params.slug);
   if (!auction) return notFound();
 
-  const endTime = new Date(auction.endTime);
-
-  if (Date.now() >= endTime.getTime()) {
+  // 🔐 ADMIN OVERRIDE
+  if (auction.status === "closed") {
     redirect(`/auctions/${auction.slug}/result`);
   }
+
+  const endTime = new Date(auction.endTime);
 
   return (
     <main className="bg-gray-50 min-h-screen">
@@ -24,7 +25,7 @@ export default function AuctionPage({
         </h1>
         <p className="mt-2 text-lg text-gray-600">{auction.cityState}</p>
 
-        <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 bg-white p-6 rounded-2xl border">
+        <div className="mt-10 bg-white border rounded-2xl p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div>
             <p className="text-sm font-medium">Auction Ends</p>
             <p className="text-sm">{endTime.toLocaleString()}</p>
@@ -48,8 +49,8 @@ export default function AuctionPage({
             <img
               key={photo}
               src={`/auctions/${auction.slug}/${photo}`}
-              className="rounded-xl object-cover border"
               alt=""
+              className="rounded-xl object-cover border"
             />
           ))}
         </div>
