@@ -33,7 +33,11 @@ export default function AuctionsIndex() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20">
             {liveAuctions.map((auction) => (
-              <AuctionCard key={auction.slug} auction={auction} />
+              <AuctionCard
+                key={auction.slug}
+                auction={auction}
+                isPast={false}
+              />
             ))}
           </div>
         )}
@@ -68,9 +72,13 @@ function AuctionCard({
   auction: any;
   isPast?: boolean;
 }) {
+  const href = isPast
+    ? `/auctions/${auction.slug}/result`
+    : `/auctions/${auction.slug}`;
+
   return (
     <Link
-      href={`/auctions/${auction.slug}`}
+      href={href}
       className={`block bg-white border border-gray-200 rounded-2xl overflow-hidden transition ${
         isPast ? "opacity-70 hover:opacity-100" : "hover:shadow-md"
       }`}
