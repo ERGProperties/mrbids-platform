@@ -108,20 +108,53 @@ function AuctionCard({
           {auction.cityStateZip}
         </p>
 
-        <div className="mt-4 flex justify-between text-sm text-gray-600">
-          <span>
-            Starting Bid: $
-            {auction.startingBid.toLocaleString()}
-          </span>
-
-          {auction.arv && (
+        {/* LIVE AUCTION META */}
+        {!isPast && (
+          <div className="mt-4 flex justify-between text-sm text-gray-600">
             <span>
-              ARV: ${auction.arv.toLocaleString()}
+              Starting Bid: $
+              {auction.startingBid.toLocaleString()}
             </span>
-          )}
-        </div>
 
-        <div className="mt-4 text-sm font-medium text-black">
+            {auction.arv && (
+              <span>
+                ARV: ${auction.arv.toLocaleString()}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* PAST AUCTION RESULTS */}
+        {isPast && (
+          <div className="mt-4 grid grid-cols-3 gap-4 text-sm text-gray-700">
+            <div>
+              <p className="font-medium text-gray-900">Final Price</p>
+              <p className="mt-1">
+                {auction.finalPrice
+                  ? `$${auction.finalPrice.toLocaleString()}`
+                  : "—"}
+              </p>
+            </div>
+
+            <div>
+              <p className="font-medium text-gray-900">Bids</p>
+              <p className="mt-1">
+                {auction.bidCount ?? "—"}
+              </p>
+            </div>
+
+            <div>
+              <p className="font-medium text-gray-900">Duration</p>
+              <p className="mt-1">
+                {auction.durationDays
+                  ? `${auction.durationDays} days`
+                  : "—"}
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-6 text-sm font-medium text-black">
           {isPast ? "View Result →" : "View Auction →"}
         </div>
       </div>
