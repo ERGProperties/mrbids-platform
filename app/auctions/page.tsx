@@ -6,9 +6,14 @@ export const dynamic = "force-dynamic";
 export default function AuctionsIndex() {
   const now = Date.now();
 
-  const liveAuctions = allAuctions.filter(
-    (auction) => new Date(auction.auctionEnd).getTime() > now
-  );
+  const liveAuctions = allAuctions
+    .filter((auction): auction is NonNullable<typeof auction> => {
+      return Boolean(auction && auction.auctionEnd);
+    })
+    .filter(
+      (auction) =>
+        new Date(auction.auctionEnd).getTime() > now
+    );
 
   return (
     <main className="bg-gray-50 min-h-screen">
@@ -58,7 +63,7 @@ export default function AuctionsIndex() {
                     )}
                   </div>
 
-                  <div className="mt-4 inline-block text-sm font-medium text-black">
+                  <div className="mt-4 text-sm font-medium text-black">
                     View Auction →
                   </div>
                 </div>
