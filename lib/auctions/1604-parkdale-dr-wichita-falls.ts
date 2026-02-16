@@ -1,4 +1,4 @@
-import { AuctionConfig } from "../auctionTypes";
+import { AuctionConfig } from "@/lib/auctionTypes";
 
 export const auction1604Parkdale: AuctionConfig = {
   slug: "1604-parkdale-dr-wichita-falls",
