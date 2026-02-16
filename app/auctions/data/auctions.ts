@@ -8,8 +8,8 @@ export type Auction = {
   cityState: string;
 
   // 🔐 ADMIN CONTROLS
-  status: AuctionStatus;       // live or closed
-  result: AuctionResult;       // result page state
+  status: AuctionStatus;
+  result: AuctionResult;
 
   endTime: string;
   startingBid: string;
@@ -34,9 +34,9 @@ export const auctions: Auction[] = [
     address: "2210 McKenzie Ave",
     cityState: "Waco, TX 76708",
 
-    // 🔐 ADMIN TOGGLES
-    status: "live",                // ← change to "closed"
-    result: "under_contract",      // ← sold | no_sale | null
+    // 🔐 AUCTION #1 — CLOSED
+    status: "closed",
+    result: "no_sale",
 
     endTime: "2026-02-15T17:00:00-06:00",
     startingBid: "$100,000",
