@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { allAuctions } from "@/lib/auctions";
 
+export const dynamic = "force-dynamic";
+
 export default function AuctionsIndex() {
   const now = Date.now();
 
@@ -49,10 +51,11 @@ export default function AuctionsIndex() {
                       Starting Bid: $
                       {auction.startingBid.toLocaleString()}
                     </span>
-                    <span>
-                      ARV: $
-                      {auction.arv?.toLocaleString()}
-                    </span>
+                    {auction.arv && (
+                      <span>
+                        ARV: ${auction.arv.toLocaleString()}
+                      </span>
+                    )}
                   </div>
 
                   <div className="mt-4 inline-block text-sm font-medium text-black">
