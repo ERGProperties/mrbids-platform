@@ -1,147 +1,194 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import Countdown from "./Countdown";
+import { AuctionImageGallery } from "../../../components/AuctionImageGallery";
 
 export const metadata: Metadata = {
-  title:
-    "Live Auction — 1604 Parkdale Dr, Wichita Falls TX | MrBids",
+  title: "Live Auction — 1604 Parkdale Dr, Wichita Falls TX | MrBids",
   description:
-    "Seller-direct real estate auction featuring a light rehab opportunity in Wichita Falls, Texas.",
+    "Seller-direct real estate auction featuring a single-family residential property in Wichita Falls, Texas.",
 };
 
-export default function AuctionParkdale() {
+// 🔒 LOCKED AUCTION END (Central Time)
+const AUCTION_END = new Date("2026-02-21T17:00:00-06:00");
+
+const images = [
+  "/auctions/1604-parkdale-dr-wichita-falls/01-house-front.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/02-dining-room.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/03-foyer.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/04-family-room.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/05-kitchen.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/06-hallway.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/07-bedroom-1.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/08-bedroom-2.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/09-bedroom-3.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/10-bedroom-4.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/11-bathroom-1.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/12-bathroom-2.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/13-laundry-room.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/14-back-patio.jpeg",
+  "/auctions/1604-parkdale-dr-wichita-falls/15-house-back.jpeg",
+];
+
+export default function LiveAuction1604Parkdale() {
+  // ⛔ SERVER-SIDE AUCTION CLOSE CHECK
+  if (Date.now() >= AUCTION_END.getTime()) {
+    redirect("/auctions/1604-parkdale-dr-wichita-falls/result");
+  }
+
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-32">
-
         {/* HEADER */}
-        <div className="mb-16">
+        <div className="mb-12">
           <p className="text-xs uppercase tracking-widest text-gray-400">
-            Live Seller-Direct Auction
+            Live Auction
           </p>
           <h1 className="mt-4 text-4xl font-semibold text-gray-900">
-            1604 Parkdale Dr, Wichita Falls TX 76306
+            1604 Parkdale Dr, Wichita Falls, TX
           </h1>
-          <p className="mt-6 text-lg text-gray-600">
-            4 Bed • 2 Bath • 2,134 SF • Light Rehab Opportunity
+          <p className="mt-4 text-lg text-gray-600">
+            Single-Family Residence • Value-Add Opportunity
           </p>
         </div>
 
-        {/* AUCTION SUMMARY */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm">
-            <div>
-              <p className="text-gray-400">Auction Status</p>
-              <p className="font-medium text-gray-900">Live</p>
-            </div>
-            <div>
-              <p className="text-gray-400">Starting Bid</p>
-              <p className="font-medium text-gray-900">$50,000</p>
-            </div>
-            <div>
-              <p className="text-gray-400">Bid Increment</p>
-              <p className="font-medium text-gray-900">$2,500</p>
-            </div>
-            <div>
-              <p className="text-gray-400">Seller ARV</p>
-              <p className="font-medium text-gray-900">$195,000</p>
-            </div>
+        {/* AUCTION STATUS */}
+        <div className="mb-12 bg-white border border-gray-200 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-6 gap-6">
+          <div>
+            <p className="text-sm font-medium text-gray-900">Auction Status</p>
+            <p className="mt-2 text-sm text-gray-600">Live</p>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-gray-900">Auction Ends</p>
+            <p className="mt-2 text-sm text-gray-600">
+              Feb 21, 2026 • 5:00 PM CT
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-gray-900">
+              Time Remaining
+            </p>
+            <Countdown />
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-gray-900">Starting Bid</p>
+            <p className="mt-2 text-sm text-gray-600">$50,000</p>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-gray-900">Bid Increment</p>
+            <p className="mt-2 text-sm text-gray-600">$2,500</p>
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-gray-900">
+              Seller ARV (Post-Rehab)
+            </p>
+            <p className="mt-2 text-sm text-gray-600">
+              $195,000 (Seller Estimate)
+            </p>
           </div>
         </div>
 
-        {/* PROPERTY OVERVIEW */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Property Overview
+        {/* PHOTO GALLERY */}
+        <div className="mb-16">
+          <h2 className="text-lg font-semibold text-gray-900 mb-6">
+            Property Photos
           </h2>
-
-          <p className="mt-6 text-sm text-gray-600 leading-relaxed">
-            Located in Wichita Falls, this four-bedroom, two-bathroom
-            home offers over 2,100 square feet of interior space and a
-            functional layout well-suited for renovation and resale or
-            rental repositioning.
-          </p>
-
-          <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-            The property requires light rehabilitation, making it an
-            accessible opportunity for investors seeking manageable
-            scope and clear upside.
-          </p>
+          <AuctionImageGallery images={images} />
         </div>
 
-        {/* PROPERTY FACTS */}
+        {/* PROPERTY DESCRIPTION */}
         <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
           <h2 className="text-lg font-semibold text-gray-900">
-            Property Facts
+            Property Description
           </h2>
 
-          <ul className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-y-4 text-sm text-gray-600">
-            <li>• Bedrooms: 4</li>
-            <li>• Bathrooms: 2</li>
-            <li>• Living Area: 2,134 SF</li>
-            <li>• Lot Size: 0.206 Acres</li>
-            <li>• Year Built: 1961</li>
-            <li>• Condition: Light Rehab Required</li>
-          </ul>
+          <div className="mt-6 space-y-4 text-sm text-gray-600 leading-relaxed">
+            <p>
+              1604 Parkdale Dr is a single-family residential property
+              located in Wichita Falls, Texas. The property is being
+              offered through a seller-direct auction on MrBids.
+            </p>
+
+            <p>
+              The property presents a value-add opportunity for buyers.
+              Interior finishes and mechanical systems should be
+              evaluated as part of buyer due diligence.
+            </p>
+
+            <p>
+              The seller has provided an estimated after-repair value
+              (ARV) of $195,000. This estimate is for reference only and
+              is not a guarantee of value.
+            </p>
+
+            <p>
+              The seller retains full discretion over bid acceptance.
+              The property is being sold as-is.
+            </p>
+          </div>
         </div>
 
-        {/* INVESTMENT NOTES */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Investment Notes
-          </h2>
+        {/* PROPERTY FACTS + AUCTION TERMS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8">
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">
+              Property Facts
+            </h3>
 
-          <ul className="mt-6 space-y-3 text-sm text-gray-600">
-            <li>• Spacious layout with strong bedroom count</li>
-            <li>• Suitable for resale or rental strategy</li>
-            <li>• Manageable rehab scope compared to full renovations</li>
-            <li>• ARV supported by neighborhood comparables (seller estimate)</li>
-          </ul>
+            <ul className="mt-6 space-y-3 text-sm text-gray-600">
+              <li>• Property Type: Single-Family</li>
+              <li>• Bedrooms: 4</li>
+              <li>• Bathrooms: 2</li>
+              <li>• Occupancy: Vacant</li>
+            </ul>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-8">
+            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-widest">
+              Auction Terms
+            </h3>
+
+            <ul className="mt-6 space-y-3 text-sm text-gray-600">
+              <li>• Property sold as-is</li>
+              <li>• Minimum bid increments of $2,500</li>
+              <li>• Seller retains bid acceptance control</li>
+              <li>• No obligation to accept any offer</li>
+              <li>• Buyer approval required</li>
+            </ul>
+          </div>
         </div>
 
-        {/* AUCTION TERMS */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Auction Structure & Terms
-          </h2>
+        {/* 👉 REQUEST ACCESS CTA (MOVED HERE — AFTER DETAILS) */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 mb-12 text-center">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Want to Place a Bid?
+          </h3>
 
-          <ul className="mt-6 space-y-3 text-sm text-gray-600">
-            <li>• Seller-direct auction format</li>
-            <li>• Investor buyers only</li>
-            <li>• As-is sale</li>
-            <li>• Reserve price set (not publicly disclosed)</li>
-            <li>
-              • If the auction concludes without a qualifying bid, the
-              seller may engage interested parties post-auction
-            </li>
-          </ul>
-        </div>
-
-        {/* CTA */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Request Buyer Access
-          </h2>
-          <p className="mt-4 text-sm text-gray-600">
-            Verified buyers may request access to participate in this auction.
+          <p className="mt-4 text-sm text-gray-600 max-w-xl mx-auto">
+            Participation in this auction is limited to approved buyers.
+            You must request and receive access before submitting any bids.
           </p>
 
-          <a
-            href="/join"
-            className="inline-block mt-8 px-10 py-4 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
-          >
-            Request Access
-          </a>
-
-          <p className="mt-6 text-xs text-gray-400">
-            Approval required. No obligation to bid.
-          </p>
+          <div className="mt-8">
+            <a
+              href="/join"
+              className="inline-block px-10 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
+            >
+              Request Buyer Access
+            </a>
+          </div>
         </div>
 
         {/* FOOTNOTE */}
-        <p className="mt-12 text-xs text-gray-400 leading-relaxed text-center">
-          MrBids auctions are administered to facilitate seller-direct
-          price discovery. Auction participation does not guarantee a
-          sale or acceptance of any bid. All information is provided for
-          informational purposes only.
+        <p className="mt-12 text-xs text-gray-400 leading-relaxed">
+          Auction closes automatically at the stated date and time.
+          Late bids will not be accepted. All information is provided
+          for general reference only and is subject to buyer due diligence.
         </p>
       </div>
     </main>
