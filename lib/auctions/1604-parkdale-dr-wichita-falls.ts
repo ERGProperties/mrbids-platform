@@ -1,4 +1,21 @@
-import { AuctionConfig } from "@/lib/auctionTypes";
+export type AuctionConfig = {
+  slug: string;
+  title: string;
+  addressLine: string;
+  cityStateZip: string;
+
+  auctionEnd: string;
+  startingBid: number;
+  bidIncrement: number;
+  arv?: number;
+
+  imagesPath: string;
+  images: string[];
+
+  description: string[];
+  propertyFacts: string[];
+  auctionTerms: string[];
+};
 
 export const auction1604Parkdale: AuctionConfig = {
   slug: "1604-parkdale-dr-wichita-falls",
