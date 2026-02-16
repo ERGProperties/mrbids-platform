@@ -1,97 +1,68 @@
-import type { Metadata } from "next";
+import Link from "next/link";
+import { allAuctions } from "@/lib/auctions";
 
-export const metadata: Metadata = {
-  title: "Auctions | MrBids",
-  description: "Browse live and completed real estate auctions on MrBids.",
-};
-
-// 🔒 AUCTION END TIMES (centralized, explicit)
-const AUCTIONS = [
-  {
-    id: "2210-mckenzie-ave-waco",
-    title: "2210 McKenzie Ave",
-    location: "Waco, TX",
-    href: "/auctions/2210-mckenzie-ave-waco",
-    endTime: new Date("2026-02-15T17:00:00-06:00"),
-    startingBid: "$100,000",
-  },
-];
-
-export default function AuctionsPage() {
+export default function AuctionsIndex() {
   const now = Date.now();
+
+  const liveAuctions = allAuctions.filter(
+    (auction) => new Date(auction.auctionEnd).getTime() > now
+  );
 
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-32">
-        {/* HEADER */}
-        <div className="mb-14">
-          <h1 className="text-4xl font-semibold text-gray-900">
-            Auctions
-          </h1>
-          <p className="mt-6 text-lg text-gray-600">
-            Seller-direct real estate auctions with transparent terms and
-            controlled participation.
+        <h1 className="text-4xl font-semibold text-gray-900 mb-12">
+          Live Auctions
+        </h1>
+
+        {liveAuctions.length === 0 ? (
+          <p className="text-gray-600">
+            There are currently no live auctions.
           </p>
-        </div>
-
-        {/* AUCTIONS LIST */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {AUCTIONS.map((auction) => {
-            const isClosed = now >= auction.endTime.getTime();
-
-            return (
-              <div
-                key={auction.id}
-                className="bg-white border border-gray-200 rounded-2xl p-8 flex flex-col justify-between"
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {liveAuctions.map((auction) => (
+              <Link
+                key={auction.slug}
+                href={`/auctions/${auction.slug}`}
+                className="block bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-md transition"
               >
-                <div>
-                  {/* STATUS BADGE */}
-                  <div className="mb-4">
-                    {isClosed ? (
-                      <span className="inline-block text-xs font-medium uppercase tracking-widest px-3 py-1 rounded-full bg-gray-100 text-gray-600">
-                        Auction Closed
-                      </span>
-                    ) : (
-                      <span className="inline-block text-xs font-medium uppercase tracking-widest px-3 py-1 rounded-full bg-green-100 text-green-700">
-                        Live Auction
-                      </span>
-                    )}
+                <div className="aspect-[4/3] bg-gray-100">
+                  <img
+                    src={`${auction.imagesPath}/${auction.images[0]}`}
+                    alt="Auction property"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
+                <div className="p-6">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    {auction.addressLine}
+                  </h2>
+
+                  <p className="mt-1 text-sm text-gray-600">
+                    {auction.cityStateZip}
+                  </p>
+
+                  <div className="mt-4 flex justify-between text-sm text-gray-600">
+                    <span>
+                      Starting Bid: $
+                      {auction.startingBid.toLocaleString()}
+                    </span>
+                    <span>
+                      ARV: $
+                      {auction.arv?.toLocaleString()}
+                    </span>
                   </div>
 
-                  {/* TITLE */}
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {auction.title}
-                  </h2>
-                  <p className="mt-2 text-sm text-gray-600">
-                    {auction.location}
-                  </p>
-
-                  {/* DETAILS */}
-                  <p className="mt-6 text-sm text-gray-600">
-                    Starting Bid:{" "}
-                    <span className="font-medium text-gray-900">
-                      {auction.startingBid}
-                    </span>
-                  </p>
+                  <div className="mt-4 inline-block text-sm font-medium text-black">
+                    View Auction →
+                  </div>
                 </div>
-
-                {/* CTA */}
-                <div className="mt-8">
-                  <a
-                    href={
-                      isClosed
-                        ? `${auction.href}/result`
-                        : auction.href
-                    }
-                    className="inline-block w-full text-center px-6 py-3 rounded-full text-sm font-medium border border-gray-300 hover:border-gray-400 transition"
-                  >
-                    {isClosed ? "View Auction Result" : "View Auction"}
-                  </a>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
