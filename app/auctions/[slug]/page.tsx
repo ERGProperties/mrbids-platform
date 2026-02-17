@@ -9,10 +9,13 @@ function getPrimaryImage(
   images: unknown,
   imagesPath: string
 ): string | null {
-  if (!Array.isArray(images) || images.length === 0) return null
+  if (!Array.isArray(images) || images.length === 0)
+    return null
 
   const files = images as string[]
-  const primary = files.find((f) => f.startsWith("01-"))
+  const primary = files.find((f) =>
+    f.startsWith("01-")
+  )
   const file = primary ?? files[0]
 
   return file ? `${imagesPath}/${file}` : null
@@ -33,12 +36,14 @@ export default async function AuctionPage({
     },
   })
 
-  if (!auction) notFound()
+  if (!auction) {
+    notFound()
+  }
 
   const now = new Date()
 
-  // 🔒 Redirect if auction ended
-  if (now > auction.endsAt) {
+  // 🔒 Redirect if auction has ended
+  if (now > auction.endAt) {
     redirect(`/auctions/${auction.slug}/result`)
   }
 
@@ -47,7 +52,8 @@ export default async function AuctionPage({
     auction.finalPrice ??
     auction.startingBid
 
-  const minimumBid = highestBid + auction.bidIncrement
+  const minimumBid =
+    highestBid + auction.bidIncrement
 
   const image = getPrimaryImage(
     auction.images,
@@ -66,7 +72,7 @@ export default async function AuctionPage({
         bidIncrement: auction.bidIncrement,
         highestBid,
         arv: auction.arv,
-        endsAt: auction.endsAt.toISOString(),
+        endsAt: auction.endAt.toISOString(), // 👈 client expects endsAt string
         image,
       }}
       minimumBid={minimumBid}
