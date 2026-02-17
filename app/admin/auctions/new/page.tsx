@@ -46,12 +46,6 @@ export default function NewAuctionPage() {
             <Input label="End Time (ISO)" name="endAt" required />
           </div>
 
-          <Input
-            label="Images Path (public/...)"
-            name="imagesPath"
-            required
-          />
-
           {error && (
             <p className="text-sm text-red-600">{error}</p>
           )}

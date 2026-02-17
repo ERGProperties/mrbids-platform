@@ -11,7 +11,6 @@ export async function createAuction(formData: FormData) {
   const slug = String(formData.get("slug") || "").trim();
   const addressLine = String(formData.get("addressLine") || "").trim();
   const cityStateZip = String(formData.get("cityStateZip") || "").trim();
-  const imagesPath = String(formData.get("imagesPath") || "").trim();
 
   const startingBid = Number(formData.get("startingBid"));
   const bidIncrement = Number(formData.get("bidIncrement"));
@@ -25,12 +24,14 @@ export async function createAuction(formData: FormData) {
   assert(slug, "Slug is required");
   assert(addressLine, "Address is required");
   assert(cityStateZip, "City/State/ZIP is required");
-  assert(imagesPath, "Images path is required");
   assert(startingBid > 0, "Starting bid must be > 0");
   assert(bidIncrement > 0, "Bid increment must be > 0");
   assert(endAt > startAt, "Auction end must be after start");
 
-  // 🔍 Infer primary image (01-*)
+  // ✅ AUTO-GENERATED (NO ADMIN INPUT)
+  const imagesPath = `/auctions/${slug}`;
+
+  // ✅ Primary image convention
   const primaryImage = "01-house-front.jpeg";
 
   await prisma.auction.create({
@@ -39,6 +40,7 @@ export async function createAuction(formData: FormData) {
       slug,
       addressLine,
       cityStateZip,
+
       imagesPath,
       images: [primaryImage],
 
