@@ -6,13 +6,19 @@ import { autoCloseExpiredAuctions } from "@/lib/auctionLifecycle";
  * Returns the primary (01-*) image URL or null
  */
 function getPrimaryImage(
-  images: string[] | null,
+  images: unknown,
   imagesPath: string
 ): string | null {
-  if (!images || images.length === 0) return null;
+  if (!Array.isArray(images)) return null;
 
-  const primary = images.find((img) => img.startsWith("01-"));
-  const file = primary ?? images[0];
+  const files = images as string[];
+  if (files.length === 0) return null;
+
+  const primary = files.find(
+    (img) => typeof img === "string" && img.startsWith("01-")
+  );
+
+  const file = primary ?? files[0];
 
   return file ? `${imagesPath}/${file}` : null;
 }
