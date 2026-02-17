@@ -24,9 +24,19 @@ export async function submitBid(
     throw new Error("Auction not found")
   }
 
+  // ✅ FIX: get userId from DB via email
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+    select: { id: true },
+  })
+
+  if (!user) {
+    throw new Error("User not found")
+  }
+
   await placeBid({
     auctionId: auction.id,
-    userId: session.user.id!,
+    userId: user.id,
     amount,
   })
 
