@@ -1,39 +1,52 @@
-import { notFound } from "next/navigation";
-import { auctions } from "../../data/auctions";
+import { notFound } from "next/navigation"
+import { prisma } from "@/lib/db"
+import ResultClient from "./ResultClient"
 
-export default function AuctionResult({
+export const dynamic = "force-dynamic"
+
+export default async function AuctionResult({
   params,
 }: {
-  params: { slug: string };
+  params: { slug: string }
 }) {
-  const auction = auctions.find((a) => a.slug === params.slug);
-  if (!auction) return notFound();
+  const auction = await prisma.auction.findUnique({
+    where: { slug: params.slug },
+    include: {
+      bids: {
+        orderBy: { amount: "desc" },
+        take: 1,
+        include: { bidder: true },
+      },
+    },
+  })
+
+  if (!auction) {
+    notFound()
+  }
+
+  const winningBid = auction.bids[0] ?? null
 
   return (
-    <main className="bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto px-6 py-32 text-center">
-        <h1 className="text-3xl font-semibold">{auction.address}</h1>
-
-        <p className="mt-6 text-lg text-gray-700">
-          {auction.result === "sold" && "Property Sold"}
-          {auction.result === "under_contract" && "Under Contract"}
-          {auction.result === "no_sale" && "Auction Closed — No Sale"}
-          {!auction.result && "Auction Closed"}
-        </p>
-
-        <div className="mt-10">
-          <a href="/auctions" className="underline">
-            Browse Other Auctions
-          </a>
-        </div>
-      </div>
-    </main>
-  );
+    <ResultClient
+      auction={{
+        id: auction.id,
+        slug: auction.slug,
+        addressLine: auction.addressLine,
+        cityStateZip: auction.cityStateZip,
+        finalPrice:
+          auction.finalPrice ??
+          winningBid?.amount ??
+          auction.startingBid,
+        status: auction.status,
+        result: auction.result,
+        winnerEmail: winningBid?.bidder?.email ?? null,
+        escrowStatus: auction.escrowStatus,
+        escrowAmount: auction.escrowAmount,
+        escrowDueBy: auction.escrowDueBy
+          ? auction.escrowDueBy.toISOString()
+          : null,
+      }}
+    />
+  )
 }
-
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/authOptions"
-
-const session = await getServerSession(authOptions)
-if (!session) notFound()
 
