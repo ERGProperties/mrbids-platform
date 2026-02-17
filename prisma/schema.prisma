@@ -36,11 +36,14 @@ model Auction {
 
 model Bid {
   id        String   @id @default(cuid())
-  auctionId String
   amount    Int
   createdAt DateTime @default(now())
 
-  auction   Auction @relation(fields: [auctionId], references: [id])
+  auctionId String
+  auction   Auction  @relation(fields: [auctionId], references: [id])
+
+  bidderId  String   // placeholder (user / wallet later)
 
   @@index([auctionId, createdAt])
 }
+
