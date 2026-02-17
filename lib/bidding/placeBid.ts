@@ -1,83 +1,89 @@
-import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/db"
+import {
+  AUCTION_EXTENSION_WINDOW_MINUTES,
+  AUCTION_EXTENSION_DURATION_MINUTES,
+} from "@/lib/auctionRules"
+import { sendOutbidEmail } from "@/lib/email/sendOutbidEmail"
 
-// Anti-sniping configuration
-const SNIPING_WINDOW_MINUTES = 5;
-const EXTEND_BY_MINUTES = 5;
-
-export async function placeBid(
-  auctionId: string,
+export async function placeBid({
+  auctionId,
+  userId,
+  amount,
+}: {
+  auctionId: string
+  userId: string
   amount: number
-) {
-  const auction = await prisma.auction.findUnique({
-    where: { id: auctionId },
-    include: {
-      bids: {
-        orderBy: { amount: "desc" },
-        take: 1,
+}) {
+  return prisma.$transaction(async (tx) => {
+    const auction = await tx.auction.findUnique({
+      where: { id: auctionId },
+      include: {
+        bids: {
+          orderBy: { amount: "desc" },
+          take: 1,
+          include: { bidder: true },
+        },
       },
-    },
-  });
+    })
 
-  if (!auction) {
-    throw new Error("Auction not found");
-  }
+    if (!auction) {
+      throw new Error("Auction not found")
+    }
 
-  if (auction.status !== "LIVE") {
-    throw new Error("Auction is not live");
-  }
+    if (auction.status !== "LIVE") {
+      throw new Error("Auction is closed")
+    }
 
-  const now = new Date();
+    const now = new Date()
+    if (auction.endAt <= now) {
+      throw new Error("Auction has ended")
+    }
 
-  if (now > auction.endAt) {
-    throw new Error("Auction has ended");
-  }
+    const previousBidder = auction.bids[0]?.bidder
 
-  const highestBid =
-    auction.bids[0]?.amount ??
-    auction.finalPrice ??
-    auction.startingBid;
-
-  const minimumNextBid =
-    highestBid + auction.bidIncrement;
-
-  if (amount < minimumNextBid) {
-    throw new Error(
-      `Bid must be at least $${minimumNextBid.toLocaleString()}`
-    );
-  }
-
-  // ⏱ Anti-sniping logic
-  const msRemaining =
-    auction.endAt.getTime() - now.getTime();
-
-  const minutesRemaining =
-    msRemaining / (1000 * 60);
-
-  let newEndAt: Date | null = null;
-
-  if (minutesRemaining <= SNIPING_WINDOW_MINUTES) {
-    newEndAt = new Date(
-      auction.endAt.getTime() +
-        EXTEND_BY_MINUTES * 60 * 1000
-    );
-  }
-
-  // 🔒 Atomic transaction
-  await prisma.$transaction([
-    prisma.bid.create({
+    // ✅ FIX: bidderId is REQUIRED
+    const bid = await tx.bid.create({
       data: {
         auctionId,
+        bidderId: userId,
         amount,
       },
-    }),
+    })
 
-    prisma.auction.update({
-      where: { id: auctionId },
-      data: {
-        bidCount: { increment: 1 },
-        finalPrice: amount,
-        ...(newEndAt ? { endAt: newEndAt } : {}),
-      },
-    }),
-  ]);
+    // Notify previous highest bidder
+    if (
+      previousBidder &&
+      previousBidder.id !== userId &&
+      previousBidder.email
+    ) {
+      await sendOutbidEmail({
+        to: previousBidder.email,
+        address: auction.addressLine,
+        auctionUrl: `${process.env.NEXTAUTH_URL}/auctions/${auction.slug}`,
+      })
+    }
+
+    // Auto-extend logic
+    const minutesRemaining =
+      (auction.endAt.getTime() - now.getTime()) / 1000 / 60
+
+    if (
+      minutesRemaining <=
+      AUCTION_EXTENSION_WINDOW_MINUTES
+    ) {
+      await tx.auction.update({
+        where: { id: auction.id },
+        data: {
+          endAt: new Date(
+            auction.endAt.getTime() +
+              AUCTION_EXTENSION_DURATION_MINUTES *
+                60 *
+                1000
+          ),
+        },
+      })
+    }
+
+    return bid
+  })
 }

@@ -30,3 +30,10 @@ export default function AuctionResult({
     </main>
   );
 }
+
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/authOptions"
+
+const session = await getServerSession(authOptions)
+if (!session) notFound()
+
