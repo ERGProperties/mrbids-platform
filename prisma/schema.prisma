@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Auction {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  addressLine   String
+  cityStateZip  String
+
+  imagesPath    String
+  images        Json     // array of image filenames
+
+  startingBid   Int
+  bidIncrement  Int
+  arv           Int?
+  finalPrice    Int?
+
+  startAt       DateTime
+  endAt         DateTime
+  status        String   // LIVE | CLOSED
+
+  bidCount      Int      @default(0)
+  durationDays  Int?
+
+  bids          Bid[]
+
+  createdAt     DateTime @default(now())
+}
+
+model Bid {
+  id        String   @id @default(cuid())
+  auctionId String
+  amount    Int
+  createdAt DateTime @default(now())
+
+  auction   Auction @relation(fields: [auctionId], references: [id])
+
+  @@index([auctionId, createdAt])
+}
