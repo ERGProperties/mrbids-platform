@@ -12,7 +12,11 @@ export default function ResultClient({
     cityStateZip: string
     finalPrice: number
     status: string
+    result: string | null
     winnerEmail: string | null
+    escrowStatus: string | null
+    escrowAmount: number | null
+    escrowDueBy: string | null
   }
 }) {
   const { data: session } = useSession()
@@ -24,11 +28,7 @@ export default function ResultClient({
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-3xl mx-auto px-6 py-32">
-        <p className="text-xs uppercase tracking-widest text-gray-400">
-          Auction Result
-        </p>
-
-        <h1 className="mt-4 text-4xl font-semibold text-gray-900">
+        <h1 className="text-3xl font-semibold">
           {auction.addressLine}
         </h1>
 
@@ -36,93 +36,76 @@ export default function ResultClient({
           {auction.cityStateZip}
         </p>
 
-        <div className="mt-10 bg-white border border-gray-200 rounded-2xl p-8">
+        <div className="mt-10 bg-white border rounded-2xl p-8">
           <p className="text-sm text-gray-500">
-            Final Sale Price
+            Final Price
           </p>
-          <p className="mt-2 text-3xl font-bold text-gray-900">
+          <p className="mt-2 text-3xl font-bold">
             ${auction.finalPrice.toLocaleString()}
           </p>
 
-          {auction.status !== "CLOSED" && (
-            <p className="mt-4 text-sm text-gray-500">
-              Result pending finalization
+          {auction.result && (
+            <p className="mt-2 text-sm text-gray-700">
+              Status:{" "}
+              {auction.result.replace("_", " ")}
             </p>
           )}
 
-          {auction.status === "CLOSED" && isWinner && (
-            <WinnerNextSteps
-              address={auction.addressLine}
-              price={auction.finalPrice}
-            />
+          {auction.status === "CLOSED" &&
+            isWinner &&
+            auction.escrowStatus ===
+              "PENDING" && (
+              <EscrowBox auction={auction} />
+            )}
+
+          {auction.escrowStatus === "RECEIVED" && (
+            <p className="mt-6 text-green-700 font-semibold">
+              Escrow received. Proceeding to closing.
+            </p>
           )}
 
-          {auction.status === "CLOSED" && !isWinner && (
-            <div className="mt-6 rounded-lg bg-gray-100 p-6">
-              <p className="text-sm font-medium text-gray-700">
-                This auction has ended
-              </p>
-              <p className="mt-2 text-sm text-gray-600">
-                Thank you for participating.
-              </p>
-            </div>
+          {auction.escrowStatus === "FAILED" && (
+            <p className="mt-6 text-red-600 font-semibold">
+              Escrow failed. Please contact support.
+            </p>
           )}
         </div>
-
-        <p className="mt-10 text-xs text-gray-400">
-          All auction results are final and subject to
-          seller approval.
-        </p>
       </div>
     </main>
   )
 }
 
-function WinnerNextSteps({
-  address,
-  price,
+function EscrowBox({
+  auction,
 }: {
-  address: string
-  price: number
+  auction: {
+    id: string
+    escrowAmount: number | null
+    escrowDueBy: string | null
+  }
 }) {
   return (
-    <div className="mt-6 rounded-lg bg-green-50 border border-green-200 p-6">
-      <p className="text-sm font-semibold text-green-700">
-        🎉 You are the winning bidder
+    <div className="mt-6 rounded-lg bg-yellow-50 border border-yellow-200 p-6">
+      <p className="font-semibold text-yellow-700">
+        Earnest Money Required
       </p>
 
-      <div className="mt-4 space-y-3 text-sm text-green-700">
-        <p>
-          <strong>Property:</strong> {address}
-        </p>
-        <p>
-          <strong>Final Price:</strong>{" "}
-          ${price.toLocaleString()}
-        </p>
-      </div>
+      <p className="mt-2 text-sm text-yellow-700">
+        Amount: $
+        {auction.escrowAmount?.toLocaleString()}
+      </p>
 
-      <div className="mt-6 space-y-3 text-sm text-green-800">
-        <p>
-          <strong>Next Steps:</strong>
-        </p>
-        <ol className="list-decimal list-inside space-y-2">
-          <li>
-            Our team will contact you within 24 hours
-            with the purchase agreement.
-          </li>
-          <li>
-            Earnest money instructions will be provided
-            via email.
-          </li>
-          <li>
-            Closing will proceed through a licensed
-            escrow or title company.
-          </li>
-        </ol>
-      </div>
+      <p className="text-sm text-yellow-700">
+        Due By:{" "}
+        {auction.escrowDueBy
+          ? new Date(
+              auction.escrowDueBy
+            ).toLocaleDateString()
+          : "—"}
+      </p>
 
-      <p className="mt-4 text-xs text-green-700">
-        Please monitor your email for instructions.
+      <p className="mt-4 text-xs text-yellow-700">
+        Wiring instructions will be emailed separately.
       </p>
     </div>
   )
