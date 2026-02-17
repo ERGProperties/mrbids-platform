@@ -6,7 +6,7 @@ import { autoCloseExpiredAuctions } from "@/lib/auctionLifecycle";
  * Returns the primary (01-*) image URL or null
  */
 function getPrimaryImage(
-  images: string[],
+  images: string[] | null,
   imagesPath: string
 ): string | null {
   if (!images || images.length === 0) return null;
@@ -40,14 +40,14 @@ export default async function AuctionsPage() {
   await autoCloseExpiredAuctions();
 
   const auctions = await getAllAuctions();
-  const now = Date.now();
+  const now = new Date();
 
   const liveAuctions = auctions.filter(
-    (a) => new Date(a.auctionEnd).getTime() > now
+    (a) => a.status === "LIVE" && a.endAt > now
   );
 
   const pastAuctions = auctions.filter(
-    (a) => new Date(a.auctionEnd).getTime() <= now
+    (a) => a.status === "CLOSED" || a.endAt <= now
   );
 
   return (
@@ -92,10 +92,12 @@ export default async function AuctionsPage() {
                           <strong>Starting Bid:</strong>{" "}
                           ${auction.startingBid.toLocaleString()}
                         </p>
-                        <p>
-                          <strong>ARV:</strong>{" "}
-                          ${auction.arv?.toLocaleString()}
-                        </p>
+                        {auction.arv && (
+                          <p>
+                            <strong>ARV:</strong>{" "}
+                            ${auction.arv.toLocaleString()}
+                          </p>
+                        )}
                       </div>
 
                       <Link
@@ -147,10 +149,12 @@ export default async function AuctionsPage() {
                       </p>
 
                       <div className="mt-4 text-sm text-gray-700 space-y-1">
-                        <p>
-                          <strong>Final Price:</strong>{" "}
-                          ${auction.finalPrice?.toLocaleString()}
-                        </p>
+                        {auction.finalPrice && (
+                          <p>
+                            <strong>Final Price:</strong>{" "}
+                            ${auction.finalPrice.toLocaleString()}
+                          </p>
+                        )}
                         <p>
                           <strong>Total Bids:</strong>{" "}
                           {auction.bidCount}
