@@ -3,41 +3,90 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
+/* =========================
+   ENUMS
+   ========================= */
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AuctionStatus {
+  DRAFT
+  LIVE
+  CLOSED
+}
+
+enum ServiceFeeStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+/* =========================
+   MODELS
+   ========================= */
 
 model Auction {
   id            String   @id @default(cuid())
-  slug          String   @unique
-  title         String
-  addressLine   String
-  cityStateZip  String
 
-  imagesPath    String
-  images        Json     // array of image filenames
+  // =========================
+  // Core Listing Info
+  // (optional during DRAFT)
+  // =========================
+  slug          String?  @unique
+  title         String?
+  addressLine   String?
+  cityStateZip  String?
 
-  startingBid   Int
-  bidIncrement  Int
+  imagesPath    String?
+  images        Json?
+  coverImage    String?   // ⭐ NEW (primary listing image)
+
+  // =========================
+  // Property Details (Step 3)
+  // =========================
+  propertyType  String?
+  beds          Int?
+  baths         Float?
+  sqft          Int?
+  condition     String?
+  description   String?
+
+  // =========================
+  // Auction Settings
+  // =========================
+  startingBid   Int?
+  bidIncrement  Int?
+  reserveAmount Int?
   arv           Int?
   finalPrice    Int?
 
-  startAt       DateTime
-  endAt         DateTime
-  status        String   // LIVE | CLOSED
-  result        String?  // UNDER_CONTRACT | SOLD | NO_SALE
+  startAt       DateTime?
+  endAt         DateTime?
 
-  // Escrow / settlement
-  escrowStatus  String?  // PENDING | RECEIVED | FAILED
-  escrowAmount  Int?
-  escrowDueBy   DateTime?
+  status        AuctionStatus @default(DRAFT)
+  result        String?       // UNDER_CONTRACT | SOLD | NO_SALE
 
   bidCount      Int      @default(0)
   durationDays  Int?
 
   bids          Bid[]
 
+  // =========================
+  // Platform Service Fee (1%)
+  // =========================
+  serviceFeeAmount   Int?
+  serviceFeeStatus   ServiceFeeStatus?
+  serviceFeePaidAt   DateTime?
+
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Bid {
@@ -57,7 +106,14 @@ model Bid {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
+
+  // =========================
+  // Verified Bidder Model
+  // =========================
+  isVerifiedBidder Boolean @default(false)
+  stripeCustomerId String?
 
   bids      Bid[]
   accounts  Account[]

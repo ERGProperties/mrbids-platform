@@ -6,6 +6,26 @@ function assert(condition: any, message: string) {
   if (!condition) throw new Error(message);
 }
 
+/**
+ * ⭐ Auto cover image builder
+ */
+function buildCoverImage(
+  imagesPath: string,
+  images: string[]
+) {
+  if (!images.length) return null;
+
+  const primary =
+    images.find((img) => img.startsWith("01-")) ??
+    images[0];
+
+  const cleanPath = imagesPath.startsWith("/")
+    ? imagesPath
+    : `/${imagesPath}`;
+
+  return `${cleanPath}/${primary}`;
+}
+
 export async function createAuction(formData: FormData) {
   const title = String(formData.get("title") || "").trim();
   const slug = String(formData.get("slug") || "").trim();
@@ -28,11 +48,16 @@ export async function createAuction(formData: FormData) {
   assert(bidIncrement > 0, "Bid increment must be > 0");
   assert(endAt > startAt, "Auction end must be after start");
 
-  // ✅ AUTO-GENERATED (NO ADMIN INPUT)
-  const imagesPath = `/auctions/${slug}`;
+  /**
+   * ⭐ CORRECT IMAGE PATH
+   * matches /public/images/auctions/[slug]
+   */
+  const imagesPath = `/images/auctions/${slug}`;
 
-  // ✅ Primary image convention
-  const primaryImage = "01-house-front.jpeg";
+  /**
+   * ⭐ Primary image convention
+   */
+  const images = ["01-house-front.jpeg"];
 
   await prisma.auction.create({
     data: {
@@ -42,7 +67,13 @@ export async function createAuction(formData: FormData) {
       cityStateZip,
 
       imagesPath,
-      images: [primaryImage],
+      images,
+
+      // ⭐ AUTO COVER IMAGE
+      coverImage: buildCoverImage(
+        imagesPath,
+        images
+      ),
 
       startingBid,
       bidIncrement,

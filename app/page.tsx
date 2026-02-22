@@ -1,6 +1,50 @@
-export default function HomePage() {
+import Link from "next/link";
+import { getAllAuctions } from "@/lib/repositories/auctionRepository";
+import AuctionCountdown from "@/components/auction/AuctionCountdown";
+
+function getPrimaryImage(auction: any) {
+  if (auction.coverImage) return auction.coverImage;
+  if (!Array.isArray(auction.images)) return null;
+  if (!auction.imagesPath) return null;
+
+  const first = auction.images[0];
+  if (!first) return null;
+
+  return `${auction.imagesPath}/${first}`;
+}
+
+function getLocation(auction: any) {
+  return auction.cityStateZip || auction.addressLine || "";
+}
+
+function getCurrentBid(auction: any) {
+  return auction.highestBid ?? auction.startingBid ?? 0;
+}
+
+function AuctionImage({ src }: { src: string | null }) {
+  return (
+    <div className="h-56 w-full bg-gray-100 overflow-hidden">
+      {src ? (
+        <img src={src} alt="" className="h-full w-full object-cover" />
+      ) : (
+        <div className="h-full w-full flex items-center justify-center text-sm text-gray-400">
+          No image available
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default async function HomePage() {
+  const auctions = await getAllAuctions();
+
+  const live = auctions.filter(
+    (a) => a.status === "LIVE" && a.endAt
+  );
+
   return (
     <main className="bg-gradient-to-b from-gray-50 to-white">
+
       {/* HERO */}
       <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
         <div className="max-w-3xl">
@@ -19,26 +63,95 @@ export default function HomePage() {
             for verified buyers and institutional-grade transactions.
           </p>
 
-          {/* BUTTONS */}
           <div className="mt-14 flex items-center gap-10">
-            <a
+            <Link
               href="/auctions"
-              className="px-10 py-5 bg-black text-white rounded-full text-base font-medium transition shadow-sm hover:bg-gray-900 hover:shadow-md"
+              className="px-10 py-5 bg-black text-white rounded-full text-base font-medium hover:bg-gray-900 transition"
             >
               Browse Auctions
-            </a>
+            </Link>
 
-            <a
+            <Link
               href="/sell"
-              className="px-10 py-5 border border-gray-300 rounded-full text-base font-medium bg-white transition hover:border-gray-400 hover:shadow-sm"
+              className="px-10 py-5 border border-gray-300 rounded-full text-base font-medium bg-white hover:border-gray-400 transition"
             >
               Sell a Property
-            </a>
+            </Link>
           </div>
 
           <p className="mt-10 text-xs text-gray-400">
             Private platform • Limited access • Admin-reviewed auctions
           </p>
+        </div>
+      </section>
+
+      {/* LIVE AUCTIONS */}
+      <section className="bg-white border-t border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 py-24">
+          <h2 className="text-3xl font-semibold mb-10">
+            Live Auctions
+          </h2>
+
+          {live.length === 0 ? (
+            <div className="border rounded-2xl bg-gray-50 p-12 text-center">
+              <h3 className="text-2xl font-semibold text-gray-900">
+                Auctions Coming Soon
+              </h3>
+
+              <p className="mt-4 text-gray-600 max-w-xl mx-auto">
+                New listings are being added. Check back shortly or start
+                your own seller-direct auction.
+              </p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-8">
+              {live.slice(0, 3).map((auction) => (
+                <div
+                  key={auction.id}
+                  className="bg-white border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
+                >
+                  <div className="relative">
+                    <AuctionImage src={getPrimaryImage(auction)} />
+
+                    <div className="absolute top-4 left-4 px-3 py-1 bg-black text-white text-xs font-medium rounded-full">
+                      ● LIVE
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {auction.title}
+                    </h3>
+
+                    <p className="mt-1 text-sm text-gray-500">
+                      {getLocation(auction)}
+                    </p>
+
+                    {/* ⭐ PREMIUM BID ANCHOR */}
+                    <div className="mt-4 inline-block rounded-xl bg-gray-50 border border-gray-200 px-4 py-2">
+                      <p className="text-[11px] uppercase tracking-wide text-gray-500">
+                        Current Bid
+                      </p>
+                      <p className="text-lg font-semibold text-gray-900 leading-tight">
+                        ${getCurrentBid(auction).toLocaleString()}
+                      </p>
+                    </div>
+
+                    <div className="mt-4">
+                      <AuctionCountdown endsAt={auction.endAt} />
+                    </div>
+
+                    <Link
+                      href={`/auctions/${auction.slug}`}
+                      className="inline-block mt-6 px-6 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
+                    >
+                      View Auction
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -105,7 +218,7 @@ export default function HomePage() {
             },
           ].map((item) => (
             <div key={item.title}>
-              <h3 className="text-base font-semibold text-gray-900 tracking-tight">
+              <h3 className="text-base font-semibold text-gray-900">
                 {item.title}
               </h3>
               <p className="mt-5 text-sm text-gray-600 leading-relaxed">
@@ -115,6 +228,7 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
     </main>
   );
 }

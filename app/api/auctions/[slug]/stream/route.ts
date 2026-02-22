@@ -1,20 +1,23 @@
 import { prisma } from "@/lib/db"
 
-export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
+const viewers: Record<string, number> = {}
 
 export async function GET(
-  _: Request,
+  req: Request,
   { params }: { params: { slug: string } }
 ) {
-  const encoder = new TextEncoder()
+  const slug = params.slug
+
+  // 👀 increment watcher count
+  viewers[slug] = (viewers[slug] || 0) + 1
 
   const stream = new ReadableStream({
     async start(controller) {
-      let lastPayload = ""
-
       const send = async () => {
         const auction = await prisma.auction.findUnique({
-          where: { slug: params.slug },
+          where: { slug },
           include: {
             bids: {
               orderBy: { amount: "desc" },
@@ -25,30 +28,34 @@ export async function GET(
 
         if (!auction) return
 
-        const payload = JSON.stringify({
-          endsAt: auction.endAt.toISOString(),
+        const payload = {
           highestBid:
             auction.bids[0]?.amount ??
             auction.finalPrice ??
             auction.startingBid,
-        })
-
-        if (payload !== lastPayload) {
-          controller.enqueue(
-            encoder.encode(`data: ${payload}\n\n`)
-          )
-          lastPayload = payload
+          endsAt: auction.endAt.toISOString(),
+          bidCount: auction.bidCount,
+          watchers: viewers[slug] || 1,
         }
+
+        controller.enqueue(
+          `data: ${JSON.stringify(payload)}\n\n`
+        )
       }
 
+      await send()
+
       const interval = setInterval(send, 2000)
-      send()
 
-      controller.enqueue(
-        encoder.encode("retry: 2000\n\n")
-      )
+      req.signal.addEventListener("abort", () => {
+        clearInterval(interval)
 
-      return () => clearInterval(interval)
+        // 👀 decrement watcher count
+        viewers[slug] = Math.max(
+          0,
+          (viewers[slug] || 1) - 1
+        )
+      })
     },
   })
 

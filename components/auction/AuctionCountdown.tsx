@@ -1,69 +1,78 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import clsx from "clsx"
+import { useEffect, useState } from "react";
 
-type Props = {
-  endsAt: string
+function getTimeRemaining(end: Date) {
+  const total = end.getTime() - Date.now();
+
+  if (total <= 0) {
+    return {
+      expired: true,
+      days: 0,
+      hours: 0,
+      minutes: 0,
+    };
+  }
+
+  const days = Math.floor(total / (1000 * 60 * 60 * 24));
+  const hours = Math.floor(
+    (total / (1000 * 60 * 60)) % 24
+  );
+  const minutes = Math.floor(
+    (total / (1000 * 60)) % 60
+  );
+
+  return {
+    expired: false,
+    days,
+    hours,
+    minutes,
+  };
 }
 
-export function AuctionCountdown({ endsAt }: Props) {
-  const [timeLeft, setTimeLeft] = useState(0)
-  const [extended, setExtended] = useState(false)
-  const previousEndsAt = useRef<Date | null>(null)
+export default function AuctionCountdown({
+  endsAt,
+}: {
+  endsAt: string | Date;
+}) {
+  const [mounted, setMounted] = useState(false);
+
+  const end =
+    typeof endsAt === "string"
+      ? new Date(endsAt)
+      : endsAt;
+
+  const [time, setTime] = useState(
+    getTimeRemaining(end)
+  );
+
+  // ⭐ prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
-    const currentEndsAt = new Date(endsAt)
+    if (!mounted) return;
 
-    if (
-      previousEndsAt.current &&
-      currentEndsAt.getTime() > previousEndsAt.current.getTime()
-    ) {
-      setExtended(true)
-      setTimeout(() => setExtended(false), 6000)
-    }
+    const interval = setInterval(() => {
+      setTime(getTimeRemaining(end));
+    }, 1000);
 
-    previousEndsAt.current = currentEndsAt
+    return () => clearInterval(interval);
+  }, [end, mounted]);
 
-    const tick = () => {
-      const now = new Date()
-      const diff = currentEndsAt.getTime() - now.getTime()
-      setTimeLeft(Math.max(0, diff))
-    }
+  // ⭐ render nothing until client mounts
+  if (!mounted) {
+    return <span>—</span>;
+  }
 
-    tick()
-    const interval = setInterval(tick, 1000)
-    return () => clearInterval(interval)
-  }, [endsAt])
-
-  const minutes = Math.floor(timeLeft / 1000 / 60)
-  const seconds = Math.floor((timeLeft / 1000) % 60)
-  const isUrgent = timeLeft <= 5 * 60 * 1000 && timeLeft > 0
+  if (time.expired) {
+    return <span>Auction ended</span>;
+  }
 
   return (
-    <div className="space-y-3">
-      <div
-        className={clsx(
-          "inline-flex items-center rounded-xl px-5 py-3 text-3xl font-bold tracking-wide transition",
-          isUrgent
-            ? "bg-red-50 text-red-700 animate-pulse"
-            : "bg-gray-100 text-gray-900"
-        )}
-      >
-        {minutes}:{seconds.toString().padStart(2, "0")}
-      </div>
-
-      {isUrgent && (
-        <div className="text-sm font-semibold text-red-600">
-          Final minutes — bidding will extend if placed now
-        </div>
-      )}
-
-      {extended && (
-        <div className="rounded-md bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-800">
-          Auction extended due to last-minute bid
-        </div>
-      )}
-    </div>
-  )
+    <span className="text-sm font-medium text-gray-900">
+      {time.days}d {time.hours}h {time.minutes}m
+    </span>
+  );
 }

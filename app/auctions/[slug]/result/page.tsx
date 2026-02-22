@@ -40,11 +40,8 @@ export default async function AuctionResult({
         status: auction.status,
         result: auction.result,
         winnerEmail: winningBid?.bidder?.email ?? null,
-        escrowStatus: auction.escrowStatus,
-        escrowAmount: auction.escrowAmount,
-        escrowDueBy: auction.escrowDueBy
-          ? auction.escrowDueBy.toISOString()
-          : null,
+        serviceFeeAmount: auction.serviceFeeAmount,
+        serviceFeeStatus: auction.serviceFeeStatus,
       }}
     />
   )

@@ -2,8 +2,16 @@
 
 import { useEffect, useState } from "react"
 
+type LiveAuctionData = {
+  highestBid?: number
+  endsAt?: string
+  bidCount?: number
+  watchers?: number
+}
+
 export function useLiveAuction(slug: string) {
-  const [data, setData] = useState<any>(null)
+  const [data, setData] =
+    useState<LiveAuctionData | null>(null)
 
   useEffect(() => {
     const source = new EventSource(
@@ -11,12 +19,16 @@ export function useLiveAuction(slug: string) {
     )
 
     source.onmessage = (event) => {
-      setData(JSON.parse(event.data))
+      try {
+        setData(JSON.parse(event.data))
+      } catch {}
     }
 
-    return () => {
+    source.onerror = () => {
       source.close()
     }
+
+    return () => source.close()
   }, [slug])
 
   return data

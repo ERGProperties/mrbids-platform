@@ -2,25 +2,17 @@ import Link from "next/link";
 import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 import { autoCloseExpiredAuctions } from "@/lib/auctionLifecycle";
 
-/**
- * Returns the primary (01-*) image URL or null
- */
-function getPrimaryImage(
-  images: unknown,
-  imagesPath: string
-): string | null {
-  if (!Array.isArray(images)) return null;
+function getPrimaryImage(auction: any) {
+  // ⭐ ALWAYS prefer coverImage
+  if (auction.coverImage) return auction.coverImage;
 
-  const files = images as string[];
-  if (files.length === 0) return null;
+  if (!Array.isArray(auction.images)) return null;
+  if (!auction.imagesPath) return null;
 
-  const primary = files.find(
-    (img) => typeof img === "string" && img.startsWith("01-")
-  );
+  const first = auction.images[0];
+  if (!first) return null;
 
-  const file = primary ?? files[0];
-
-  return file ? `${imagesPath}/${file}` : null;
+  return `${auction.imagesPath}/${first}`;
 }
 
 function AuctionImage({ src }: { src: string | null }) {
@@ -42,148 +34,77 @@ function AuctionImage({ src }: { src: string | null }) {
 }
 
 export default async function AuctionsPage() {
-  // 🔒 Auto-close expired auctions before rendering
   await autoCloseExpiredAuctions();
 
   const auctions = await getAllAuctions();
-  const now = new Date();
 
-  const liveAuctions = auctions.filter(
-    (a) => a.status === "LIVE" && a.endAt > now
-  );
-
-  const pastAuctions = auctions.filter(
-    (a) => a.status === "CLOSED" || a.endAt <= now
-  );
+  const live = auctions.filter((a) => a.status === "LIVE");
+  const past = auctions.filter((a) => a.status === "CLOSED");
 
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-32">
-        {/* LIVE AUCTIONS */}
-        <section className="mb-24">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-10">
-            Live Auctions
-          </h1>
 
-          {liveAuctions.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              There are no live auctions.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {liveAuctions.map((auction) => {
-                const image = getPrimaryImage(
-                  auction.images,
-                  auction.imagesPath
-                );
+        <h1 className="text-3xl font-semibold mb-10">
+          Live Auctions
+        </h1>
 
-                return (
-                  <div
-                    key={auction.slug}
-                    className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
-                  >
-                    <AuctionImage src={image} />
+        <div className="grid md:grid-cols-2 gap-8 mb-24">
+          {live.map((auction) => (
+            <div
+              key={auction.id}
+              className="bg-white border rounded-2xl overflow-hidden"
+            >
+              <AuctionImage
+                src={getPrimaryImage(auction)}
+              />
 
-                    <div className="p-6">
-                      <h2 className="text-lg font-semibold text-gray-900">
-                        {auction.title}
-                      </h2>
+              <div className="p-6">
+                <h2 className="text-lg font-semibold">
+                  {auction.title}
+                </h2>
 
-                      <p className="mt-1 text-sm text-gray-600">
-                        {auction.cityStateZip}
-                      </p>
-
-                      <div className="mt-4 text-sm text-gray-700">
-                        <p>
-                          <strong>Starting Bid:</strong>{" "}
-                          ${auction.startingBid.toLocaleString()}
-                        </p>
-                        {auction.arv && (
-                          <p>
-                            <strong>ARV:</strong>{" "}
-                            ${auction.arv.toLocaleString()}
-                          </p>
-                        )}
-                      </div>
-
-                      <Link
-                        href={`/auctions/${auction.slug}`}
-                        className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm font-medium"
-                      >
-                        View Live Auction
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
+                <Link
+                  href={`/auctions/${auction.slug}`}
+                  className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
+                >
+                  View Live Auction
+                </Link>
+              </div>
             </div>
-          )}
-        </section>
+          ))}
+        </div>
 
-        {/* PAST AUCTIONS */}
-        <section>
-          <h2 className="text-3xl font-semibold text-gray-900 mb-10">
-            Past Auctions
-          </h2>
+        <h2 className="text-3xl font-semibold mb-10">
+          Past Auctions
+        </h2>
 
-          {pastAuctions.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              There are no past auctions.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {pastAuctions.map((auction) => {
-                const image = getPrimaryImage(
-                  auction.images,
-                  auction.imagesPath
-                );
+        <div className="grid md:grid-cols-2 gap-8">
+          {past.map((auction) => (
+            <div
+              key={auction.id}
+              className="bg-white border rounded-2xl overflow-hidden"
+            >
+              <AuctionImage
+                src={getPrimaryImage(auction)}
+              />
 
-                return (
-                  <div
-                    key={auction.slug}
-                    className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
-                  >
-                    <AuctionImage src={image} />
+              <div className="p-6">
+                <h2 className="text-lg font-semibold">
+                  {auction.title}
+                </h2>
 
-                    <div className="p-6">
-                      <h2 className="text-lg font-semibold text-gray-900">
-                        {auction.title}
-                      </h2>
-
-                      <p className="mt-1 text-sm text-gray-600">
-                        {auction.cityStateZip}
-                      </p>
-
-                      <div className="mt-4 text-sm text-gray-700 space-y-1">
-                        {auction.finalPrice && (
-                          <p>
-                            <strong>Final Price:</strong>{" "}
-                            ${auction.finalPrice.toLocaleString()}
-                          </p>
-                        )}
-                        <p>
-                          <strong>Total Bids:</strong>{" "}
-                          {auction.bidCount}
-                        </p>
-                        <p>
-                          <strong>Duration:</strong>{" "}
-                          {auction.durationDays} days
-                        </p>
-                      </div>
-
-                      <Link
-                        href={`/auctions/${auction.slug}/result`}
-                        className="inline-block mt-6 px-6 py-2 bg-gray-900 text-white rounded-full text-sm font-medium"
-                      >
-                        View Auction Results
-                      </Link>
-                    </div>
-                  </div>
-                );
-              })}
+                <Link
+                  href={`/auctions/${auction.slug}/result`}
+                  className="inline-block mt-6 px-6 py-2 bg-gray-900 text-white rounded-full text-sm"
+                >
+                  View Auction Results
+                </Link>
+              </div>
             </div>
-          )}
-        </section>
+          ))}
+        </div>
+
       </div>
     </main>
   );
