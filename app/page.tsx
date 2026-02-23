@@ -82,7 +82,52 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ================= FEATURED ================= */}
+      {/* ================= AUTHORITY + MOMENTUM ================= */}
+      <section className="border-t border-gray-100 bg-white">
+        <div className="max-w-7xl mx-auto px-6 py-14">
+          <div className="grid md:grid-cols-3 gap-10 text-center md:text-left">
+
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
+                Platform Activity
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Live Auctions Running Now
+              </h3>
+              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                Active bidding events create real-time market pricing driven by buyers.
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
+                Transparency
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Visible Bid History
+              </h3>
+              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                Every bid is time-stamped and recorded to ensure fairness and clarity.
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
+                Seller Confidence
+              </p>
+              <h3 className="text-xl font-semibold text-gray-900">
+                Full Seller Control
+              </h3>
+              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+                Sellers set reserve pricing and retain final acceptance authority.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ================= FEATURED AUCTION ================= */}
       {featured && (
         <section className="border-t border-b border-gray-100 bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 py-20">
@@ -118,7 +163,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ================= LIVE GRID ================= */}
+      {/* ================= LIVE AUCTIONS ================= */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-20">
 
@@ -174,7 +219,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ================= TRUST MULTIPLIER (RESTORED) ================= */}
+      {/* ================= TRUST MULTIPLIER ================= */}
       <section className="border-t border-gray-100 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10 text-center">
 
