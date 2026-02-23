@@ -26,6 +26,17 @@ function AuctionImage({ src }: { src: string | null }) {
   );
 }
 
+function getTimeStatus(endAt?: Date | null) {
+  if (!endAt) return "ACTIVE";
+
+  const diff = new Date(endAt).getTime() - Date.now();
+
+  if (diff <= 0) return "ENDED";
+  if (diff < 1000 * 60 * 60 * 24) return "ENDING SOON";
+
+  return "LIVE NOW";
+}
+
 function formatTimeRemaining(endAt?: Date | null) {
   if (!endAt) return "—";
 
@@ -36,6 +47,21 @@ function formatTimeRemaining(endAt?: Date | null) {
   const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
 
   return `${days}d ${hours}h`;
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const styles =
+    status === "ENDING SOON"
+      ? "bg-red-100 text-red-700"
+      : "bg-green-100 text-green-700";
+
+  return (
+    <span
+      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}
+    >
+      {status}
+    </span>
+  );
 }
 
 export default async function HomePage() {
@@ -60,8 +86,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="mt-8 text-xl text-gray-600 leading-relaxed">
-            A private auction marketplace where verified buyers compete
-            transparently and sellers retain full control.
+            Verified buyers compete transparently while sellers retain full control.
           </p>
 
           <div className="mt-14 flex flex-wrap gap-4">
@@ -82,59 +107,60 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ================= AUTHORITY + MOMENTUM ================= */}
+      {/* ================= AUTHORITY ================= */}
       <section className="border-t border-gray-100 bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-14">
-          <div className="grid md:grid-cols-3 gap-10 text-center md:text-left">
+        <div className="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-3 gap-10">
 
-            <div>
-              <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
-                Platform Activity
-              </p>
-              <h3 className="text-xl font-semibold text-gray-900">
-                Live Auctions Running Now
-              </h3>
-              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                Active bidding events create real-time market pricing driven by buyers.
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
-                Transparency
-              </p>
-              <h3 className="text-xl font-semibold text-gray-900">
-                Visible Bid History
-              </h3>
-              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                Every bid is time-stamped and recorded to ensure fairness and clarity.
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
-                Seller Confidence
-              </p>
-              <h3 className="text-xl font-semibold text-gray-900">
-                Full Seller Control
-              </h3>
-              <p className="mt-3 text-sm text-gray-600 leading-relaxed">
-                Sellers set reserve pricing and retain final acceptance authority.
-              </p>
-            </div>
-
+          <div>
+            <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
+              Platform Activity
+            </p>
+            <h3 className="text-xl font-semibold text-gray-900">
+              Live Auctions Running Now
+            </h3>
+            <p className="mt-3 text-sm text-gray-600">
+              Active bidding creates true market-driven pricing.
+            </p>
           </div>
+
+          <div>
+            <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
+              Transparency
+            </p>
+            <h3 className="text-xl font-semibold text-gray-900">
+              Visible Bid History
+            </h3>
+            <p className="mt-3 text-sm text-gray-600">
+              Every bid is time-stamped and auditable.
+            </p>
+          </div>
+
+          <div>
+            <p className="text-xs uppercase tracking-widest text-gray-500 mb-3">
+              Seller Control
+            </p>
+            <h3 className="text-xl font-semibold text-gray-900">
+              Reserve Pricing Authority
+            </h3>
+            <p className="mt-3 text-sm text-gray-600">
+              Sellers retain full acceptance control.
+            </p>
+          </div>
+
         </div>
       </section>
 
-      {/* ================= FEATURED AUCTION ================= */}
+      {/* ================= FEATURED ================= */}
       {featured && (
         <section className="border-t border-b border-gray-100 bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 py-20">
 
-            <p className="text-xs uppercase tracking-widest text-gray-500 mb-4">
-              Featured Auction
-            </p>
+            <div className="flex items-center gap-3 mb-4">
+              <p className="text-xs uppercase tracking-widest text-gray-500">
+                Featured Auction
+              </p>
+              <StatusBadge status={getTimeStatus(featured.endAt)} />
+            </div>
 
             <div className="grid lg:grid-cols-2 bg-white border rounded-2xl overflow-hidden shadow-sm">
               <div className="h-[420px]">
@@ -147,7 +173,11 @@ export default async function HomePage() {
                 </h2>
 
                 <p className="mt-4 text-sm text-gray-600">
-                  Live Auction • Ends in {formatTimeRemaining(featured.endAt)}
+                  Ends in {formatTimeRemaining(featured.endAt)}
+                </p>
+
+                <p className="mt-4 text-sm text-gray-500">
+                  Active bidding • Market-driven pricing
                 </p>
 
                 <Link
@@ -163,7 +193,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ================= LIVE AUCTIONS ================= */}
+      {/* ================= LIVE GRID ================= */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-20">
 
@@ -180,82 +210,72 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {live.length === 0 ? (
-            <div className="border rounded-2xl bg-gray-50 p-12 text-center">
-              <h3 className="text-2xl font-semibold text-gray-900">
-                Be First on MrBids
-              </h3>
-              <p className="mt-4 text-gray-600">
-                Launch the first seller-direct auction and set the market.
-              </p>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-3 gap-8">
-              {live.slice(0, 3).map((auction) => (
-                <div
-                  key={auction.id}
-                  className="bg-white border rounded-2xl overflow-hidden hover:shadow-md transition"
-                >
-                  <div className="h-56">
-                    <AuctionImage src={getPrimaryImage(auction)} />
-                  </div>
-
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {auction.title}
-                    </h3>
-
-                    <Link
-                      href={`/auctions/${auction.slug}`}
-                      className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
-                    >
-                      View Auction
-                    </Link>
-                  </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {live.slice(0, 3).map((auction) => (
+              <div
+                key={auction.id}
+                className="bg-white border rounded-2xl overflow-hidden hover:shadow-lg transition"
+              >
+                <div className="h-56 relative">
+                  <AuctionImage src={getPrimaryImage(auction)} />
                 </div>
-              ))}
-            </div>
-          )}
+
+                <div className="p-6">
+                  <div className="mb-3">
+                    <StatusBadge status={getTimeStatus(auction.endAt)} />
+                  </div>
+
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {auction.title}
+                  </h3>
+
+                  <p className="mt-3 text-sm text-gray-600">
+                    Ends in {formatTimeRemaining(auction.endAt)}
+                  </p>
+
+                  <Link
+                    href={`/auctions/${auction.slug}`}
+                    className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
+                  >
+                    View Auction
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
         </div>
       </section>
 
-      {/* ================= TRUST MULTIPLIER ================= */}
+      {/* ================= TRUST ================= */}
       <section className="border-t border-gray-100 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-4 gap-10 text-center">
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Licensed Escrow
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Licensed Escrow</h3>
             <p className="mt-3 text-sm text-gray-600">
-              Funds flow through third-party licensed escrow providers.
+              Funds flow through licensed third-party escrow.
             </p>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Verified Participants
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Verified Participants</h3>
             <p className="mt-3 text-sm text-gray-600">
-              Buyers and sellers are reviewed prior to participation.
+              Buyers and sellers reviewed prior to participation.
             </p>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Admin Oversight
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Admin Oversight</h3>
             <p className="mt-3 text-sm text-gray-600">
-              Auctions are monitored to ensure compliance and fairness.
+              Auctions monitored for fairness and compliance.
             </p>
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Audit Trail
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-900">Audit Trail</h3>
             <p className="mt-3 text-sm text-gray-600">
-              Every bid and action is recorded and preserved.
+              Every action recorded and preserved.
             </p>
           </div>
 
