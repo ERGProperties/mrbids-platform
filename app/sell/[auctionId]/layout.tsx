@@ -11,17 +11,22 @@ export default function SellFlowLayout({
 }) {
   return (
     <SellerPreviewProvider>
-      {/* IMPORTANT: isolate this layout from global header/footer */}
-      <div className="relative z-0">
+
+      {/* IMPORTANT:
+         Do NOT add relative/z-index here.
+         It creates a stacking context that blocks header/footer clicks.
+      */}
+      <div className="w-full">
         <div className="max-w-7xl mx-auto px-4 py-6">
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-            
+
             {/* LEFT — FORM */}
             <div className="min-w-0">
               {children}
             </div>
 
-            {/* RIGHT — PREVIEW */}
+            {/* RIGHT — LIVE PREVIEW */}
             <aside className="hidden lg:block">
               <div className="sticky top-24">
                 <LivePreview />
@@ -29,8 +34,10 @@ export default function SellFlowLayout({
             </aside>
 
           </div>
+
         </div>
       </div>
+
     </SellerPreviewProvider>
   );
 }
