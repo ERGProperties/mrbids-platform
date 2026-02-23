@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
+// ⭐ VERY IMPORTANT — prevents prerender/build execution
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   try {
-    // ⭐ create client INSIDE handler (build-safe)
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
     });
