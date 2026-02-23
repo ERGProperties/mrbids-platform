@@ -60,7 +60,13 @@ export default function BidForm({
 
     try {
       setLoading(true);
-      await submitBid(slug, value);
+
+      // ⭐ FIX — NEW submitBid signature
+      await submitBid({
+        slug,
+        amount: value,
+      });
+
       setSuccess(true);
       setAmount("");
     } catch (e: any) {
@@ -68,9 +74,7 @@ export default function BidForm({
         e?.message || "Failed to place bid";
 
       // 🔒 Redirect unverified users
-      if (
-        message.toLowerCase().includes("verify")
-      ) {
+      if (message.toLowerCase().includes("verify")) {
         router.push("/verify");
         return;
       }

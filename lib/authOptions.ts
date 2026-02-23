@@ -1,7 +1,7 @@
-import EmailProvider from "next-auth/providers/email"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { prisma } from "@/lib/db"
-import type { NextAuthOptions } from "next-auth"
+import EmailProvider from "next-auth/providers/email";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "@/lib/db";
+import type { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -14,4 +14,4 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "database",
   },
-}
+};

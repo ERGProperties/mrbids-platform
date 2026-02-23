@@ -1,16 +1,16 @@
-import { prisma } from "@/lib/db"
-import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/authOptions"
+import { prisma } from "@/lib/db";
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 
 export async function GET() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
   if (!session) {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401 }
-    )
+    );
   }
 
   const auctions = await prisma.auction.findMany({
@@ -21,7 +21,7 @@ export async function GET() {
         take: 1,
       },
     },
-  })
+  });
 
   const data = auctions.map((a) => ({
     id: a.id,
@@ -30,21 +30,18 @@ export async function GET() {
     cityStateZip: a.cityStateZip,
     status: a.status,
     result: a.result,
-    escrowStatus: a.escrowStatus,
-    escrowAmount: a.escrowAmount,
-    escrowDueBy: a.escrowDueBy
-      ? a.escrowDueBy.toISOString()
-      : null,
+
     startingBid: a.startingBid,
     bidIncrement: a.bidIncrement,
     arv: a.arv,
-    endAt: a.endAt.toISOString(),
+
+    endAt: a.endAt ? a.endAt.toISOString() : null,
+
     highestBid:
       a.bids[0]?.amount ??
       a.finalPrice ??
       a.startingBid,
-  }))
+  }));
 
-  return NextResponse.json(data)
+  return NextResponse.json(data);
 }
-

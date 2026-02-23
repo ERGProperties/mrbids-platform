@@ -1,44 +1,68 @@
-"use server"
+"use server";
 
-import { placeBid } from "@/lib/bidding/placeBid"
-import { prisma } from "@/lib/db"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/authOptions"
-import { revalidatePath } from "next/cache"
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 
-export async function submitBid(
-  slug: string,
-  amount: number
-) {
-  const session = await getServerSession(authOptions)
+export async function submitBid({
+  slug,
+  amount,
+}: {
+  slug: string;
+  amount: number;
+}) {
+  const session = await getServerSession(authOptions);
 
-  if (!session?.user?.email) {
-    throw new Error("Unauthorized")
+  // ⭐ FIX: check user id instead of email
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
   }
 
   const auction = await prisma.auction.findUnique({
     where: { slug },
-  })
+    include: {
+      bids: {
+        orderBy: { amount: "desc" },
+        take: 1,
+      },
+    },
+  });
 
   if (!auction) {
-    throw new Error("Auction not found")
+    throw new Error("Auction not found");
   }
 
-  // ✅ FIX: get userId from DB via email
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-    select: { id: true },
-  })
+  const highestBid =
+    auction.bids[0]?.amount ??
+    auction.finalPrice ??
+    auction.startingBid ??
+    0;
 
-  if (!user) {
-    throw new Error("User not found")
+  const minimumBid =
+    highestBid + (auction.bidIncrement ?? 0);
+
+  if (amount < minimumBid) {
+    throw new Error(
+      `Bid must be at least ${minimumBid}`
+    );
   }
 
-  await placeBid({
-    auctionId: auction.id,
-    userId: user.id,
-    amount,
-  })
+  await prisma.bid.create({
+    data: {
+      amount,
+      auctionId: auction.id,
+      bidderId: session.user.id,
+    },
+  });
 
-  revalidatePath(`/auctions/${slug}`)
+  await prisma.auction.update({
+    where: { id: auction.id },
+    data: {
+      bidCount: {
+        increment: 1,
+      },
+    },
+  });
+
+  return { success: true };
 }

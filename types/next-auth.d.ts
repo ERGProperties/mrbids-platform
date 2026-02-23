@@ -5,13 +5,14 @@ declare module "next-auth" {
     user: {
       id: string;
       role: "USER" | "ADMIN";
+      isVerifiedBidder?: boolean;
+      email?: string | null;
     };
   }
-}
 
-declare module "next-auth/jwt" {
-  interface JWT {
+  interface User {
     id: string;
     role: "USER" | "ADMIN";
+    isVerifiedBidder?: boolean;
   }
 }
