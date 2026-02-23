@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export async function POST(request: Request) {
   try {
+    // ⭐ create client INSIDE handler (build-safe)
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
     const body = await request.json();
 
     const {
@@ -48,11 +49,12 @@ Tone: professional, confident, factual.
     });
 
     const description =
-      response.choices[0].message.content;
+      response.choices[0]?.message?.content ?? "";
 
     return NextResponse.json({ description });
   } catch (error) {
     console.error("AI generation error:", error);
+
     return NextResponse.json(
       { error: "Failed to generate description" },
       { status: 500 }
