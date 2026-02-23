@@ -32,7 +32,7 @@ export default function RootLayout({
       <body className="bg-white text-gray-900 antialiased flex flex-col min-h-screen">
         <SessionProvider>
 
-          {/* HEADER */}
+          {/* ================= HEADER ================= */}
           <header className="fixed top-0 inset-x-0 z-50 bg-white border-b border-gray-100">
             <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
 
@@ -68,12 +68,13 @@ export default function RootLayout({
             </div>
           </header>
 
-          {/* MAIN */}
-          <main className="flex-grow pt-20">
+          {/* ================= MAIN ================= */}
+          {/* Header height = h-20 (80px) */}
+          <main className="flex-grow pt-[80px] relative">
             {children}
           </main>
 
-          {/* FOOTER */}
+          {/* ================= FOOTER ================= */}
           <footer className="border-t border-gray-100 bg-white">
             <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-3 gap-10">
 

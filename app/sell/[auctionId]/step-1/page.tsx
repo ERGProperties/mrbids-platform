@@ -18,25 +18,36 @@ export default async function Step1Page({ params }: Props) {
   }
 
   return (
-    <div className="w-full p-8">
-      {/* Progress */}
-      <StepProgress currentStep={1} totalSteps={5} />
+    <section className="w-full relative">
 
-      {/* Confidence Layer */}
-      <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
-        <p className="font-medium">✔ Your draft is saved automatically</p>
-        <p className="text-gray-600 mt-1">
-          You can leave anytime and continue later.
-        </p>
+      {/* Inner container */}
+      <div className="w-full p-8">
+
+        {/* Progress */}
+        <div className="relative z-0">
+          <StepProgress currentStep={1} totalSteps={5} />
+        </div>
+
+        {/* Confidence Layer */}
+        <div className="mb-6 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
+          <p className="font-medium">✔ Your draft is saved automatically</p>
+          <p className="text-gray-600 mt-1">
+            You can leave anytime and continue later.
+          </p>
+        </div>
+
+        {/* Header */}
+        <h1 className="text-2xl font-semibold mb-6">
+          Step 1: Property Basics
+        </h1>
+
+        {/* Form */}
+        <div className="relative z-0">
+          <Step1Form auction={auction} />
+        </div>
+
       </div>
 
-      {/* Header */}
-      <h1 className="text-2xl font-semibold mb-6">
-        Step 1: Property Basics
-      </h1>
-
-      {/* Form */}
-      <Step1Form auction={auction} />
-    </div>
+    </section>
   );
 }

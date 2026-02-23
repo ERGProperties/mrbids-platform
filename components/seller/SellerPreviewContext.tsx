@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useCallback,
+} from "react";
 
 type PreviewData = {
   title?: string;
@@ -15,9 +21,9 @@ type PreviewContextType = {
   setPreviewData: (data: Partial<PreviewData>) => void;
 };
 
-const SellerPreviewContext = createContext<PreviewContextType | undefined>(
-  undefined
-);
+const SellerPreviewContext = createContext<
+  PreviewContextType | undefined
+>(undefined);
 
 export function SellerPreviewProvider({
   children,
@@ -26,9 +32,13 @@ export function SellerPreviewProvider({
 }) {
   const [previewData, setPreviewState] = useState<PreviewData>({});
 
-  const setPreviewData = (data: Partial<PreviewData>) => {
-    setPreviewState((prev) => ({ ...prev, ...data }));
-  };
+  // ⭐ FIX: memoized so reference does NOT change every render
+  const setPreviewData = useCallback(
+    (data: Partial<PreviewData>) => {
+      setPreviewState((prev) => ({ ...prev, ...data }));
+    },
+    []
+  );
 
   return (
     <SellerPreviewContext.Provider
@@ -41,10 +51,12 @@ export function SellerPreviewProvider({
 
 export function useSellerPreview() {
   const context = useContext(SellerPreviewContext);
+
   if (!context) {
     throw new Error(
       "useSellerPreview must be used inside SellerPreviewProvider"
     );
   }
+
   return context;
 }
