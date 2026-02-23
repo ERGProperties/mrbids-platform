@@ -25,11 +25,10 @@ function AuctionImage({ src }: { src: string | null }) {
 }
 
 function getTimeStatus(endAt?: Date | null) {
-  if (!endAt) return "LIVE NOW";
+  if (!endAt) return "LIVE";
   const diff = new Date(endAt).getTime() - Date.now();
-  if (diff <= 0) return "ENDED";
   if (diff < 1000 * 60 * 60 * 24) return "ENDING SOON";
-  return "LIVE NOW";
+  return "LIVE";
 }
 
 function formatTimeRemaining(endAt?: Date | null) {
@@ -44,11 +43,11 @@ function formatTimeRemaining(endAt?: Date | null) {
 function StatusBadge({ status }: { status: string }) {
   const styles =
     status === "ENDING SOON"
-      ? "bg-red-100 text-red-700"
-      : "bg-green-100 text-green-700";
+      ? "bg-red-50 text-red-700"
+      : "bg-green-50 text-green-700";
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}>
+    <span className={`px-3 py-1 rounded-full text-[11px] font-semibold tracking-wide ${styles}`}>
       {status}
     </span>
   );
@@ -62,34 +61,34 @@ export default async function HomePage() {
   return (
     <main className="bg-white">
 
-      {/* ================= HERO ================= */}
-      <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
+      {/* HERO */}
+      <section className="max-w-7xl mx-auto px-6 pt-40 pb-32">
         <div className="max-w-3xl">
-          <p className="text-sm font-medium text-gray-500 mb-6 tracking-[0.18em] uppercase">
-            Private Marketplace for Real Assets
+          <p className="text-xs uppercase tracking-[0.25em] text-gray-500 mb-8">
+            Private Marketplace
           </p>
 
-          <h1 className="text-6xl md:text-7xl font-semibold tracking-tight text-gray-900 leading-[1.05]">
+          <h1 className="text-6xl md:text-7xl font-semibold leading-[1.03] tracking-tight text-gray-900">
             Seller-Direct
             <br />
             Real Estate Auctions
           </h1>
 
           <p className="mt-10 text-xl text-gray-600 leading-relaxed max-w-2xl">
-            Verified buyers compete transparently while sellers retain full control.
+            A premium auction marketplace designed for serious buyers and motivated sellers.
           </p>
 
           <div className="mt-14 flex flex-wrap gap-4">
             <Link
               href="/auctions"
-              className="px-10 py-5 bg-black text-white rounded-full text-base font-medium hover:bg-gray-900 transition"
+              className="px-10 py-5 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
             >
               Browse Auctions
             </Link>
 
             <Link
               href="/sell"
-              className="px-10 py-5 border border-gray-300 rounded-full text-base font-medium bg-white hover:border-gray-400 transition"
+              className="px-10 py-5 border border-gray-300 rounded-full text-sm font-medium hover:border-gray-400 transition"
             >
               Sell a Property
             </Link>
@@ -97,60 +96,34 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ================= MARKETPLACE ACTIVITY ================= */}
+      {/* LUXURY ACTIVITY STRIP */}
       <section className="border-y border-gray-100 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap gap-8 text-sm text-gray-700">
-          <span>● Multiple auctions live now</span>
-          <span>● Bidding activity in progress</span>
-          <span>● Verified buyers participating</span>
-          <span>● New listings added weekly</span>
+        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap gap-8 text-sm text-gray-600">
+          <span>Live auctions active</span>
+          <span>Verified buyer participation</span>
+          <span>Transparent bidding environment</span>
+          <span>New listings added regularly</span>
         </div>
       </section>
 
-      {/* ================= AUTHORITY ================= */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-14">
-          <div>
-            <h3 className="text-2xl font-semibold text-gray-900">Live Marketplace</h3>
-            <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-              Auctions operate in real time with active bidder participation.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-semibold text-gray-900">Transparent Bidding</h3>
-            <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-              Every bid is visible, time-stamped, and auditable.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-semibold text-gray-900">Seller Authority</h3>
-            <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-              Sellers maintain reserve pricing and acceptance control.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= FEATURED ================= */}
+      {/* FEATURED */}
       {featured && (
-        <section className="border-t border-b border-gray-100 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-6 py-24">
+        <section className="bg-white border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-6 py-28">
 
-            <div className="flex items-center gap-3 mb-5">
+            <div className="flex items-center gap-3 mb-6">
               <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
                 Featured Auction
               </p>
               <StatusBadge status={getTimeStatus(featured.endAt)} />
             </div>
 
-            <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition">
-              <div className="h-[460px]">
+            <div className="grid lg:grid-cols-2 rounded-3xl overflow-hidden border bg-white shadow-sm hover:shadow-md transition">
+              <div className="h-[480px]">
                 <AuctionImage src={getPrimaryImage(featured)} />
               </div>
 
-              <div className="p-12 flex flex-col justify-center">
+              <div className="p-14 flex flex-col justify-center">
                 <h2 className="text-4xl font-semibold text-gray-900 leading-tight">
                   {featured.title}
                 </h2>
@@ -159,15 +132,11 @@ export default async function HomePage() {
                   Ends in {formatTimeRemaining(featured.endAt)}
                 </p>
 
-                <p className="mt-3 text-sm text-gray-500">
-                  Active bidding • Market-driven pricing
-                </p>
-
                 <Link
                   href={`/auctions/${featured.slug}`}
                   className="inline-block mt-10 px-8 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
                 >
-                  View Featured Auction
+                  View Auction
                 </Link>
               </div>
             </div>
@@ -176,16 +145,16 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ================= LIVE AUCTIONS ================= */}
+      {/* LIVE AUCTIONS */}
       <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-24">
+        <div className="max-w-7xl mx-auto px-6 py-28">
 
-          <div className="flex items-center justify-between mb-12">
+          <div className="flex justify-between items-center mb-14">
             <h2 className="text-4xl font-semibold text-gray-900">
               Live Auctions
             </h2>
 
-            <Link href="/auctions" className="text-sm font-medium text-gray-700 hover:text-black">
+            <Link href="/auctions" className="text-sm text-gray-700 hover:text-black">
               View all →
             </Link>
           </div>
@@ -194,7 +163,7 @@ export default async function HomePage() {
             {live.slice(0, 3).map((auction) => (
               <div
                 key={auction.id}
-                className="bg-white border rounded-3xl overflow-hidden hover:shadow-xl transition duration-300"
+                className="border rounded-3xl overflow-hidden bg-white hover:shadow-lg transition"
               >
                 <div className="h-60">
                   <AuctionImage src={getPrimaryImage(auction)} />
@@ -203,7 +172,7 @@ export default async function HomePage() {
                 <div className="p-7">
                   <StatusBadge status={getTimeStatus(auction.endAt)} />
 
-                  <h3 className="mt-4 text-xl font-semibold text-gray-900 leading-snug">
+                  <h3 className="mt-4 text-xl font-semibold text-gray-900">
                     {auction.title}
                   </h3>
 
@@ -225,25 +194,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ================= TRUST ================= */}
+      {/* TRUST */}
       <section className="border-t border-gray-100 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-4 gap-12 text-center">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Licensed Escrow</h3>
-            <p className="mt-3 text-sm text-gray-600">Funds handled via third-party escrow.</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Verified Participants</h3>
-            <p className="mt-3 text-sm text-gray-600">Identity and access reviewed.</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Admin Oversight</h3>
-            <p className="mt-3 text-sm text-gray-600">Auctions monitored for fairness.</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Audit Trail</h3>
-            <p className="mt-3 text-sm text-gray-600">Every action is recorded.</p>
-          </div>
+          <div><h3 className="font-semibold text-gray-900">Licensed Escrow</h3></div>
+          <div><h3 className="font-semibold text-gray-900">Verified Participants</h3></div>
+          <div><h3 className="font-semibold text-gray-900">Admin Oversight</h3></div>
+          <div><h3 className="font-semibold text-gray-900">Audit Trail</h3></div>
         </div>
       </section>
 
