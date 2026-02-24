@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useSellerPreview } from "@/components/seller/SellerPreviewContext";
 
 interface Props {
   auction: any;
@@ -23,7 +25,27 @@ export default function PropertyDetailsForm({ auction }: Props) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Autosave
+  // ⭐ PREVIEW CONTEXT
+  const { setPreviewData } = useSellerPreview();
+
+  // ===== LIVE PREVIEW UPDATE =====
+  useEffect(() => {
+    setPreviewData({
+      title: auction.title,
+      address: `${auction.addressLine || ""} ${
+        auction.cityStateZip || ""
+      }`.trim(),
+      description: description || undefined,
+    });
+  }, [
+    auction.title,
+    auction.addressLine,
+    auction.cityStateZip,
+    description,
+    setPreviewData,
+  ]);
+
+  // ===== AUTOSAVE =====
   useEffect(() => {
     const timeout = setTimeout(async () => {
       try {
@@ -61,6 +83,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
     auction.id,
   ]);
 
+  // ===== AI DESCRIPTION =====
   const generateDescription = async () => {
     try {
       setLoading(true);
@@ -97,6 +120,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
 
   return (
     <div className="space-y-6">
+
       <select
         className="w-full border rounded-lg px-4 py-2"
         value={propertyType}
@@ -165,12 +189,13 @@ export default function PropertyDetailsForm({ auction }: Props) {
         {saving ? "Saving..." : "All changes saved"}
       </div>
 
-      <a
+      <Link
         href={`/sell/${auction.id}/step-4`}
         className="inline-block px-6 py-3 bg-black text-white rounded-lg text-sm"
       >
         Continue →
-      </a>
+      </Link>
+
     </div>
   );
 }

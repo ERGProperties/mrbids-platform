@@ -1,8 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import StepProgress from "@/components/sell/StepProgress";
-import ImageUpload from "./ImageUpload";
-import CoverImageGrid from "./CoverImageGrid";
-import Link from "next/link";
+import Step4Client from "./Step4Client";
 
 export const dynamic = "force-dynamic";
 
@@ -19,10 +17,8 @@ export default async function Step4Page({ params }: Props) {
     return <div className="p-6">Auction not found.</div>;
   }
 
-  // ⭐ FIX — build full image URLs
   const images =
-    Array.isArray(auction.images) &&
-    auction.imagesPath
+    Array.isArray(auction.images) && auction.imagesPath
       ? (auction.images as string[]).map(
           (img) => `${auction.imagesPath}/${img}`
         )
@@ -36,30 +32,10 @@ export default async function Step4Page({ params }: Props) {
         Step 4: Upload Images
       </h1>
 
-      <ImageUpload auction={auction} />
-
-      {images.length > 0 && (
-        <div className="mt-8">
-          <h2 className="text-sm font-medium text-gray-700 mb-3">
-            Uploaded Images (click to set cover)
-          </h2>
-
-          <CoverImageGrid
-            auctionId={auction.id}
-            images={images}
-            coverImage={auction.coverImage}
-          />
-        </div>
-      )}
-
-      <div className="mt-10">
-        <Link
-          href={`/sell/${auction.id}/step-5`}
-          className="inline-block px-6 py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition"
-        >
-          Continue →
-        </Link>
-      </div>
+      <Step4Client
+        auction={auction}
+        initialImages={images}
+      />
     </div>
   );
 }

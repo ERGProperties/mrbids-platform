@@ -14,6 +14,9 @@ type PreviewData = {
   startingBid?: number;
   bidIncrement?: number;
   endDate?: string;
+
+  // ⭐ NEW — enables Step-3 description preview
+  description?: string;
 };
 
 type PreviewContextType = {
@@ -32,7 +35,7 @@ export function SellerPreviewProvider({
 }) {
   const [previewData, setPreviewState] = useState<PreviewData>({});
 
-  // ⭐ FIX: memoized so reference does NOT change every render
+  // stable reference (prevents render loops)
   const setPreviewData = useCallback(
     (data: Partial<PreviewData>) => {
       setPreviewState((prev) => ({ ...prev, ...data }));

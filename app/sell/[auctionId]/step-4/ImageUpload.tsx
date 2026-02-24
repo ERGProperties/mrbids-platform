@@ -4,9 +4,13 @@ import { useState } from "react";
 
 interface Props {
   auction: any;
+  onUploadComplete?: (images: string[]) => void;
 }
 
-export default function ImageUpload({ auction }: Props) {
+export default function ImageUpload({
+  auction,
+  onUploadComplete,
+}: Props) {
   const [saving, setSaving] = useState(false);
 
   const handleUpload = async (
@@ -22,13 +26,20 @@ export default function ImageUpload({ auction }: Props) {
     try {
       setSaving(true);
 
-      await fetch(`/api/sell/${auction.id}/upload-image`, {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch(
+        `/api/sell/${auction.id}/upload-image`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-      // refresh page so thumbnails update
-      window.location.reload();
+      // ⭐ expect updated images back
+      const data = await res.json();
+
+      if (data.images && onUploadComplete) {
+        onUploadComplete(data.images);
+      }
     } catch (err) {
       console.error("Upload failed", err);
     } finally {

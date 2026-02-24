@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useSellerPreview } from "@/components/seller/SellerPreviewContext";
 
 interface Props {
   auction: any;
@@ -24,10 +26,36 @@ export default function Step2Form({ auction }: Props) {
   const [saving, setSaving] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
+  // ⭐ PREVIEW CONTEXT
+  const { setPreviewData } = useSellerPreview();
+
   useEffect(() => {
     setInitialized(true);
   }, []);
 
+  // ===== LIVE PREVIEW UPDATE =====
+  useEffect(() => {
+    let endDate: string | undefined;
+
+    if (durationDays) {
+      const date = new Date();
+      date.setDate(date.getDate() + Number(durationDays));
+      endDate = date.toLocaleDateString();
+    }
+
+    setPreviewData({
+      startingBid: Number(startingBid) || undefined,
+      bidIncrement: Number(bidIncrement) || undefined,
+      endDate,
+    });
+  }, [
+    startingBid,
+    bidIncrement,
+    durationDays,
+    setPreviewData,
+  ]);
+
+  // ===== AUTO SAVE =====
   useEffect(() => {
     if (!initialized) return;
 
@@ -68,6 +96,7 @@ export default function Step2Form({ auction }: Props) {
 
   return (
     <div className="space-y-6">
+
       {/* Starting Bid */}
       <div>
         <label className="block text-sm mb-2 font-medium">
@@ -147,13 +176,14 @@ export default function Step2Form({ auction }: Props) {
 
       {/* Continue */}
       <div className="pt-4">
-        <a
+        <Link
           href={`/sell/${auction.id}/step-3`}
           className="inline-block px-6 py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition"
         >
           Continue →
-        </a>
+        </Link>
       </div>
+
     </div>
   );
 }
