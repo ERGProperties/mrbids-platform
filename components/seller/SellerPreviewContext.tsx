@@ -14,9 +14,10 @@ type PreviewData = {
   startingBid?: number;
   bidIncrement?: number;
   endDate?: string;
-
-  // ⭐ NEW — enables Step-3 description preview
   description?: string;
+
+  // ⭐ REQUIRED FOR STEP-4 PREVIEW
+  coverImage?: string;
 };
 
 type PreviewContextType = {
@@ -33,12 +34,17 @@ export function SellerPreviewProvider({
 }: {
   children: ReactNode;
 }) {
-  const [previewData, setPreviewState] = useState<PreviewData>({});
+  const [previewData, setPreviewState] = useState<PreviewData>(
+    {}
+  );
 
-  // stable reference (prevents render loops)
+  // stable reference prevents render loops
   const setPreviewData = useCallback(
     (data: Partial<PreviewData>) => {
-      setPreviewState((prev) => ({ ...prev, ...data }));
+      setPreviewState((prev) => ({
+        ...prev,
+        ...data,
+      }));
     },
     []
   );
