@@ -38,19 +38,18 @@ export async function POST(
     }
 
     // =========================
-    // Numbered filename
+    // Existing images
     // =========================
     const existingImages = Array.isArray(auction.images)
       ? (auction.images as string[])
       : [];
 
-    const nextNumber = existingImages.length + 1;
+    // =========================
+    // UNIQUE filename (Blob-safe)
+    // =========================
     const ext = getExtension(file.name);
 
-    const fileName = `${String(nextNumber).padStart(
-      2,
-      "0"
-    )}-image.${ext}`;
+    const fileName = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
 
     // =========================
     // Upload to Vercel Blob
@@ -60,7 +59,7 @@ export async function POST(
       file,
       {
         access: "public",
-        allowOverwrite: true, // ⭐ prevents duplicate filename errors
+        addRandomSuffix: false, // we already generate unique names
       }
     );
 
@@ -74,10 +73,10 @@ export async function POST(
         ? blob.url
         : auction.coverImage;
 
-    await prisma.auction.update({
+    const updated = await prisma.auction.update({
       where: { id: params.auctionId },
       data: {
-        imagesPath: "", // legacy field (safe to keep)
+        imagesPath: "", // legacy field safe to keep
         images,
         coverImage,
       },
@@ -85,7 +84,9 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      images,
+      images: Array.isArray(updated.images)
+        ? updated.images
+        : [],
     });
   } catch (err) {
     console.error(err);

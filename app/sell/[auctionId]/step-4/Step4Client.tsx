@@ -15,9 +15,13 @@ export default function Step4Client({
   auction,
   initialImages,
 }: Props) {
-  // ⭐ LOCAL STATE (source of truth for UI)
+  // ⭐ normalize images (supports BOTH old local + new blob URLs)
   const [images, setImages] = useState<string[]>(
-    initialImages || []
+    (initialImages || []).map((img: string) =>
+      img.startsWith("http")
+        ? img
+        : `${auction.imagesPath}/${img}`
+    )
   );
 
   const [coverImage, setCoverImage] = useState<string | null>(
@@ -33,8 +37,7 @@ export default function Step4Client({
     });
   }, [coverImage, setPreviewData]);
 
-  // ⭐ if first upload happens and no cover exists,
-  // automatically use first image
+  // ⭐ auto-set first image as cover if none exists
   useEffect(() => {
     if (!coverImage && images.length > 0) {
       setCoverImage(images[0]);
@@ -47,8 +50,14 @@ export default function Step4Client({
       <ImageUpload
         auction={auction}
         onUploadComplete={(newImages: string[]) => {
-          // force fresh state update (important for production)
-          setImages([...newImages]);
+          // normalize uploaded images too
+          const normalized = newImages.map((img) =>
+            img.startsWith("http")
+              ? img
+              : `${auction.imagesPath}/${img}`
+          );
+
+          setImages([...normalized]);
         }}
       />
 

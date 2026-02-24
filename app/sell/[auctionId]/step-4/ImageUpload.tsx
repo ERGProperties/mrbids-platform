@@ -44,6 +44,9 @@ export default function ImageUpload({
 
         const data = await res.json();
 
+        // ⭐ DEBUG LOG (IMPORTANT)
+        console.log("UPLOAD RESPONSE:", data);
+
         if (data.images?.length) {
           latestImages = data.images;
         }
@@ -56,7 +59,7 @@ export default function ImageUpload({
     } catch (err) {
       console.error("Upload error:", err);
     } finally {
-      // ⭐ ALWAYS reset uploading state
+      // always reset uploading state
       setSaving(false);
 
       // reset input so same file can re-upload
