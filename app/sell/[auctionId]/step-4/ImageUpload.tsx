@@ -18,13 +18,14 @@ export default function ImageUpload({
   ) {
     if (!e.target.files?.length) return;
 
-    const files = Array.from(e.target.files);
+    setSaving(true);
 
     try {
-      setSaving(true);
+      const files = Array.from(e.target.files);
 
       let latestImages: string[] = [];
 
+      // upload files sequentially (stable for Vercel)
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
@@ -37,16 +38,29 @@ export default function ImageUpload({
           }
         );
 
+        if (!res.ok) {
+          throw new Error("Upload failed");
+        }
+
         const data = await res.json();
 
-        // Blob already returns FULL URLs
         if (data.images?.length) {
           latestImages = data.images;
-          onUploadComplete?.(latestImages);
         }
       }
+
+      // update parent AFTER all uploads finish
+      if (latestImages.length) {
+        onUploadComplete?.(latestImages);
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
     } finally {
+      // ⭐ ALWAYS reset uploading state
       setSaving(false);
+
+      // reset input so same file can re-upload
+      e.target.value = "";
     }
   }
 

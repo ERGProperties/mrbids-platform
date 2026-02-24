@@ -60,6 +60,7 @@ export async function POST(
       file,
       {
         access: "public",
+        allowOverwrite: true, // ⭐ prevents duplicate filename errors
       }
     );
 
@@ -76,7 +77,7 @@ export async function POST(
     await prisma.auction.update({
       where: { id: params.auctionId },
       data: {
-        imagesPath: "", // legacy field safe to keep
+        imagesPath: "", // legacy field (safe to keep)
         images,
         coverImage,
       },

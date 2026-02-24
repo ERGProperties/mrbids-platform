@@ -15,19 +15,31 @@ export default function Step4Client({
   auction,
   initialImages,
 }: Props) {
-  const [images, setImages] = useState(initialImages);
+  // ⭐ LOCAL STATE (source of truth for UI)
+  const [images, setImages] = useState<string[]>(
+    initialImages || []
+  );
+
   const [coverImage, setCoverImage] = useState<string | null>(
     auction.coverImage || null
   );
 
   const { setPreviewData } = useSellerPreview();
 
-  // ⭐ keep live preview synced
+  // ⭐ keep seller preview synced
   useEffect(() => {
     setPreviewData({
       coverImage: coverImage || undefined,
     });
   }, [coverImage, setPreviewData]);
+
+  // ⭐ if first upload happens and no cover exists,
+  // automatically use first image
+  useEffect(() => {
+    if (!coverImage && images.length > 0) {
+      setCoverImage(images[0]);
+    }
+  }, [images, coverImage]);
 
   return (
     <>
@@ -35,7 +47,8 @@ export default function Step4Client({
       <ImageUpload
         auction={auction}
         onUploadComplete={(newImages: string[]) => {
-          setImages(newImages);
+          // force fresh state update (important for production)
+          setImages([...newImages]);
         }}
       />
 
