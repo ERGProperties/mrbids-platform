@@ -34,11 +34,17 @@ export default function ImageUpload({
         }
       );
 
-      // ⭐ expect updated images back
       const data = await res.json();
 
+      // ⭐ CRITICAL FIX:
+      // convert filenames → full image URLs
       if (data.images && onUploadComplete) {
-        onUploadComplete(data.images);
+        const fullImages = data.images.map(
+          (img: string) =>
+            `${auction.imagesPath}/${img}`
+        );
+
+        onUploadComplete(fullImages);
       }
     } catch (err) {
       console.error("Upload failed", err);
