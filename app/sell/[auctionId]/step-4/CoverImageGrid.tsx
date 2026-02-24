@@ -34,7 +34,7 @@ export default function CoverImageGrid({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        image: img.split("/").pop(),
+        image: img, // full blob URL
       }),
     });
 

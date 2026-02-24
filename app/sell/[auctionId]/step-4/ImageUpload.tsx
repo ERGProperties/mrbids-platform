@@ -39,15 +39,12 @@ export default function ImageUpload({
 
         const data = await res.json();
 
-        if (data.images) {
-          latestImages = data.images.map(
-            (img: string) =>
-              `${auction.imagesPath}/${img}`
-          );
+        // Blob already returns FULL URLs
+        if (data.images?.length) {
+          latestImages = data.images;
+          onUploadComplete?.(latestImages);
         }
       }
-
-      onUploadComplete?.(latestImages);
     } finally {
       setSaving(false);
     }
