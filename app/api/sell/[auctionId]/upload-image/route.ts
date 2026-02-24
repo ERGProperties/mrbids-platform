@@ -41,7 +41,10 @@ export async function POST(
     // Existing images
     // =========================
     const existingImages = Array.isArray(auction.images)
-      ? (auction.images as string[])
+      ? auction.images.filter(
+          (img): img is string =>
+            typeof img === "string"
+        )
       : [];
 
     // =========================
@@ -81,14 +84,23 @@ export async function POST(
       },
     });
 
-    // ⭐ DEBUG LOG (VERY IMPORTANT)
+    // ⭐ DEBUG LOG
     console.log("UPDATED IMAGES:", updated.images);
+
+    // =========================
+    // SAFE RESPONSE (production fix)
+    // =========================
+    const safeImages =
+      Array.isArray(updated.images)
+        ? updated.images.filter(
+            (img): img is string =>
+              typeof img === "string"
+          )
+        : [];
 
     return NextResponse.json({
       success: true,
-      images: Array.isArray(updated.images)
-        ? updated.images
-        : [],
+      images: safeImages,
     });
   } catch (err) {
     console.error(err);
