@@ -45,10 +45,9 @@ export async function POST(
       : [];
 
     // =========================
-    // UNIQUE filename (Blob-safe)
+    // UNIQUE filename
     // =========================
     const ext = getExtension(file.name);
-
     const fileName = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
 
     // =========================
@@ -59,12 +58,12 @@ export async function POST(
       file,
       {
         access: "public",
-        addRandomSuffix: false, // we already generate unique names
+        addRandomSuffix: false,
       }
     );
 
     // =========================
-    // Save DB (FULL URL)
+    // Save DB
     // =========================
     const images = [...existingImages, blob.url];
 
@@ -76,11 +75,14 @@ export async function POST(
     const updated = await prisma.auction.update({
       where: { id: params.auctionId },
       data: {
-        imagesPath: "", // legacy field safe to keep
+        imagesPath: "",
         images,
         coverImage,
       },
     });
+
+    // ⭐ DEBUG LOG (VERY IMPORTANT)
+    console.log("UPDATED IMAGES:", updated.images);
 
     return NextResponse.json({
       success: true,

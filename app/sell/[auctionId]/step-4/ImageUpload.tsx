@@ -23,9 +23,7 @@ export default function ImageUpload({
     try {
       const files = Array.from(e.target.files);
 
-      let latestImages: string[] = [];
-
-      // upload files sequentially (stable for Vercel)
+      // upload sequentially
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
@@ -44,25 +42,17 @@ export default function ImageUpload({
 
         const data = await res.json();
 
-        // ⭐ DEBUG LOG (IMPORTANT)
         console.log("UPLOAD RESPONSE:", data);
 
+        // ⭐ UPDATE UI IMMEDIATELY
         if (data.images?.length) {
-          latestImages = data.images;
+          onUploadComplete?.(data.images);
         }
-      }
-
-      // update parent AFTER all uploads finish
-      if (latestImages.length) {
-        onUploadComplete?.(latestImages);
       }
     } catch (err) {
       console.error("Upload error:", err);
     } finally {
-      // always reset uploading state
       setSaving(false);
-
-      // reset input so same file can re-upload
       e.target.value = "";
     }
   }
