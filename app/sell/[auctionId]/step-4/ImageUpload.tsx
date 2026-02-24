@@ -18,33 +18,39 @@ export default function ImageUpload({
   ) => {
     if (!e.target.files?.length) return;
 
-    const file = e.target.files[0];
-
-    const formData = new FormData();
-    formData.append("file", file);
+    const files = Array.from(e.target.files);
 
     try {
       setSaving(true);
 
-      const res = await fetch(
-        `/api/sell/${auction.id}/upload-image`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      let latestImages: string[] = [];
 
-      const data = await res.json();
+      // ⭐ upload files one-by-one safely
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
 
-      // ⭐ CRITICAL FIX:
-      // convert filenames → full image URLs
-      if (data.images && onUploadComplete) {
-        const fullImages = data.images.map(
-          (img: string) =>
-            `${auction.imagesPath}/${img}`
+        const res = await fetch(
+          `/api/sell/${auction.id}/upload-image`,
+          {
+            method: "POST",
+            body: formData,
+          }
         );
 
-        onUploadComplete(fullImages);
+        const data = await res.json();
+
+        if (data.images) {
+          latestImages = data.images.map(
+            (img: string) =>
+              `${auction.imagesPath}/${img}`
+          );
+        }
+      }
+
+      // update UI once at end (feels faster)
+      if (onUploadComplete) {
+        onUploadComplete(latestImages);
       }
     } catch (err) {
       console.error("Upload failed", err);
@@ -62,12 +68,15 @@ export default function ImageUpload({
       <input
         type="file"
         accept="image/*"
+        multiple
         onChange={handleUpload}
         className="block w-full text-sm"
       />
 
       <p className="text-xs text-gray-500 mt-3">
-        {saving ? "Uploading..." : "Images saved"}
+        {saving
+          ? "Uploading images..."
+          : "Images saved"}
       </p>
     </div>
   );
