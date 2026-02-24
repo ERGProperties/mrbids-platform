@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ImageUpload from "./ImageUpload";
 import CoverImageGrid from "./CoverImageGrid";
 import { useSellerPreview } from "@/components/seller/SellerPreviewContext";
@@ -15,13 +16,10 @@ export default function Step4Client({
   auction,
   initialImages,
 }: Props) {
-  // ⭐ normalize images (supports BOTH old local + new blob URLs)
+  const router = useRouter();
+
   const [images, setImages] = useState<string[]>(
-    (initialImages || []).map((img: string) =>
-      img.startsWith("http")
-        ? img
-        : `${auction.imagesPath}/${img}`
-    )
+    initialImages || []
   );
 
   const [coverImage, setCoverImage] = useState<string | null>(
@@ -30,14 +28,12 @@ export default function Step4Client({
 
   const { setPreviewData } = useSellerPreview();
 
-  // ⭐ keep seller preview synced
   useEffect(() => {
     setPreviewData({
       coverImage: coverImage || undefined,
     });
   }, [coverImage, setPreviewData]);
 
-  // ⭐ auto-set first image as cover if none exists
   useEffect(() => {
     if (!coverImage && images.length > 0) {
       setCoverImage(images[0]);
@@ -46,22 +42,17 @@ export default function Step4Client({
 
   return (
     <>
-      {/* IMAGE UPLOAD */}
       <ImageUpload
         auction={auction}
         onUploadComplete={(newImages: string[]) => {
-          // normalize uploaded images too
-          const normalized = newImages.map((img) =>
-            img.startsWith("http")
-              ? img
-              : `${auction.imagesPath}/${img}`
-          );
+          // update local UI immediately
+          setImages(newImages);
 
-          setImages([...normalized]);
+          // ⭐ FORCE SERVER REFRESH (production fix)
+          router.refresh();
         }}
       />
 
-      {/* IMAGE GRID */}
       {images.length > 0 && (
         <div className="mt-8">
           <h2 className="text-sm font-medium text-gray-700 mb-3">
@@ -88,7 +79,6 @@ export default function Step4Client({
         </div>
       )}
 
-      {/* CONTINUE */}
       <div className="mt-10">
         <Link
           href={`/sell/${auction.id}/step-5`}
