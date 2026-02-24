@@ -17,11 +17,12 @@ export default async function Step4Page({ params }: Props) {
     return notFound();
   }
 
-  // ⭐ SAFE JSON → string[] conversion
-  const initialImages: string[] = Array.isArray(
-    auction.images
-  )
-    ? (auction.images as string[])
+  // ⭐ FORCE SAFE JSON CONVERSION (production-safe)
+  const initialImages: string[] = Array.isArray(auction.images)
+    ? auction.images.filter(
+        (img): img is string =>
+          typeof img === "string"
+      )
     : [];
 
   return (
