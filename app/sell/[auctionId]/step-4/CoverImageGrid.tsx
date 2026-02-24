@@ -3,8 +3,9 @@
 interface Props {
   auctionId: string;
   images: string[];
-  coverImage?: string | null;
+  coverImage: string | null;
   onCoverChange?: (img: string) => void;
+  onDelete?: (img: string) => void;
 }
 
 export default function CoverImageGrid({
@@ -12,27 +13,33 @@ export default function CoverImageGrid({
   images,
   coverImage,
   onCoverChange,
+  onDelete,
 }: Props) {
-  const setCover = async (img: string) => {
-    try {
-      await fetch(`/api/sell/${auctionId}/set-cover-image`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          coverImage: img,
-        }),
-      });
+  async function setCover(img: string) {
+    await fetch(`/api/sell/${auctionId}/set-cover-image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ coverImage: img }),
+    });
 
-      // ⭐ update UI instantly (no reload)
-      if (onCoverChange) {
-        onCoverChange(img);
-      }
-    } catch (err) {
-      console.error("Failed to set cover image:", err);
-    }
-  };
+    onCoverChange?.(img);
+  }
+
+  async function deleteImage(img: string) {
+    await fetch(`/api/sell/${auctionId}/delete-image`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        image: img.split("/").pop(),
+      }),
+    });
+
+    onDelete?.(img);
+  }
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -40,20 +47,19 @@ export default function CoverImageGrid({
         const isCover = coverImage === img;
 
         return (
-          <button
+          <div
             key={img}
-            type="button"
-            onClick={() => setCover(img)}
-            className={`relative rounded-xl overflow-hidden border transition ${
+            className={`relative rounded-xl overflow-hidden border ${
               isCover
                 ? "ring-2 ring-black border-black"
-                : "border-gray-200 hover:border-gray-400"
+                : "border-gray-200"
             }`}
           >
             <img
               src={img}
-              alt="Property"
-              className="w-full h-40 object-cover"
+              alt=""
+              className="w-full h-40 object-cover cursor-pointer"
+              onClick={() => setCover(img)}
             />
 
             {isCover && (
@@ -61,7 +67,15 @@ export default function CoverImageGrid({
                 Cover
               </div>
             )}
-          </button>
+
+            <button
+              type="button"
+              onClick={() => deleteImage(img)}
+              className="absolute top-2 right-2 bg-white px-2 py-1 text-xs rounded"
+            >
+              ✕
+            </button>
+          </div>
         );
       })}
     </div>

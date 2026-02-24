@@ -16,14 +16,13 @@ export default function Step4Client({
   initialImages,
 }: Props) {
   const [images, setImages] = useState(initialImages);
-  const [coverImage, setCoverImage] = useState(
+  const [coverImage, setCoverImage] = useState<string | null>(
     auction.coverImage || null
   );
 
-  // ⭐ PREVIEW CONTEXT
   const { setPreviewData } = useSellerPreview();
 
-  // ⭐ KEEP PREVIEW IMAGE IN SYNC
+  // ⭐ keep live preview synced
   useEffect(() => {
     setPreviewData({
       coverImage: coverImage || undefined,
@@ -32,7 +31,7 @@ export default function Step4Client({
 
   return (
     <>
-      {/* Upload */}
+      {/* IMAGE UPLOAD */}
       <ImageUpload
         auction={auction}
         onUploadComplete={(newImages: string[]) => {
@@ -40,7 +39,7 @@ export default function Step4Client({
         }}
       />
 
-      {/* Image Grid */}
+      {/* IMAGE GRID */}
       {images.length > 0 && (
         <div className="mt-8">
           <h2 className="text-sm font-medium text-gray-700 mb-3">
@@ -51,13 +50,23 @@ export default function Step4Client({
             auctionId={auction.id}
             images={images}
             coverImage={coverImage}
-            onCoverChange={(img: string) =>
-              setCoverImage(img)
-            }
+            onCoverChange={(img: string) => {
+              setCoverImage(img);
+            }}
+            onDelete={(img: string) => {
+              setImages((prev) =>
+                prev.filter((i) => i !== img)
+              );
+
+              if (coverImage === img) {
+                setCoverImage(null);
+              }
+            }}
           />
         </div>
       )}
 
+      {/* CONTINUE */}
       <div className="mt-10">
         <Link
           href={`/sell/${auction.id}/step-5`}
