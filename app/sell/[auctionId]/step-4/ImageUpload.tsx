@@ -26,16 +26,26 @@ export default function ImageUpload({
 
     for (const file of files) {
       try {
-        // ⭐ AGGRESSIVE SAFE COMPRESSION
-        const compressed = await imageCompression(file, {
-          maxSizeMB: 1,              // hard cap
-          maxWidthOrHeight: 1200,    // perfect for listings
-          initialQuality: 0.6,       // strong compression
-          useWebWorker: true,
-        });
+        let uploadFile: File | Blob = file;
+
+        // ⭐ TRY compression first
+        try {
+          uploadFile = await imageCompression(file, {
+            maxSizeMB: 1,
+            maxWidthOrHeight: 1200,
+            initialQuality: 0.6,
+            useWebWorker: true,
+          });
+        } catch {
+          // ⭐ FALLBACK: use original file
+          console.warn(
+            "Compression failed, using original:",
+            file.name
+          );
+        }
 
         const formData = new FormData();
-        formData.append("file", compressed);
+        formData.append("file", uploadFile);
 
         const res = await fetch(
           `/api/sell/${auction.id}/upload-image`,
@@ -55,11 +65,8 @@ export default function ImageUpload({
         if (data.images?.length) {
           latestImages = data.images;
         }
-      } catch (err) {
-        console.warn(
-          "Compression or upload failed:",
-          file.name
-        );
+      } catch {
+        console.warn("Upload crashed:", file.name);
         continue;
       }
     }
