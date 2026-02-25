@@ -2,14 +2,21 @@ export const runtime = "nodejs";
 
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  secure: true,
+});
 
 export async function POST(
   request: Request,
   { params }: { params: { auctionId: string } }
 ) {
   try {
+    console.log("ENV CHECK:", {
+      CLOUDINARY_URL: !!process.env.CLOUDINARY_URL,
+    });
+
     const formData = await request.formData();
     const file = formData.get("file");
 
@@ -23,21 +30,28 @@ export async function POST(
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadDir = path.join(
-      process.cwd(),
-      "public",
-      "uploads"
+    const uploadResult: any = await new Promise(
+      (resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "mrbids",
+            public_id: `${params.auctionId}-${Date.now()}`,
+          },
+          (error, result) => {
+            if (error) {
+              console.error("CLOUDINARY ERROR:", error);
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+
+        stream.end(buffer);
+      }
     );
 
-    await mkdir(uploadDir, { recursive: true });
-
-    // ⭐ SAFE UNIQUE NAME (NEW)
-    const safeName = `${params.auctionId}-${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
-
-    const filePath = path.join(uploadDir, safeName);
-    await writeFile(filePath, buffer);
-
-    const url = `/uploads/${safeName}`;
+    const url = uploadResult.secure_url;
 
     const auction = await prisma.auction.findUnique({
       where: { id: params.auctionId },
@@ -52,8 +66,7 @@ export async function POST(
 
     const existingImages = Array.isArray(auction.images)
       ? auction.images.filter(
-          (img): img is string =>
-            typeof img === "string"
+          (img): img is string => typeof img === "string"
         )
       : [];
 
@@ -74,11 +87,11 @@ export async function POST(
       success: true,
       images: updated.images,
     });
-  } catch (err) {
-    console.error(err);
+  } catch (err: any) {
+    console.error("UPLOAD ERROR FULL:", err);
 
     return NextResponse.json(
-      { error: "Upload failed" },
+      { error: err?.message || "Upload failed" },
       { status: 500 }
     );
   }
