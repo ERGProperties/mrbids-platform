@@ -36,6 +36,7 @@ export async function POST(
           {
             folder: "mrbids",
             public_id: `${params.auctionId}-${Date.now()}`,
+            format: "jpg", // ⭐ forces browser-safe format
           },
           (error, result) => {
             if (error) {
