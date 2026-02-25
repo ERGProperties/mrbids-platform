@@ -9,23 +9,33 @@ type AuctionImageGalleryProps = {
 
 export function AuctionImageGallery({ images }: AuctionImageGalleryProps) {
   const [activeImage, setActiveImage] = useState(images[0]);
+  const [hiddenImages, setHiddenImages] = useState<string[]>([]);
+
+  const safeImages = images.filter(
+    (img) => !hiddenImages.includes(img)
+  );
 
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg border">
-        <Image
-          src={activeImage}
-          alt="Property image"
-          fill
-          className="object-cover"
-          priority
-        />
-      </div>
+      {activeImage && !hiddenImages.includes(activeImage) && (
+        <div className="relative w-full aspect-[4/3] overflow-hidden rounded-lg border">
+          <Image
+            src={activeImage}
+            alt="Property image"
+            fill
+            className="object-cover"
+            priority
+            onError={() =>
+              setHiddenImages((prev) => [...prev, activeImage])
+            }
+          />
+        </div>
+      )}
 
       {/* Thumbnails */}
       <div className="grid grid-cols-5 gap-2">
-        {images.map((img) => (
+        {safeImages.map((img) => (
           <button
             key={img}
             onClick={() => setActiveImage(img)}
@@ -41,6 +51,9 @@ export function AuctionImageGallery({ images }: AuctionImageGalleryProps) {
               alt="Property thumbnail"
               fill
               className="object-cover"
+              onError={() =>
+                setHiddenImages((prev) => [...prev, img])
+              }
             />
           </button>
         ))}
