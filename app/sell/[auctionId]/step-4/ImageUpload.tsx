@@ -27,6 +27,7 @@ export default function ImageUpload({
       try {
         let uploadFile = file;
 
+        // skip compression for HEIC
         if (!file.name.toLowerCase().endsWith(".heic")) {
           uploadFile = await imageCompression(file, {
             maxSizeMB: 1.5,
@@ -50,7 +51,7 @@ export default function ImageUpload({
       }
     }
 
-    // ⭐ ONLY refresh once after ALL uploads finish
+    // ⭐ refresh once after ALL uploads
     onUploadComplete?.();
 
     setSaving(false);

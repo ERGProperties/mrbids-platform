@@ -46,7 +46,6 @@ export async function POST(
 
     const url = uploadResult.secure_url;
 
-    // ⭐ SAFE TRANSACTION VERSION
     const updated = await prisma.$transaction(
       async (tx) => {
         const auction = await tx.auction.findUnique({
@@ -79,9 +78,9 @@ export async function POST(
       }
     );
 
+    // ⭐ IMPORTANT: do NOT return images array
     return NextResponse.json({
       success: true,
-      images: updated.images,
     });
   } catch (err: any) {
     console.error("UPLOAD ERROR:", err);
