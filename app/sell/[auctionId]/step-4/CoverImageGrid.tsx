@@ -53,7 +53,6 @@ export default function CoverImageGrid({
                 : "border-gray-200"
             }`}
           >
-            {/* ⭐ FORCED RAW IMAGE RENDER */}
             <img
               src={img}
               alt="Auction"
@@ -62,7 +61,9 @@ export default function CoverImageGrid({
               className="w-full h-40 object-cover cursor-pointer"
               onClick={() => setCover(img)}
               onError={(e) => {
-                console.error("IMAGE LOAD FAILED:", img);
+                // silently hide broken images
+                (e.currentTarget as HTMLImageElement).style.display =
+                  "none";
               }}
             />
 
