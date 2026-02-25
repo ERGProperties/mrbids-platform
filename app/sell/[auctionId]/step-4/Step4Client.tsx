@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import ImageUpload from "./ImageUpload";
 import CoverImageGrid from "./CoverImageGrid";
 import { useSellerPreview } from "@/components/seller/SellerPreviewContext";
@@ -16,8 +15,6 @@ export default function Step4Client({
   auction,
   initialImages,
 }: Props) {
-  const router = useRouter();
-
   const [images, setImages] = useState<string[]>(
     initialImages || []
   );
@@ -28,14 +25,14 @@ export default function Step4Client({
 
   const { setPreviewData } = useSellerPreview();
 
-  // keep preview synced
+  // Keep preview synced
   useEffect(() => {
     setPreviewData({
       coverImage: coverImage || undefined,
     });
   }, [coverImage, setPreviewData]);
 
-  // auto set cover
+  // Auto-set cover image
   useEffect(() => {
     if (!coverImage && images.length > 0) {
       setCoverImage(images[0]);
@@ -47,12 +44,8 @@ export default function Step4Client({
       <ImageUpload
         auction={auction}
         onUploadComplete={(newImages: string[]) => {
-          // update UI immediately
-          setImages([...newImages]);
-
-          // ⭐ CRITICAL FIX
-          // force server re-fetch after upload
-          router.refresh();
+          // ⭐ FIX: just update state
+          setImages(newImages);
         }}
       />
 
@@ -77,8 +70,6 @@ export default function Step4Client({
               if (coverImage === img) {
                 setCoverImage(null);
               }
-
-              router.refresh();
             }}
           />
         </div>
