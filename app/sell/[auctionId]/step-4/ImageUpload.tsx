@@ -26,10 +26,11 @@ export default function ImageUpload({
 
     for (const file of files) {
       try {
-        // ⭐ SAFE compression config
+        // ⭐ AGGRESSIVE SAFE COMPRESSION
         const compressed = await imageCompression(file, {
-          maxSizeMB: 2,
-          maxWidthOrHeight: 1600,
+          maxSizeMB: 1,              // hard cap
+          maxWidthOrHeight: 1200,    // perfect for listings
+          initialQuality: 0.6,       // strong compression
           useWebWorker: true,
         });
 
@@ -55,7 +56,11 @@ export default function ImageUpload({
           latestImages = data.images;
         }
       } catch (err) {
-        console.warn("Compression or upload failed:", file.name);
+        console.warn(
+          "Compression or upload failed:",
+          file.name
+        );
+        continue;
       }
     }
 
