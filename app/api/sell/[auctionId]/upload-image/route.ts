@@ -4,7 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 
-cloudinary.config({ secure: true });
+cloudinary.config({
+  secure: true,
+});
 
 export async function POST(
   request: Request,
@@ -44,38 +46,18 @@ export async function POST(
 
     const url = uploadResult.secure_url;
 
-    // ⭐ CRITICAL FIX: use transaction to avoid race conditions
-    const updated = await prisma.$transaction(
-      async (tx) => {
-        const auction = await tx.auction.findUnique({
-          where: { id: params.auctionId },
-        });
-
-        if (!auction) {
-          throw new Error("Auction not found");
-        }
-
-        const existingImages = Array.isArray(auction.images)
-          ? auction.images.filter(
-              (img): img is string =>
-                typeof img === "string"
-            )
-          : [];
-
-        const images = [...existingImages, url];
-
-        return tx.auction.update({
-          where: { id: params.auctionId },
-          data: {
-            images,
-            coverImage:
-              existingImages.length === 0
-                ? url
-                : auction.coverImage,
-          },
-        });
-      }
-    );
+    // ⭐ CRITICAL FIX: atomic update
+    const updated = await prisma.auction.update({
+      where: { id: params.auctionId },
+      data: {
+        images: {
+          push: url,
+        },
+        coverImage: {
+          set: undefined,
+        },
+      },
+    });
 
     return NextResponse.json({
       success: true,
