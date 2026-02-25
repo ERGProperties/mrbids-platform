@@ -19,6 +19,9 @@ export default async function Step4Page({ params }: Props) {
     return notFound();
   }
 
+  // ⭐ DEBUG — VERY IMPORTANT
+  console.log("STEP4 SERVER IMAGES:", auction.images);
+
   // ⭐ SAFE JSON → string[] conversion (production-safe)
   const initialImages: string[] = Array.isArray(auction.images)
     ? auction.images.filter(

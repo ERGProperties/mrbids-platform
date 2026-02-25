@@ -33,9 +33,7 @@ export default function CoverImageGrid({
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        image: img, // full blob URL
-      }),
+      body: JSON.stringify({ image: img }),
     });
 
     onDelete?.(img);
@@ -55,11 +53,17 @@ export default function CoverImageGrid({
                 : "border-gray-200"
             }`}
           >
+            {/* ⭐ FORCED RAW IMAGE RENDER */}
             <img
               src={img}
-              alt=""
+              alt="Auction"
+              loading="lazy"
+              referrerPolicy="no-referrer"
               className="w-full h-40 object-cover cursor-pointer"
               onClick={() => setCover(img)}
+              onError={(e) => {
+                console.error("IMAGE LOAD FAILED:", img);
+              }}
             />
 
             {isCover && (
