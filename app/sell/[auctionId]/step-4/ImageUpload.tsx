@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import imageCompression from "browser-image-compression";
 
 interface Props {
   auction: any;
@@ -26,18 +25,8 @@ export default function ImageUpload({
 
     for (const file of files) {
       try {
-        let uploadFile = file;
-
-        if (!file.name.toLowerCase().endsWith(".heic")) {
-          uploadFile = await imageCompression(file, {
-            maxSizeMB: 1.5,
-            maxWidthOrHeight: 1920,
-            useWebWorker: true,
-          });
-        }
-
         const formData = new FormData();
-        formData.append("file", uploadFile);
+        formData.append("file", file);
 
         const res = await fetch(
           `/api/sell/${auction.id}/upload-image`,
@@ -47,15 +36,18 @@ export default function ImageUpload({
           }
         );
 
-        if (!res.ok) continue;
+        if (!res.ok) {
+          console.warn("Upload failed:", file.name);
+          continue;
+        }
 
         const data = await res.json();
 
         if (data.images?.length) {
           latestImages = data.images;
         }
-      } catch {
-        continue;
+      } catch (err) {
+        console.warn("Upload crashed:", file.name);
       }
     }
 
