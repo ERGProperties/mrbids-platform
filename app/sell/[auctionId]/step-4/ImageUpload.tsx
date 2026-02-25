@@ -21,14 +21,13 @@ export default function ImageUpload({
 
     setSaving(true);
 
-    try {
-      const files = Array.from(e.target.files);
-      let latestImages: string[] = [];
+    const files = Array.from(e.target.files);
+    let latestImages: string[] = [];
 
-      for (const file of files) {
+    for (const file of files) {
+      try {
         let uploadFile = file;
 
-        // ⭐ skip compression for HEIC (prevents Event error)
         if (!file.name.toLowerCase().endsWith(".heic")) {
           uploadFile = await imageCompression(file, {
             maxSizeMB: 1.5,
@@ -49,7 +48,7 @@ export default function ImageUpload({
         );
 
         if (!res.ok) {
-          throw new Error("Upload failed");
+          continue; // silently skip failed file
         }
 
         const data = await res.json();
@@ -57,17 +56,18 @@ export default function ImageUpload({
         if (data.images?.length) {
           latestImages = data.images;
         }
+      } catch {
+        // silently skip bad file
+        continue;
       }
-
-      if (latestImages.length) {
-        onUploadComplete?.(latestImages);
-      }
-    } catch (err) {
-      console.error("Upload error:", err);
-    } finally {
-      setSaving(false);
-      e.target.value = "";
     }
+
+    if (latestImages.length) {
+      onUploadComplete?.(latestImages);
+    }
+
+    setSaving(false);
+    e.target.value = "";
   }
 
   return (
