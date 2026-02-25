@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -19,10 +20,10 @@ export default async function Step4Page({ params }: Props) {
     return notFound();
   }
 
-  // ⭐ DEBUG — VERY IMPORTANT
+  // ⭐ DEBUG — confirms production sees images
   console.log("STEP4 SERVER IMAGES:", auction.images);
 
-  // ⭐ SAFE JSON → string[] conversion (production-safe)
+  // ⭐ SAFE JSON → string[] conversion
   const initialImages: string[] = Array.isArray(auction.images)
     ? auction.images.filter(
         (img): img is string =>
