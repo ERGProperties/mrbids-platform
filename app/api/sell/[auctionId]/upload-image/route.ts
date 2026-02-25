@@ -46,41 +46,37 @@ export async function POST(
 
     const url = uploadResult.secure_url;
 
-    const updated = await prisma.$transaction(
-      async (tx) => {
-        const auction = await tx.auction.findUnique({
-          where: { id: params.auctionId },
-        });
+    const updated = await prisma.$transaction(async (tx) => {
+      const auction = await tx.auction.findUnique({
+        where: { id: params.auctionId },
+      });
 
-        if (!auction) {
-          throw new Error("Auction not found");
-        }
+      if (!auction) throw new Error("Auction not found");
 
-        const existingImages = Array.isArray(auction.images)
-          ? auction.images.filter(
-              (img): img is string =>
-                typeof img === "string"
-            )
-          : [];
+      const existingImages = Array.isArray(auction.images)
+        ? auction.images.filter(
+            (img): img is string => typeof img === "string"
+          )
+        : [];
 
-        const images = [...existingImages, url];
+      const images = [...existingImages, url];
 
-        return tx.auction.update({
-          where: { id: params.auctionId },
-          data: {
-            images,
-            coverImage:
-              existingImages.length === 0
-                ? url
-                : auction.coverImage,
-          },
-        });
-      }
-    );
+      return tx.auction.update({
+        where: { id: params.auctionId },
+        data: {
+          images,
+          coverImage:
+            existingImages.length === 0
+              ? url
+              : auction.coverImage,
+        },
+      });
+    });
 
-    // ⭐ IMPORTANT: do NOT return images array
+    // ⭐ RETURN IMAGES AGAIN (important)
     return NextResponse.json({
       success: true,
+      images: updated.images,
     });
   } catch (err: any) {
     console.error("UPLOAD ERROR:", err);

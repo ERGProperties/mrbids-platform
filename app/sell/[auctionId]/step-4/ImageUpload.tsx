@@ -5,7 +5,7 @@ import imageCompression from "browser-image-compression";
 
 interface Props {
   auction: any;
-  onUploadComplete?: () => void;
+  onUploadComplete?: (images: string[]) => void;
 }
 
 export default function ImageUpload({
@@ -22,12 +22,12 @@ export default function ImageUpload({
     setSaving(true);
 
     const files = Array.from(e.target.files);
+    let latestImages: string[] = [];
 
     for (const file of files) {
       try {
         let uploadFile = file;
 
-        // skip compression for HEIC
         if (!file.name.toLowerCase().endsWith(".heic")) {
           uploadFile = await imageCompression(file, {
             maxSizeMB: 1.5,
@@ -39,20 +39,29 @@ export default function ImageUpload({
         const formData = new FormData();
         formData.append("file", uploadFile);
 
-        await fetch(
+        const res = await fetch(
           `/api/sell/${auction.id}/upload-image`,
           {
             method: "POST",
             body: formData,
           }
         );
+
+        if (!res.ok) continue;
+
+        const data = await res.json();
+
+        if (data.images?.length) {
+          latestImages = data.images;
+        }
       } catch {
         continue;
       }
     }
 
-    // ⭐ refresh once after ALL uploads
-    onUploadComplete?.();
+    if (latestImages.length) {
+      onUploadComplete?.(latestImages);
+    }
 
     setSaving(false);
     e.target.value = "";

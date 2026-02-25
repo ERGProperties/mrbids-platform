@@ -25,14 +25,12 @@ export default function Step4Client({
 
   const { setPreviewData } = useSellerPreview();
 
-  // keep preview synced
   useEffect(() => {
     setPreviewData({
       coverImage: coverImage || undefined,
     });
   }, [coverImage, setPreviewData]);
 
-  // auto set cover image
   useEffect(() => {
     if (!coverImage && images.length > 0) {
       setCoverImage(images[0]);
@@ -43,10 +41,8 @@ export default function Step4Client({
     <>
       <ImageUpload
         auction={auction}
-        onUploadComplete={() => {
-          // ⭐ SIMPLE + STABLE FIX
-          // reload once after uploads finish
-          window.location.reload();
+        onUploadComplete={(newImages) => {
+          setImages(newImages);
         }}
       />
 
@@ -60,10 +56,8 @@ export default function Step4Client({
             auctionId={auction.id}
             images={images}
             coverImage={coverImage}
-            onCoverChange={(img: string) => {
-              setCoverImage(img);
-            }}
-            onDelete={(img: string) => {
+            onCoverChange={setCoverImage}
+            onDelete={(img) => {
               setImages((prev) =>
                 prev.filter((i) => i !== img)
               );
