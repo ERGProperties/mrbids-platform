@@ -1,33 +1,22 @@
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const maxDuration = 60;
 
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
-
-function getExtension(name: string) {
-  return name.split(".").pop() || "jpg";
-}
 
 export async function POST(
   request: Request,
   { params }: { params: { auctionId: string } }
 ) {
   try {
-    const formData = await request.formData();
-    const file = formData.get("file") as File;
+    const { url } = await request.json();
 
-    if (!file) {
+    if (!url) {
       return NextResponse.json(
-        { error: "No file uploaded" },
+        { error: "Missing URL" },
         { status: 400 }
       );
     }
 
-    // =========================
-    // Load auction
-    // =========================
     const auction = await prisma.auction.findUnique({
       where: { id: params.auctionId },
     });
@@ -39,9 +28,6 @@ export async function POST(
       );
     }
 
-    // =========================
-    // Existing images
-    // =========================
     const existingImages = Array.isArray(auction.images)
       ? auction.images.filter(
           (img): img is string =>
@@ -49,57 +35,25 @@ export async function POST(
         )
       : [];
 
-    // =========================
-    // Unique filename
-    // =========================
-    const ext = getExtension(file.name);
-    const fileName = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
-
-    // =========================
-    // Upload to Vercel Blob
-    // =========================
-    const blob = await put(
-      `auctions/${auction.slug || params.auctionId}/${fileName}`,
-      file,
-      {
-        access: "public",
-        addRandomSuffix: false,
-      }
-    );
-
-    // =========================
-    // Save DB
-    // =========================
-    const images = [...existingImages, blob.url];
-
-    const coverImage =
-      images.length === 1
-        ? blob.url
-        : auction.coverImage;
+    const images = [...existingImages, url];
 
     const updated = await prisma.auction.update({
       where: { id: params.auctionId },
       data: {
-        imagesPath: "",
         images,
-        coverImage,
+        coverImage:
+          existingImages.length === 0
+            ? url
+            : auction.coverImage,
       },
     });
 
-    const safeImages =
-      Array.isArray(updated.images)
-        ? updated.images.filter(
-            (img): img is string =>
-              typeof img === "string"
-          )
-        : [];
-
     return NextResponse.json({
       success: true,
-      images: safeImages,
+      images: updated.images,
     });
   } catch (err) {
-    console.error("UPLOAD ERROR:", err);
+    console.error(err);
 
     return NextResponse.json(
       { error: "Upload failed" },

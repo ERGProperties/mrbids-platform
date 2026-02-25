@@ -13,45 +13,6 @@ export default function ImageUpload({
 }: Props) {
   const [saving, setSaving] = useState(false);
 
-  async function compressImage(file: File): Promise<File> {
-    const bitmap = await createImageBitmap(file);
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d")!;
-
-    const MAX = 1600;
-
-    let width = bitmap.width;
-    let height = bitmap.height;
-
-    if (width > height && width > MAX) {
-      height *= MAX / width;
-      width = MAX;
-    } else if (height > MAX) {
-      width *= MAX / height;
-      height = MAX;
-    }
-
-    canvas.width = width;
-    canvas.height = height;
-
-    ctx.drawImage(bitmap, 0, 0, width, height);
-
-    return new Promise((resolve) => {
-      canvas.toBlob(
-        (blob) => {
-          resolve(
-            new File([blob!], file.name, {
-              type: "image/jpeg",
-            })
-          );
-        },
-        "image/jpeg",
-        0.8
-      );
-    });
-  }
-
   async function handleUpload(
     e: React.ChangeEvent<HTMLInputElement>
   ) {
@@ -65,23 +26,40 @@ export default function ImageUpload({
       let latestImages: string[] = [];
 
       for (const file of files) {
-        // ⭐ COMPRESS FIRST (fixes 413)
-        const compressed = await compressImage(file);
+        // 1️⃣ get upload URL
+        const urlRes = await fetch(
+          `/api/sell/${auction.id}/upload-url`,
+          { method: "POST" }
+        );
 
-        const formData = new FormData();
-        formData.append("file", compressed);
+        const { uploadUrl } = await urlRes.json();
 
-        const res = await fetch(
+        // 2️⃣ DIRECT upload to Blob (NO SIZE LIMIT)
+        const blobRes = await fetch(uploadUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type,
+          },
+        });
+
+        const blob = await blobRes.json();
+
+        // 3️⃣ save image in DB
+        const saveRes = await fetch(
           `/api/sell/${auction.id}/upload-image`,
           {
             method: "POST",
-            body: formData,
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              url: blob.url,
+            }),
           }
         );
 
-        if (!res.ok) throw new Error("Upload failed");
-
-        const data = await res.json();
+        const data = await saveRes.json();
 
         if (data.images?.length) {
           latestImages = data.images;
