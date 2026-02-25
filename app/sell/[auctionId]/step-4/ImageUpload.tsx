@@ -28,7 +28,7 @@ export default function ImageUpload({
       try {
         let uploadFile = file;
 
-        // Skip compression for HEIC
+        // Skip compression for HEIC (Cloudinary will convert)
         if (!file.name.toLowerCase().endsWith(".heic")) {
           uploadFile = await imageCompression(file, {
             maxSizeMB: 1.5,
