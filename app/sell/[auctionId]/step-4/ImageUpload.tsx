@@ -5,7 +5,7 @@ import imageCompression from "browser-image-compression";
 
 interface Props {
   auction: any;
-  onUploadComplete?: (images: string[]) => void;
+  onUploadComplete?: () => void;
 }
 
 export default function ImageUpload({
@@ -22,13 +22,11 @@ export default function ImageUpload({
     setSaving(true);
 
     const files = Array.from(e.target.files);
-    let latestImages: string[] = [];
 
     for (const file of files) {
       try {
         let uploadFile = file;
 
-        // Skip compression for HEIC (Cloudinary converts)
         if (!file.name.toLowerCase().endsWith(".heic")) {
           uploadFile = await imageCompression(file, {
             maxSizeMB: 1.5,
@@ -40,34 +38,20 @@ export default function ImageUpload({
         const formData = new FormData();
         formData.append("file", uploadFile);
 
-        const res = await fetch(
+        await fetch(
           `/api/sell/${auction.id}/upload-image`,
           {
             method: "POST",
             body: formData,
           }
         );
-
-        // show warning if upload fails
-        if (!res.ok) {
-          console.warn("Upload failed:", file.name);
-          continue;
-        }
-
-        const data = await res.json();
-
-        if (data.images?.length) {
-          latestImages = data.images;
-        }
-      } catch (err) {
-        console.warn("Skipped file:", file.name);
+      } catch {
         continue;
       }
     }
 
-    if (latestImages.length) {
-      onUploadComplete?.(latestImages);
-    }
+    // ⭐ ONLY refresh once after ALL uploads finish
+    onUploadComplete?.();
 
     setSaving(false);
     e.target.value = "";
