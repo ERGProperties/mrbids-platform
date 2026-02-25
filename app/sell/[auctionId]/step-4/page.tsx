@@ -20,20 +20,22 @@ export default async function Step4Page({ params }: Props) {
     return notFound();
   }
 
-  // ⭐ DEBUG — confirms production sees images
-  console.log("STEP4 SERVER IMAGES:", auction.images);
-
-  // ⭐ SAFE JSON → string[] conversion
+  // ⭐ SAFE IMAGE ARRAY
   const initialImages: string[] = Array.isArray(auction.images)
     ? auction.images.filter(
-        (img): img is string =>
-          typeof img === "string"
+        (img): img is string => typeof img === "string"
       )
     : [];
 
+  // ⭐ SERIALIZABLE SAFE OBJECT (IMPORTANT)
+  const safeAuction = {
+    id: auction.id,
+    coverImage: auction.coverImage ?? null,
+  };
+
   return (
     <Step4Client
-      auction={auction}
+      auction={safeAuction}
       initialImages={initialImages}
     />
   );
