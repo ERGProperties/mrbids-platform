@@ -28,6 +28,7 @@ export default function ImageUpload({
       try {
         let uploadFile = file;
 
+        // Skip compression for HEIC
         if (!file.name.toLowerCase().endsWith(".heic")) {
           uploadFile = await imageCompression(file, {
             maxSizeMB: 1.5,
@@ -47,9 +48,8 @@ export default function ImageUpload({
           }
         );
 
-        if (!res.ok) {
-          continue; // silently skip failed file
-        }
+        // silently skip failed uploads
+        if (!res.ok) continue;
 
         const data = await res.json();
 
@@ -57,7 +57,7 @@ export default function ImageUpload({
           latestImages = data.images;
         }
       } catch {
-        // silently skip bad file
+        // silently skip bad files
         continue;
       }
     }
