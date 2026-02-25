@@ -1,4 +1,15 @@
 export const runtime = "nodejs";
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
+// ⭐ FIXES 413 Payload Too Large (Vercel)
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "25mb",
+    },
+  },
+};
 
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
@@ -84,11 +95,10 @@ export async function POST(
       },
     });
 
-    // ⭐ DEBUG LOG
     console.log("UPDATED IMAGES:", updated.images);
 
     // =========================
-    // SAFE RESPONSE (production fix)
+    // SAFE RESPONSE
     // =========================
     const safeImages =
       Array.isArray(updated.images)
