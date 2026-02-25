@@ -13,6 +13,7 @@ export default function ImageUpload({
   onUploadComplete,
 }: Props) {
   const [saving, setSaving] = useState(false);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   async function handleUpload(
     e: React.ChangeEvent<HTMLInputElement>
@@ -23,10 +24,16 @@ export default function ImageUpload({
 
     try {
       const files = Array.from(e.target.files);
+
+      // ⭐ instant previews
+      const previews = files.map((file) =>
+        URL.createObjectURL(file)
+      );
+      setPreviewUrls((prev) => [...prev, ...previews]);
+
       let latestImages: string[] = [];
 
       for (const file of files) {
-        // ⭐ compress image BEFORE upload
         const compressedFile =
           await imageCompression(file, {
             maxSizeMB: 1.5,
@@ -83,6 +90,20 @@ export default function ImageUpload({
       <p className="text-xs text-gray-500 mt-2">
         {saving ? "Uploading..." : "Images saved"}
       </p>
+
+      {/* ⭐ Instant Preview Grid */}
+      {previewUrls.length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">
+          {previewUrls.map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt="Preview"
+              className="w-full h-32 object-cover rounded-lg"
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
