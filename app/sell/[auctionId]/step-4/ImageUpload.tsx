@@ -28,7 +28,7 @@ export default function ImageUpload({
       try {
         let uploadFile = file;
 
-        // Skip compression for HEIC (Cloudinary will convert)
+        // Skip compression for HEIC (Cloudinary converts)
         if (!file.name.toLowerCase().endsWith(".heic")) {
           uploadFile = await imageCompression(file, {
             maxSizeMB: 1.5,
@@ -48,16 +48,19 @@ export default function ImageUpload({
           }
         );
 
-        // silently skip failed uploads
-        if (!res.ok) continue;
+        // show warning if upload fails
+        if (!res.ok) {
+          console.warn("Upload failed:", file.name);
+          continue;
+        }
 
         const data = await res.json();
 
         if (data.images?.length) {
           latestImages = data.images;
         }
-      } catch {
-        // silently skip bad files
+      } catch (err) {
+        console.warn("Skipped file:", file.name);
         continue;
       }
     }
