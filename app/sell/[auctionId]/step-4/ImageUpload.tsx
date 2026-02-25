@@ -22,44 +22,26 @@ export default function ImageUpload({
 
     try {
       const files = Array.from(e.target.files);
-
       let latestImages: string[] = [];
 
+      // upload sequentially (stable)
       for (const file of files) {
-        // 1️⃣ get upload URL
-        const urlRes = await fetch(
-          `/api/sell/${auction.id}/upload-url`,
-          { method: "POST" }
-        );
+        const formData = new FormData();
+        formData.append("file", file);
 
-        const { uploadUrl } = await urlRes.json();
-
-        // 2️⃣ DIRECT upload to Blob (NO SIZE LIMIT)
-        const blobRes = await fetch(uploadUrl, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type,
-          },
-        });
-
-        const blob = await blobRes.json();
-
-        // 3️⃣ save image in DB
-        const saveRes = await fetch(
+        const res = await fetch(
           `/api/sell/${auction.id}/upload-image`,
           {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              url: blob.url,
-            }),
+            body: formData,
           }
         );
 
-        const data = await saveRes.json();
+        if (!res.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const data = await res.json();
 
         if (data.images?.length) {
           latestImages = data.images;
