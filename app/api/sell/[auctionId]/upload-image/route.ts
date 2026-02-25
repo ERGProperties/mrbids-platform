@@ -1,15 +1,6 @@
 export const runtime = "nodejs";
-export const maxDuration = 60;
 export const dynamic = "force-dynamic";
-
-// ⭐ FIXES 413 Payload Too Large (Vercel)
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "25mb",
-    },
-  },
-};
+export const maxDuration = 60;
 
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
@@ -59,7 +50,7 @@ export async function POST(
       : [];
 
     // =========================
-    // UNIQUE filename
+    // Unique filename
     // =========================
     const ext = getExtension(file.name);
     const fileName = `${Date.now()}-${crypto.randomUUID()}.${ext}`;
@@ -95,11 +86,6 @@ export async function POST(
       },
     });
 
-    console.log("UPDATED IMAGES:", updated.images);
-
-    // =========================
-    // SAFE RESPONSE
-    // =========================
     const safeImages =
       Array.isArray(updated.images)
         ? updated.images.filter(
@@ -113,7 +99,7 @@ export async function POST(
       images: safeImages,
     });
   } catch (err) {
-    console.error(err);
+    console.error("UPLOAD ERROR:", err);
 
     return NextResponse.json(
       { error: "Upload failed" },
