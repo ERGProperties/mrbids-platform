@@ -26,15 +26,19 @@ export default function ImageUpload({
       let latestImages: string[] = [];
 
       for (const file of files) {
-        const compressedFile =
-          await imageCompression(file, {
+        let uploadFile = file;
+
+        // ⭐ skip compression for HEIC (prevents Event error)
+        if (!file.name.toLowerCase().endsWith(".heic")) {
+          uploadFile = await imageCompression(file, {
             maxSizeMB: 1.5,
             maxWidthOrHeight: 1920,
             useWebWorker: true,
           });
+        }
 
         const formData = new FormData();
-        formData.append("file", compressedFile);
+        formData.append("file", uploadFile);
 
         const res = await fetch(
           `/api/sell/${auction.id}/upload-image`,
