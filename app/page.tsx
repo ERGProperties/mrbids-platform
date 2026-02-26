@@ -27,16 +27,12 @@ function getPrimaryImage(auction: any) {
 function AuctionImage({ src }: { src: string | null }) {
   return (
     <div className="h-full w-full bg-gray-100 overflow-hidden">
-      {src ? (
+      {typeof src === "string" && src.length > 0 ? (
         <img
           src={src}
           alt=""
           className="h-full w-full object-cover"
           loading="lazy"
-          onError={(e) => {
-            console.error("Image failed:", src);
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
         />
       ) : (
         <div className="h-full w-full flex items-center justify-center text-sm text-gray-400">
@@ -97,12 +93,16 @@ function StatusBadge({ status }: { status: string }) {
 /* ---------- PAGE ---------- */
 
 export default async function HomePage() {
-  const auctions = (await getAllAuctions()) ?? [];
+  let auctions: any[] = [];
 
-  const live = Array.isArray(auctions)
-    ? auctions.filter((a) => a?.status === "LIVE")
-    : [];
+  try {
+    const result = await getAllAuctions();
+    auctions = Array.isArray(result) ? result : [];
+  } catch (err) {
+    console.error("Failed loading auctions:", err);
+  }
 
+  const live = auctions.filter((a) => a?.status === "LIVE");
   const featured = live.length > 0 ? live[0] : null;
 
   return (
@@ -177,12 +177,11 @@ export default async function HomePage() {
       {featured && (
         <section className="border-y bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 py-24">
-
             <div className="flex items-center gap-3 mb-5">
               <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
                 Featured Auction
               </p>
-              <StatusBadge status={getTimeStatus(featured.endAt)} />
+              <StatusBadge status={getTimeStatus(featured?.endAt)} />
             </div>
 
             <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden">
@@ -191,27 +190,22 @@ export default async function HomePage() {
               </div>
 
               <div className="p-12 flex flex-col justify-center">
-                <h2 className="text-4xl font-semibold">{featured.title}</h2>
-
+                <h2 className="text-4xl font-semibold">{featured?.title}</h2>
                 <p className="mt-4 text-sm text-gray-600">
-                  {featured.addressLine}
-                  <br />
-                  {featured.cityStateZip}
+                  {featured?.addressLine}<br />{featured?.cityStateZip}
                 </p>
-
                 <p className="mt-5 text-sm text-gray-600">
-                  Ends in {formatTimeRemaining(featured.endAt)}
+                  Ends in {formatTimeRemaining(featured?.endAt)}
                 </p>
 
                 <Link
-                  href={`/auctions/${featured.slug}`}
+                  href={`/auctions/${featured?.slug}`}
                   className="inline-block mt-10 px-8 py-3 bg-black text-white rounded-full"
                 >
                   View Featured Auction
                 </Link>
               </div>
             </div>
-
           </div>
         </section>
       )}
@@ -219,7 +213,6 @@ export default async function HomePage() {
       {/* LIVE AUCTIONS */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-24">
-
           <div className="flex items-center justify-between mb-12">
             <h2 className="text-4xl font-semibold">Live Auctions</h2>
             <Link href="/auctions" className="text-sm font-medium">
@@ -235,24 +228,19 @@ export default async function HomePage() {
                 </div>
 
                 <div className="p-7">
-                  <StatusBadge status={getTimeStatus(auction.endAt)} />
-
-                  <h3 className="mt-4 text-xl font-semibold">
-                    {auction.title}
-                  </h3>
+                  <StatusBadge status={getTimeStatus(auction?.endAt)} />
+                  <h3 className="mt-4 text-xl font-semibold">{auction?.title}</h3>
 
                   <p className="mt-2 text-sm text-gray-600">
-                    {auction.addressLine}
-                    <br />
-                    {auction.cityStateZip}
+                    {auction?.addressLine}<br />{auction?.cityStateZip}
                   </p>
 
                   <p className="mt-3 text-sm text-gray-600">
-                    Ends in {formatTimeRemaining(auction.endAt)}
+                    Ends in {formatTimeRemaining(auction?.endAt)}
                   </p>
 
                   <Link
-                    href={`/auctions/${auction.slug}`}
+                    href={`/auctions/${auction?.slug}`}
                     className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
                   >
                     View Auction
@@ -261,7 +249,6 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-
         </div>
       </section>
 
