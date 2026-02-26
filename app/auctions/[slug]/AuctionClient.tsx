@@ -33,7 +33,6 @@ export default function AuctionClient({
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
-        {/* HEADER */}
         <div className="mb-10 border-b border-gray-200 pb-6">
           <p className="text-[11px] uppercase tracking-[0.25em] text-gray-500 font-medium">
             LIVE AUCTION
@@ -50,13 +49,9 @@ export default function AuctionClient({
           </p>
         </div>
 
-        {/* MAIN GRID */}
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
 
-          {/* LEFT SIDE */}
           <div>
-
-            {/* MAIN IMAGE */}
             <div className="bg-white border rounded-2xl overflow-hidden mb-6">
               {selectedImage ? (
                 <img
@@ -71,7 +66,6 @@ export default function AuctionClient({
               )}
             </div>
 
-            {/* THUMBNAILS */}
             {imageList.length > 1 && (
               <div className="flex gap-3 mb-8 overflow-x-auto">
                 {imageList.map((img: string, i: number) => (
@@ -92,7 +86,6 @@ export default function AuctionClient({
               </div>
             )}
 
-            {/* PROPERTY DETAILS */}
             <div className="bg-white border rounded-2xl p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">
                 Property Details
@@ -106,7 +99,6 @@ export default function AuctionClient({
               </div>
             </div>
 
-            {/* DESCRIPTION */}
             <div className="bg-white border rounded-2xl p-6">
               <h2 className="text-xl font-semibold mb-4">
                 Description
@@ -117,7 +109,6 @@ export default function AuctionClient({
             </div>
           </div>
 
-          {/* RIGHT SIDE — STICKY BID PANEL */}
           <aside className="lg:sticky lg:top-24 h-fit">
             <div className="bg-white border rounded-2xl p-6 shadow-sm">
 
@@ -140,7 +131,7 @@ export default function AuctionClient({
                     }
                     className="w-full bg-black text-white rounded-xl py-3 font-medium hover:bg-gray-800 transition"
                   >
-                    Sign in to Bid
+                    Create Account / Sign In to Bid
                   </button>
                 ) : isVerified ? (
                   <BidForm

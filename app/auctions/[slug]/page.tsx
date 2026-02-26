@@ -12,7 +12,7 @@ function formatCurrency(value: number) {
 }
 
 function getMomentumText(lastBidAt?: Date | null) {
-  if (!lastBidAt) return "Opening bid opportunity";
+  if (!lastBidAt) return "Auction just launched";
 
   const diff = (Date.now() - lastBidAt.getTime()) / 1000 / 60;
 
@@ -127,6 +127,7 @@ export default async function AuctionPage({
         </div>
       </section>
 
+      {/* AUCTION CONTENT */}
       <AuctionClient
         auction={{
           id: auction.id,
@@ -155,7 +156,9 @@ export default async function AuctionPage({
       {auction.bidCount > 0 && (
         <div className="max-w-6xl mx-auto px-6 pb-20">
           <section className="bg-white rounded-2xl border shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">Bid History</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              Bid History
+            </h2>
             <BidHistoryServer auctionId={auction.id} />
           </section>
         </div>
