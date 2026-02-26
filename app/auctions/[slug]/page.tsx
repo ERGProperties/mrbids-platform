@@ -12,7 +12,7 @@ function formatCurrency(value: number) {
 }
 
 function getMomentumText(lastBidAt?: Date | null) {
-  if (!lastBidAt) return "No bids yet — opening opportunity";
+  if (!lastBidAt) return "Opening bid opportunity";
 
   const diff = (Date.now() - lastBidAt.getTime()) / 1000 / 60;
 
@@ -23,7 +23,6 @@ function getMomentumText(lastBidAt?: Date | null) {
   return "Momentum: bidding activity started";
 }
 
-// ⭐ SAFE JSON → STRING[] NORMALIZER
 function normalizeImages(images: unknown): string[] {
   if (!Array.isArray(images)) return [];
   return images.filter((img): img is string => typeof img === "string");
@@ -52,6 +51,8 @@ export default async function AuctionPage({
     redirect(`/auctions/${auction.slug}/result`);
   }
 
+  const hasBids = auction.bidCount > 0;
+
   const highestBid =
     auction.bids[0]?.amount ??
     auction.finalPrice ??
@@ -60,9 +61,7 @@ export default async function AuctionPage({
 
   const minimumBid = highestBid + (auction.bidIncrement ?? 0);
 
-  // ⭐ NORMALIZED IMAGES
   const images = normalizeImages(auction.images);
-
   const image = auction.coverImage || images[0] || null;
 
   const latestBid = await prisma.bid.findFirst({
@@ -73,6 +72,8 @@ export default async function AuctionPage({
 
   return (
     <main className="bg-gray-50 min-h-screen">
+
+      {/* AUTHORITY STRIP */}
       <section className="border-b border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap gap-4 text-sm text-gray-700">
           <div className="flex items-center gap-2">
@@ -90,6 +91,7 @@ export default async function AuctionPage({
         </div>
       </section>
 
+      {/* ENERGY BAR */}
       <section className="bg-black text-white border-b border-black">
         <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm font-medium">
@@ -98,9 +100,9 @@ export default async function AuctionPage({
           </div>
 
           <div className="text-sm text-gray-200">
-            {auction.bidCount > 0
+            {hasBids
               ? `${auction.bidCount} bids placed`
-              : "No bids yet — be the first to bid"}
+              : "Opening bid opportunity"}
           </div>
 
           <div className="text-sm text-gray-200">
@@ -108,11 +110,20 @@ export default async function AuctionPage({
           </div>
 
           <div className="text-sm text-gray-200">
-            Current Highest Bid:{" "}
+            {hasBids ? "Current Highest Bid:" : "Starting Bid:"}{" "}
             <span className="text-white font-semibold">
               {formatCurrency(highestBid)}
             </span>
           </div>
+        </div>
+      </section>
+
+      {/* PROCESS CONFIDENCE LAYER */}
+      <section className="bg-white border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-6 py-5 grid md:grid-cols-3 gap-4 text-sm text-gray-700">
+          <div>① Highest bid wins (seller approval)</div>
+          <div>② Buyer & seller proceed to escrow</div>
+          <div>③ Closing handled off-platform</div>
         </div>
       </section>
 
