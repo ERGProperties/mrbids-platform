@@ -3,7 +3,6 @@
 import { useState } from "react";
 import BidForm from "./BidForm";
 import { useSession } from "next-auth/react";
-import { SignInButton } from "@/components/auth/SignInButton";
 import AuctionCountdown from "@/components/auction/AuctionCountdown";
 
 export default function AuctionClient({
@@ -57,7 +56,7 @@ export default function AuctionClient({
           {/* LEFT SIDE */}
           <div>
 
-            {/* IMAGE */}
+            {/* MAIN IMAGE */}
             <div className="bg-white border rounded-2xl overflow-hidden mb-6">
               {selectedImage ? (
                 <img
@@ -135,7 +134,14 @@ export default function AuctionClient({
 
               <div className="mt-6">
                 {!session ? (
-                  <SignInButton />
+                  <button
+                    onClick={() =>
+                      (window.location.href = "/api/auth/signin")
+                    }
+                    className="w-full bg-black text-white rounded-xl py-3 font-medium hover:bg-gray-800 transition"
+                  >
+                    Sign in to Bid
+                  </button>
                 ) : isVerified ? (
                   <BidForm
                     slug={auction.slug}
