@@ -80,9 +80,7 @@ export default function AuctionClient({
                     key={i}
                     onClick={() => setSelectedIndex(i)}
                     className={`border rounded-lg overflow-hidden ${
-                      i === selectedIndex
-                        ? "ring-2 ring-black"
-                        : ""
+                      i === selectedIndex ? "ring-2 ring-black" : ""
                     }`}
                   >
                     <img
@@ -142,6 +140,7 @@ export default function AuctionClient({
                   <BidForm
                     slug={auction.slug}
                     minimumBid={minimumBid}
+                    currentBid={auction.highestBid || 0}
                   />
                 ) : (
                   <p className="text-sm text-gray-600">
