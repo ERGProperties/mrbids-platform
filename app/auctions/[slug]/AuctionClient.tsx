@@ -75,13 +75,18 @@ export default function AuctionClient({
             {auction.title || "Untitled Property"}
           </h1>
 
-          {/* ⭐ FIXED ADDRESS DISPLAY */}
           <p className="mt-3 text-base text-gray-600">
-            {auction.addressLine && <>{auction.addressLine}<br /></>}
+            {auction.addressLine && (
+              <>
+                {auction.addressLine}
+                <br />
+              </>
+            )}
             {auction.cityStateZip || "Location Pending"}
           </p>
         </div>
 
+        {/* MAIN GRID */}
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
 
           {/* LEFT SIDE */}
@@ -103,16 +108,20 @@ export default function AuctionClient({
 
                   {imageList.length > 1 && (
                     <>
+                      {/* LEFT ARROW */}
                       <button
                         onClick={goPrev}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full hover:bg-black/80 transition"
+                        aria-label="Previous image"
                       >
                         ←
                       </button>
 
+                      {/* RIGHT ARROW */}
                       <button
                         onClick={goNext}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full hover:bg-black/80 transition"
+                        aria-label="Next image"
                       >
                         →
                       </button>
@@ -147,15 +156,40 @@ export default function AuctionClient({
               </div>
             )}
 
-            {/* DETAILS + DESCRIPTION unchanged */}
+            {/* PROPERTY DETAILS */}
+            <div className="bg-white border rounded-2xl p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4">
+                Property Details
+              </h2>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-700">
+                <div>Beds: {auction.beds ?? "-"}</div>
+                <div>Baths: {auction.baths ?? "-"}</div>
+                <div>Sqft: {auction.sqft ?? "-"}</div>
+                <div>Type: {auction.propertyType ?? "-"}</div>
+              </div>
+            </div>
+
+            {/* DESCRIPTION */}
+            <div className="bg-white border rounded-2xl p-6">
+              <h2 className="text-xl font-semibold mb-4">
+                Description
+              </h2>
+
+              <p className="text-gray-700 whitespace-pre-line">
+                {auction.description || "No description provided."}
+              </p>
+            </div>
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* RIGHT SIDE — BID PANEL */}
           <aside className="lg:sticky lg:top-24 h-fit">
             <div className="bg-white border rounded-2xl p-6 shadow-sm">
+
               <p className="text-sm text-gray-500">
                 Current Highest Bid
               </p>
+
               <p className="text-3xl font-semibold mt-1">
                 ${auction.highestBid?.toLocaleString()}
               </p>
@@ -170,7 +204,7 @@ export default function AuctionClient({
                     onClick={() =>
                       (window.location.href = "/api/auth/signin")
                     }
-                    className="w-full bg-black text-white rounded-xl py-3"
+                    className="w-full bg-black text-white rounded-xl py-3 font-medium hover:bg-gray-800 transition"
                   >
                     Create Account / Sign In to Bid
                   </button>
