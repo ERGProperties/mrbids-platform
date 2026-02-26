@@ -39,6 +39,16 @@ export default function Step4Client({
 
   return (
     <>
+      {/* Upload Guidance */}
+      <div className="mb-3">
+        <p className="text-sm text-gray-600">
+          Upload high-quality photos of the property.
+        </p>
+        <p className="text-sm text-gray-500">
+          10–15 images recommended.
+        </p>
+      </div>
+
       <ImageUpload
         auction={auction}
         onUploadComplete={(newImages) => {
