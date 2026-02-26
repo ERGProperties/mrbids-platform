@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 
-/* ⭐ SAFE JSON NORMALIZER */
+/* ---------- SAFE IMAGE NORMALIZER ---------- */
 function normalizeImages(images: unknown): string[] {
   if (!Array.isArray(images)) return [];
 
@@ -13,7 +13,6 @@ function normalizeImages(images: unknown): string[] {
   );
 }
 
-/* ⭐ FIXED IMAGE LOGIC */
 function getPrimaryImage(auction: any) {
   if (typeof auction.coverImage === "string" && auction.coverImage.length) {
     return auction.coverImage;
@@ -22,6 +21,8 @@ function getPrimaryImage(auction: any) {
   const images = normalizeImages(auction.images);
   return images[0] || null;
 }
+
+/* ---------- UI HELPERS ---------- */
 
 function AuctionImage({ src }: { src: string | null }) {
   return (
@@ -86,6 +87,8 @@ function AddressBlock({ auction }: { auction: any }) {
   );
 }
 
+/* ---------- PAGE ---------- */
+
 export default async function HomePage() {
   const auctions = await getAllAuctions();
   const live = auctions.filter((a) => a.status === "LIVE");
@@ -97,11 +100,35 @@ export default async function HomePage() {
       {/* HERO */}
       <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
         <div className="max-w-3xl">
-          <h1 className="text-6xl md:text-7xl font-semibold tracking-tight text-gray-900">
+          <p className="text-sm font-medium text-gray-500 mb-6 tracking-[0.18em] uppercase">
+            Private Marketplace for Real Assets
+          </p>
+
+          <h1 className="text-6xl md:text-7xl font-semibold tracking-tight text-gray-900 leading-[1.05]">
             Seller-Direct
             <br />
             Real Estate Auctions
           </h1>
+
+          <p className="mt-10 text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Verified buyers compete transparently while sellers retain full control.
+          </p>
+
+          <div className="mt-14 flex flex-wrap gap-4">
+            <Link
+              href="/auctions"
+              className="px-10 py-5 bg-black text-white rounded-full text-base font-medium"
+            >
+              Browse Auctions
+            </Link>
+
+            <Link
+              href="/sell"
+              className="px-10 py-5 border border-gray-300 rounded-full text-base font-medium bg-white"
+            >
+              Sell a Property
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -117,7 +144,7 @@ export default async function HomePage() {
               <StatusBadge status={getTimeStatus(featured.endAt)} />
             </div>
 
-            <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden">
+            <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden shadow-sm">
               <div className="h-[460px]">
                 <AuctionImage src={getPrimaryImage(featured)} />
               </div>
@@ -141,6 +168,7 @@ export default async function HomePage() {
                 </Link>
               </div>
             </div>
+
           </div>
         </section>
       )}
@@ -148,11 +176,16 @@ export default async function HomePage() {
       {/* LIVE AUCTIONS */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-24">
+
+          <h2 className="text-4xl font-semibold text-gray-900 mb-12">
+            Live Auctions
+          </h2>
+
           <div className="grid md:grid-cols-3 gap-10">
             {live.slice(0, 3).map((auction) => (
               <div
                 key={auction.id}
-                className="bg-white border rounded-3xl overflow-hidden"
+                className="bg-white border rounded-3xl overflow-hidden hover:shadow-xl transition"
               >
                 <div className="h-60">
                   <AuctionImage src={getPrimaryImage(auction)} />
@@ -181,6 +214,7 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
