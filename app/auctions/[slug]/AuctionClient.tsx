@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import BidForm from "./BidForm";
 import { useSession } from "next-auth/react";
 import { SignInButton } from "@/components/auth/SignInButton";
 import AuctionCountdown from "@/components/auction/AuctionCountdown";
-import Link from "next/link";
 
 export default function AuctionClient({
   auction,
@@ -16,28 +15,14 @@ export default function AuctionClient({
 }) {
   const { data: session } = useSession();
 
-  function buildImageUrl(path: string, file: string) {
-    if (!file) return "";
-    if (file.startsWith("/")) return file;
-    const cleanPath = path?.startsWith("/") ? path : `/${path}`;
-    return `${cleanPath}/${file}`;
-  }
-
   const imageList =
     Array.isArray(auction.images) && auction.images.length
-      ? auction.images.map((img: string) =>
-          buildImageUrl(auction.imagesPath, img)
-        )
-      : auction.coverImage
-      ? [auction.coverImage]
+      ? auction.images
+      : auction.image
+      ? [auction.image]
       : [];
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [fade, setFade] = useState(true);
-  const [bidPulse, setBidPulse] = useState(false);
-
-  const touchStartX = useRef<number | null>(null);
 
   const selectedImage =
     imageList.length > 0 ? imageList[selectedIndex] : null;
@@ -45,67 +30,17 @@ export default function AuctionClient({
   const isVerified =
     session?.user?.isVerifiedBidder === true;
 
-  function changeImage(index: number) {
-    setFade(false);
-    setTimeout(() => {
-      setSelectedIndex(index);
-      setFade(true);
-    }, 120);
-  }
-
-  function goPrev() {
-    const next =
-      selectedIndex === 0
-        ? imageList.length - 1
-        : selectedIndex - 1;
-    changeImage(next);
-  }
-
-  function goNext() {
-    const next =
-      selectedIndex === imageList.length - 1
-        ? 0
-        : selectedIndex + 1;
-    changeImage(next);
-  }
-
-  function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
-    touchStartX.current = e.touches[0].clientX;
-  }
-
-  function onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
-    if (touchStartX.current == null) return;
-    const delta =
-      e.changedTouches[0].clientX - touchStartX.current;
-    if (Math.abs(delta) > 50) {
-      delta > 0 ? goPrev() : goNext();
-    }
-    touchStartX.current = null;
-  }
-
-  function triggerBidPulse() {
-    setBidPulse(true);
-    setTimeout(() => setBidPulse(false), 700);
-  }
-
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
-        {/* ===== HEADER ===== */}
+        {/* HEADER */}
         <div className="mb-10 border-b border-gray-200 pb-6">
-          <div className="flex items-center gap-3">
-            <p className="text-[11px] uppercase tracking-[0.25em] text-gray-500 font-medium">
-              LIVE AUCTION
-            </p>
+          <p className="text-[11px] uppercase tracking-[0.25em] text-gray-500 font-medium">
+            LIVE AUCTION
+          </p>
 
-            {/* LIVE ENERGY BADGE */}
-            <span className="text-[10px] px-2 py-1 rounded-full bg-green-100 text-green-700 font-semibold">
-              Auction Active
-            </span>
-          </div>
-
-          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-gray-900 leading-tight">
+          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-gray-900">
             {auction.title || "Untitled Property"}
           </h1>
 
@@ -114,90 +49,109 @@ export default function AuctionClient({
               auction.addressLine ||
               "Location Pending"}
           </p>
-
-          <p className="mt-2 text-sm text-gray-500">
-            Seller-Direct Real Estate Auction
-          </p>
         </div>
 
-        {/* TRUST LAYER */}
-        <div className="mb-8 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="bg-white border rounded-xl px-4 py-3">
-            <p className="text-xs font-semibold text-gray-900">
-              Verified Marketplace
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Seller identity and listing reviewed.
-            </p>
-          </div>
+        {/* MAIN GRID */}
+        <div className="grid lg:grid-cols-[1fr_360px] gap-8">
 
-          <div className="bg-white border rounded-xl px-4 py-3">
-            <p className="text-xs font-semibold text-gray-900">
-              Transparent Auction
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Real-time bidding with visible pricing.
-            </p>
-          </div>
-
-          <div className="bg-white border rounded-xl px-4 py-3">
-            <p className="text-xs font-semibold text-gray-900">
-              Admin Oversight
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Marketplace monitored for fairness.
-            </p>
-          </div>
-        </div>
-
-        {/* INFO BAR */}
-        <div className="mb-8 bg-white border rounded-2xl p-6 grid grid-cols-2 md:grid-cols-6 gap-6">
+          {/* LEFT SIDE */}
           <div>
-            <p className="text-sm font-medium">Status</p>
-            <p className="mt-2 text-sm text-green-700 font-medium">
-              Live Now
-            </p>
-          </div>
 
-          <div>
-            <p className="text-sm font-medium">Time Remaining</p>
-            <div className="mt-2 text-sm text-gray-700 font-medium">
-              <AuctionCountdown endsAt={auction.endsAt} />
+            {/* IMAGE */}
+            <div className="bg-white border rounded-2xl overflow-hidden mb-6">
+              {selectedImage ? (
+                <img
+                  src={selectedImage}
+                  alt="Property"
+                  className="w-full h-[420px] object-cover"
+                />
+              ) : (
+                <div className="h-[420px] flex items-center justify-center text-gray-400">
+                  No Image Available
+                </div>
+              )}
+            </div>
+
+            {/* THUMBNAILS */}
+            {imageList.length > 1 && (
+              <div className="flex gap-3 mb-8 overflow-x-auto">
+                {imageList.map((img: string, i: number) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedIndex(i)}
+                    className={`border rounded-lg overflow-hidden ${
+                      i === selectedIndex
+                        ? "ring-2 ring-black"
+                        : ""
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      className="w-24 h-16 object-cover"
+                      alt=""
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* PROPERTY DETAILS */}
+            <div className="bg-white border rounded-2xl p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4">
+                Property Details
+              </h2>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>Beds: {auction.beds ?? "-"}</div>
+                <div>Baths: {auction.baths ?? "-"}</div>
+                <div>Sqft: {auction.sqft ?? "-"}</div>
+                <div>Type: {auction.propertyType ?? "-"}</div>
+              </div>
+            </div>
+
+            {/* DESCRIPTION */}
+            <div className="bg-white border rounded-2xl p-6">
+              <h2 className="text-xl font-semibold mb-4">
+                Description
+              </h2>
+              <p className="text-gray-700 whitespace-pre-line">
+                {auction.description || "No description provided."}
+              </p>
             </div>
           </div>
 
-          <div>
-            <p className="text-sm font-medium">Current Bid</p>
-            <p className="mt-2 text-sm text-gray-700">
-              ${auction.highestBid?.toLocaleString()}
-            </p>
-          </div>
+          {/* RIGHT SIDE — STICKY BID PANEL */}
+          <aside className="lg:sticky lg:top-24 h-fit">
+            <div className="bg-white border rounded-2xl p-6 shadow-sm">
 
-          <div>
-            <p className="text-sm font-medium">Starting Bid</p>
-            <p className="mt-2 text-sm text-gray-700">
-              ${auction.startingBid?.toLocaleString()}
-            </p>
-          </div>
+              <p className="text-sm text-gray-500">
+                Current Highest Bid
+              </p>
+              <p className="text-3xl font-semibold mt-1">
+                ${auction.highestBid?.toLocaleString()}
+              </p>
 
-          <div>
-            <p className="text-sm font-medium">Increment</p>
-            <p className="mt-2 text-sm text-gray-700">
-              ${auction.bidIncrement?.toLocaleString()}
-            </p>
-          </div>
+              <div className="mt-4 text-sm text-gray-600">
+                <AuctionCountdown endsAt={auction.endsAt} />
+              </div>
 
-          <div>
-            <p className="text-sm font-medium">Seller ARV</p>
-            <p className="mt-2 text-sm text-gray-700">
-              {auction.arv
-                ? `$${auction.arv.toLocaleString()}`
-                : "Not provided"}
-            </p>
-          </div>
+              <div className="mt-6">
+                {!session ? (
+                  <SignInButton />
+                ) : isVerified ? (
+                  <BidForm
+                    slug={auction.slug}
+                    minimumBid={minimumBid}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    Verify your account to place bids.
+                  </p>
+                )}
+              </div>
+            </div>
+          </aside>
         </div>
-
-        {/* (rest of your file remains unchanged — gallery, description, bid panel, lightbox) */}
       </div>
     </main>
   );
