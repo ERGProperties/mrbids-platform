@@ -3,11 +3,14 @@ import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 
 function getPrimaryImage(auction: any) {
   if (auction.coverImage) return auction.coverImage;
+
   if (!Array.isArray(auction.images)) return null;
-  if (!auction.imagesPath) return null;
-  const first = auction.images[0];
-  if (!first) return null;
-  return `${auction.imagesPath}/${first}`;
+
+  const first = auction.images.find(
+    (img: unknown) => typeof img === "string"
+  );
+
+  return first || null;
 }
 
 function AuctionImage({ src }: { src: string | null }) {
@@ -48,9 +51,25 @@ function StatusBadge({ status }: { status: string }) {
       : "bg-green-100 text-green-700";
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}>
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}
+    >
       {status}
     </span>
+  );
+}
+
+function AddressBlock({ auction }: { auction: any }) {
+  return (
+    <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+      {auction.addressLine && (
+        <>
+          {auction.addressLine}
+          <br />
+        </>
+      )}
+      {auction.cityStateZip}
+    </p>
   );
 }
 
@@ -62,7 +81,7 @@ export default async function HomePage() {
   return (
     <main className="bg-white">
 
-      {/* ================= HERO ================= */}
+      {/* HERO */}
       <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
         <div className="max-w-3xl">
           <p className="text-sm font-medium text-gray-500 mb-6 tracking-[0.18em] uppercase">
@@ -97,43 +116,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ================= MARKETPLACE ACTIVITY ================= */}
-      <section className="border-y border-gray-100 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap gap-8 text-sm text-gray-700">
-          <span>● Multiple auctions live now</span>
-          <span>● Bidding activity in progress</span>
-          <span>● Verified buyers participating</span>
-          <span>● New listings added weekly</span>
-        </div>
-      </section>
-
-      {/* ================= AUTHORITY ================= */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-14">
-          <div>
-            <h3 className="text-2xl font-semibold text-gray-900">Live Marketplace</h3>
-            <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-              Auctions operate in real time with active bidder participation.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-semibold text-gray-900">Transparent Bidding</h3>
-            <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-              Every bid is visible, time-stamped, and auditable.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-2xl font-semibold text-gray-900">Seller Authority</h3>
-            <p className="mt-4 text-sm text-gray-600 leading-relaxed">
-              Sellers maintain reserve pricing and acceptance control.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ================= FEATURED ================= */}
+      {/* FEATURED */}
       {featured && (
         <section className="border-t border-b border-gray-100 bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 py-24">
@@ -155,12 +138,11 @@ export default async function HomePage() {
                   {featured.title}
                 </h2>
 
+                {/* ⭐ ADDRESS NOW SHOWN */}
+                <AddressBlock auction={featured} />
+
                 <p className="mt-5 text-sm text-gray-600">
                   Ends in {formatTimeRemaining(featured.endAt)}
-                </p>
-
-                <p className="mt-3 text-sm text-gray-500">
-                  Active bidding • Market-driven pricing
                 </p>
 
                 <Link
@@ -176,7 +158,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ================= LIVE AUCTIONS ================= */}
+      {/* LIVE AUCTIONS */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-24">
 
@@ -185,7 +167,10 @@ export default async function HomePage() {
               Live Auctions
             </h2>
 
-            <Link href="/auctions" className="text-sm font-medium text-gray-700 hover:text-black">
+            <Link
+              href="/auctions"
+              className="text-sm font-medium text-gray-700 hover:text-black"
+            >
               View all →
             </Link>
           </div>
@@ -207,6 +192,9 @@ export default async function HomePage() {
                     {auction.title}
                   </h3>
 
+                  {/* ⭐ ADDRESS NOW SHOWN */}
+                  <AddressBlock auction={auction} />
+
                   <p className="mt-3 text-sm text-gray-600">
                     Ends in {formatTimeRemaining(auction.endAt)}
                   </p>
@@ -222,28 +210,6 @@ export default async function HomePage() {
             ))}
           </div>
 
-        </div>
-      </section>
-
-      {/* ================= TRUST ================= */}
-      <section className="border-t border-gray-100 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-4 gap-12 text-center">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Licensed Escrow</h3>
-            <p className="mt-3 text-sm text-gray-600">Funds handled via third-party escrow.</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Verified Participants</h3>
-            <p className="mt-3 text-sm text-gray-600">Identity and access reviewed.</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Admin Oversight</h3>
-            <p className="mt-3 text-sm text-gray-600">Auctions monitored for fairness.</p>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Audit Trail</h3>
-            <p className="mt-3 text-sm text-gray-600">Every action is recorded.</p>
-          </div>
         </div>
       </section>
 
