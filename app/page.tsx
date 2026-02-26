@@ -4,8 +4,10 @@ import Link from "next/link";
 import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 
 /* ---------- IMAGE HELPERS ---------- */
+
 function normalizeImages(images: unknown): string[] {
   if (!Array.isArray(images)) return [];
+
   return images.filter(
     (img): img is string =>
       typeof img === "string" && img.startsWith("http")
@@ -21,7 +23,12 @@ function AuctionImage({ src }: { src: string | null }) {
   return (
     <div className="h-full w-full bg-gray-100 overflow-hidden">
       {src ? (
-        <img src={src} alt="" className="h-full w-full object-cover" />
+        <img
+          src={src}
+          alt=""
+          className="h-full w-full object-cover"
+          loading="lazy"
+        />
       ) : (
         <div className="h-full w-full flex items-center justify-center text-sm text-gray-400">
           No image available
@@ -31,10 +38,43 @@ function AuctionImage({ src }: { src: string | null }) {
   );
 }
 
+/* ---------- TIME ---------- */
+
+function getTimeStatus(endAt?: Date | null) {
+  if (!endAt) return "LIVE NOW";
+  const diff = new Date(endAt).getTime() - Date.now();
+  if (diff <= 0) return "ENDED";
+  if (diff < 1000 * 60 * 60 * 24) return "ENDING SOON";
+  return "LIVE NOW";
+}
+
+function formatTimeRemaining(endAt?: Date | null) {
+  if (!endAt) return "—";
+  const diff = new Date(endAt).getTime() - Date.now();
+  if (diff <= 0) return "Ended";
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  return `${days}d ${hours}h`;
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const styles =
+    status === "ENDING SOON"
+      ? "bg-red-100 text-red-700"
+      : "bg-green-100 text-green-700";
+
+  return (
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}>
+      {status}
+    </span>
+  );
+}
+
 /* ---------- PAGE ---------- */
 
 export default async function HomePage() {
   const auctions = await getAllAuctions();
+
   const live = auctions.filter((a) => a.status === "LIVE");
   const featured = live[0];
 
@@ -44,7 +84,7 @@ export default async function HomePage() {
       {/* HERO */}
       <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
         <div className="max-w-3xl">
-          <p className="text-sm font-medium text-gray-500 mb-6 uppercase">
+          <p className="text-sm font-medium text-gray-500 mb-6 uppercase tracking-[0.18em]">
             Private Marketplace for Real Assets
           </p>
 
@@ -69,10 +109,53 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* MARKETPLACE ACTIVITY */}
+      <section className="border-y bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap gap-8 text-sm text-gray-700">
+          <span>● Multiple auctions live now</span>
+          <span>● Bidding activity in progress</span>
+          <span>● Verified buyers participating</span>
+          <span>● New listings added weekly</span>
+        </div>
+      </section>
+
+      {/* AUTHORITY */}
+      <section className="bg-white">
+        <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-14">
+          <div>
+            <h3 className="text-2xl font-semibold">Live Marketplace</h3>
+            <p className="mt-4 text-sm text-gray-600">
+              Auctions operate in real time with active bidder participation.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-2xl font-semibold">Transparent Bidding</h3>
+            <p className="mt-4 text-sm text-gray-600">
+              Every bid is visible, time-stamped, and auditable.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-2xl font-semibold">Seller Authority</h3>
+            <p className="mt-4 text-sm text-gray-600">
+              Sellers maintain reserve pricing and acceptance control.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* FEATURED */}
       {featured && (
         <section className="border-y bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 py-24">
+
+            <div className="flex items-center gap-3 mb-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
+                Featured Auction
+              </p>
+              <StatusBadge status={getTimeStatus(featured.endAt)} />
+            </div>
 
             <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden">
               <div className="h-[460px]">
@@ -85,6 +168,10 @@ export default async function HomePage() {
                 <p className="mt-4 text-sm text-gray-600">
                   {featured.addressLine}<br />
                   {featured.cityStateZip}
+                </p>
+
+                <p className="mt-5 text-sm text-gray-600">
+                  Ends in {formatTimeRemaining(featured.endAt)}
                 </p>
 
                 <Link
@@ -104,9 +191,12 @@ export default async function HomePage() {
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-24">
 
-          <h2 className="text-4xl font-semibold mb-12">
-            Live Auctions
-          </h2>
+          <div className="flex items-center justify-between mb-12">
+            <h2 className="text-4xl font-semibold">Live Auctions</h2>
+            <Link href="/auctions" className="text-sm font-medium">
+              View all →
+            </Link>
+          </div>
 
           <div className="grid md:grid-cols-3 gap-10">
             {live.slice(0, 3).map((auction) => (
@@ -116,11 +206,14 @@ export default async function HomePage() {
                 </div>
 
                 <div className="p-7">
-                  <h3 className="text-xl font-semibold">{auction.title}</h3>
+                  <StatusBadge status={getTimeStatus(auction.endAt)} />
+
+                  <h3 className="mt-4 text-xl font-semibold">
+                    {auction.title}
+                  </h3>
 
                   <p className="mt-3 text-sm text-gray-600">
-                    {auction.addressLine}<br />
-                    {auction.cityStateZip}
+                    Ends in {formatTimeRemaining(auction.endAt)}
                   </p>
 
                   <Link
@@ -137,13 +230,25 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* TRUST SECTION (RESTORED) */}
+      {/* TRUST */}
       <section className="border-t bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-4 gap-12 text-center">
-          <div><h3 className="font-semibold">Licensed Escrow</h3></div>
-          <div><h3 className="font-semibold">Verified Participants</h3></div>
-          <div><h3 className="font-semibold">Admin Oversight</h3></div>
-          <div><h3 className="font-semibold">Audit Trail</h3></div>
+          <div>
+            <h3 className="font-semibold">Licensed Escrow</h3>
+            <p className="mt-3 text-sm text-gray-600">Funds handled via third-party escrow.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Verified Participants</h3>
+            <p className="mt-3 text-sm text-gray-600">Identity and access reviewed.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Admin Oversight</h3>
+            <p className="mt-3 text-sm text-gray-600">Auctions monitored for fairness.</p>
+          </div>
+          <div>
+            <h3 className="font-semibold">Audit Trail</h3>
+            <p className="mt-3 text-sm text-gray-600">Every action is recorded.</p>
+          </div>
         </div>
       </section>
 
