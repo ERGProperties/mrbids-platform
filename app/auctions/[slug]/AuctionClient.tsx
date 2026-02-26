@@ -29,10 +29,25 @@ export default function AuctionClient({
   const isVerified =
     session?.user?.isVerifiedBidder === true;
 
+  function goPrev() {
+    if (!imageList.length) return;
+    setSelectedIndex((prev) =>
+      prev === 0 ? imageList.length - 1 : prev - 1
+    );
+  }
+
+  function goNext() {
+    if (!imageList.length) return;
+    setSelectedIndex((prev) =>
+      prev === imageList.length - 1 ? 0 : prev + 1
+    );
+  }
+
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
+        {/* HEADER */}
         <div className="mb-10 border-b border-gray-200 pb-6">
           <p className="text-[11px] uppercase tracking-[0.25em] text-gray-500 font-medium">
             LIVE AUCTION
@@ -49,16 +64,44 @@ export default function AuctionClient({
           </p>
         </div>
 
+        {/* MAIN GRID */}
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
 
+          {/* LEFT SIDE */}
           <div>
-            <div className="bg-white border rounded-2xl overflow-hidden mb-6">
+
+            {/* MAIN IMAGE WITH ARROWS */}
+            <div className="relative bg-white border rounded-2xl overflow-hidden mb-6">
               {selectedImage ? (
-                <img
-                  src={selectedImage}
-                  alt="Property"
-                  className="w-full h-[420px] object-cover"
-                />
+                <>
+                  <img
+                    src={selectedImage}
+                    alt="Property"
+                    className="w-full h-[420px] object-cover"
+                  />
+
+                  {imageList.length > 1 && (
+                    <>
+                      {/* LEFT ARROW */}
+                      <button
+                        onClick={goPrev}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full hover:bg-black/80 transition"
+                        aria-label="Previous image"
+                      >
+                        ←
+                      </button>
+
+                      {/* RIGHT ARROW */}
+                      <button
+                        onClick={goNext}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full hover:bg-black/80 transition"
+                        aria-label="Next image"
+                      >
+                        →
+                      </button>
+                    </>
+                  )}
+                </>
               ) : (
                 <div className="h-[420px] flex items-center justify-center text-gray-400">
                   No Image Available
@@ -66,6 +109,7 @@ export default function AuctionClient({
               )}
             </div>
 
+            {/* THUMBNAILS */}
             {imageList.length > 1 && (
               <div className="flex gap-3 mb-8 overflow-x-auto">
                 {imageList.map((img: string, i: number) => (
@@ -86,6 +130,7 @@ export default function AuctionClient({
               </div>
             )}
 
+            {/* PROPERTY DETAILS */}
             <div className="bg-white border rounded-2xl p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">
                 Property Details
@@ -99,6 +144,7 @@ export default function AuctionClient({
               </div>
             </div>
 
+            {/* DESCRIPTION */}
             <div className="bg-white border rounded-2xl p-6">
               <h2 className="text-xl font-semibold mb-4">
                 Description
@@ -109,6 +155,7 @@ export default function AuctionClient({
             </div>
           </div>
 
+          {/* RIGHT SIDE — STICKY BID PANEL */}
           <aside className="lg:sticky lg:top-24 h-fit">
             <div className="bg-white border rounded-2xl p-6 shadow-sm">
 
