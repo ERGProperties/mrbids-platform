@@ -1,13 +1,16 @@
 import Link from "next/link";
 import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 
+/* ⭐ FIXED IMAGE LOGIC */
 function getPrimaryImage(auction: any) {
-  if (auction.coverImage) return auction.coverImage;
+  if (typeof auction.coverImage === "string" && auction.coverImage.length) {
+    return auction.coverImage;
+  }
 
   if (!Array.isArray(auction.images)) return null;
 
   const first = auction.images.find(
-    (img: unknown) => typeof img === "string"
+    (img: unknown) => typeof img === "string" && img.length
   );
 
   return first || null;
@@ -17,7 +20,12 @@ function AuctionImage({ src }: { src: string | null }) {
   return (
     <div className="h-full w-full bg-gray-100 overflow-hidden">
       {src ? (
-        <img src={src} alt="" className="h-full w-full object-cover" />
+        <img
+          src={src}
+          alt=""
+          className="h-full w-full object-cover"
+          loading="lazy"
+        />
       ) : (
         <div className="h-full w-full flex items-center justify-center text-sm text-gray-400">
           No image available
@@ -51,9 +59,7 @@ function StatusBadge({ status }: { status: string }) {
       : "bg-green-100 text-green-700";
 
   return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}
-    >
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}>
       {status}
     </span>
   );
@@ -81,41 +87,6 @@ export default async function HomePage() {
   return (
     <main className="bg-white">
 
-      {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
-        <div className="max-w-3xl">
-          <p className="text-sm font-medium text-gray-500 mb-6 tracking-[0.18em] uppercase">
-            Private Marketplace for Real Assets
-          </p>
-
-          <h1 className="text-6xl md:text-7xl font-semibold tracking-tight text-gray-900 leading-[1.05]">
-            Seller-Direct
-            <br />
-            Real Estate Auctions
-          </h1>
-
-          <p className="mt-10 text-xl text-gray-600 leading-relaxed max-w-2xl">
-            Verified buyers compete transparently while sellers retain full control.
-          </p>
-
-          <div className="mt-14 flex flex-wrap gap-4">
-            <Link
-              href="/auctions"
-              className="px-10 py-5 bg-black text-white rounded-full text-base font-medium hover:bg-gray-900 transition"
-            >
-              Browse Auctions
-            </Link>
-
-            <Link
-              href="/sell"
-              className="px-10 py-5 border border-gray-300 rounded-full text-base font-medium bg-white hover:border-gray-400 transition"
-            >
-              Sell a Property
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* FEATURED */}
       {featured && (
         <section className="border-t border-b border-gray-100 bg-gray-50">
@@ -128,17 +99,16 @@ export default async function HomePage() {
               <StatusBadge status={getTimeStatus(featured.endAt)} />
             </div>
 
-            <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition">
+            <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden shadow-sm">
               <div className="h-[460px]">
                 <AuctionImage src={getPrimaryImage(featured)} />
               </div>
 
               <div className="p-12 flex flex-col justify-center">
-                <h2 className="text-4xl font-semibold text-gray-900 leading-tight">
+                <h2 className="text-4xl font-semibold text-gray-900">
                   {featured.title}
                 </h2>
 
-                {/* ⭐ ADDRESS NOW SHOWN */}
                 <AddressBlock auction={featured} />
 
                 <p className="mt-5 text-sm text-gray-600">
@@ -147,39 +117,24 @@ export default async function HomePage() {
 
                 <Link
                   href={`/auctions/${featured.slug}`}
-                  className="inline-block mt-10 px-8 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-gray-900 transition"
+                  className="inline-block mt-10 px-8 py-3 bg-black text-white rounded-full text-sm"
                 >
                   View Featured Auction
                 </Link>
               </div>
             </div>
-
           </div>
         </section>
       )}
 
-      {/* LIVE AUCTIONS */}
+      {/* LIVE */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-24">
-
-          <div className="flex items-center justify-between mb-12">
-            <h2 className="text-4xl font-semibold text-gray-900">
-              Live Auctions
-            </h2>
-
-            <Link
-              href="/auctions"
-              className="text-sm font-medium text-gray-700 hover:text-black"
-            >
-              View all →
-            </Link>
-          </div>
-
           <div className="grid md:grid-cols-3 gap-10">
             {live.slice(0, 3).map((auction) => (
               <div
                 key={auction.id}
-                className="bg-white border rounded-3xl overflow-hidden hover:shadow-xl transition duration-300"
+                className="bg-white border rounded-3xl overflow-hidden"
               >
                 <div className="h-60">
                   <AuctionImage src={getPrimaryImage(auction)} />
@@ -188,11 +143,10 @@ export default async function HomePage() {
                 <div className="p-7">
                   <StatusBadge status={getTimeStatus(auction.endAt)} />
 
-                  <h3 className="mt-4 text-xl font-semibold text-gray-900 leading-snug">
+                  <h3 className="mt-4 text-xl font-semibold text-gray-900">
                     {auction.title}
                   </h3>
 
-                  {/* ⭐ ADDRESS NOW SHOWN */}
                   <AddressBlock auction={auction} />
 
                   <p className="mt-3 text-sm text-gray-600">
@@ -209,7 +163,6 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
-
         </div>
       </section>
 
