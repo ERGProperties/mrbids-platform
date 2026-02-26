@@ -6,16 +6,14 @@ import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 /* ---------- IMAGE HELPERS ---------- */
 
 function getPrimaryImage(auction: any) {
-  // Always prefer cover image if valid
   if (
-    typeof auction.coverImage === "string" &&
+    typeof auction?.coverImage === "string" &&
     auction.coverImage.startsWith("http")
   ) {
     return auction.coverImage;
   }
 
-  // fallback to images array
-  if (!Array.isArray(auction.images)) return null;
+  if (!Array.isArray(auction?.images)) return null;
 
   const first = auction.images.find(
     (img: unknown) =>
@@ -51,20 +49,33 @@ function AuctionImage({ src }: { src: string | null }) {
 
 /* ---------- TIME HELPERS ---------- */
 
-function getTimeStatus(endAt?: Date | null) {
+function getTimeStatus(endAt?: Date | string | null) {
   if (!endAt) return "LIVE NOW";
-  const diff = new Date(endAt).getTime() - Date.now();
+
+  const end = new Date(endAt);
+  if (isNaN(end.getTime())) return "LIVE NOW";
+
+  const diff = end.getTime() - Date.now();
+
   if (diff <= 0) return "ENDED";
   if (diff < 1000 * 60 * 60 * 24) return "ENDING SOON";
+
   return "LIVE NOW";
 }
 
-function formatTimeRemaining(endAt?: Date | null) {
+function formatTimeRemaining(endAt?: Date | string | null) {
   if (!endAt) return "—";
-  const diff = new Date(endAt).getTime() - Date.now();
+
+  const end = new Date(endAt);
+  if (isNaN(end.getTime())) return "—";
+
+  const diff = end.getTime() - Date.now();
+
   if (diff <= 0) return "Ended";
+
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+
   return `${days}d ${hours}h`;
 }
 
@@ -86,10 +97,13 @@ function StatusBadge({ status }: { status: string }) {
 /* ---------- PAGE ---------- */
 
 export default async function HomePage() {
-  const auctions = await getAllAuctions();
+  const auctions = (await getAllAuctions()) ?? [];
 
-  const live = auctions.filter((a) => a.status === "LIVE");
-  const featured = live[0];
+  const live = Array.isArray(auctions)
+    ? auctions.filter((a) => a?.status === "LIVE")
+    : [];
+
+  const featured = live.length > 0 ? live[0] : null;
 
   return (
     <main className="bg-white">
@@ -133,7 +147,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* AUTHORITY SECTION */}
+      {/* AUTHORITY */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-14">
           <div>
@@ -159,7 +173,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* FEATURED AUCTION */}
+      {/* FEATURED */}
       {featured && (
         <section className="border-y bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 py-24">
@@ -251,7 +265,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* TRUST SECTION */}
+      {/* TRUST */}
       <section className="border-t bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-4 gap-12 text-center">
           <div>
