@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 import { autoCloseExpiredAuctions } from "@/lib/auctionLifecycle";
