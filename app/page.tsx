@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 
-/* ⭐ FIXED IMAGE LOGIC */
+/* ⭐ CLOUDINARY-SAFE IMAGE HANDLER */
 function getPrimaryImage(auction: any) {
   if (typeof auction.coverImage === "string" && auction.coverImage.length) {
     return auction.coverImage;
@@ -87,6 +87,41 @@ export default async function HomePage() {
   return (
     <main className="bg-white">
 
+      {/* HERO */}
+      <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
+        <div className="max-w-3xl">
+          <p className="text-sm font-medium text-gray-500 mb-6 tracking-[0.18em] uppercase">
+            Private Marketplace for Real Assets
+          </p>
+
+          <h1 className="text-6xl md:text-7xl font-semibold tracking-tight text-gray-900 leading-[1.05]">
+            Seller-Direct
+            <br />
+            Real Estate Auctions
+          </h1>
+
+          <p className="mt-10 text-xl text-gray-600 leading-relaxed max-w-2xl">
+            Verified buyers compete transparently while sellers retain full control.
+          </p>
+
+          <div className="mt-14 flex flex-wrap gap-4">
+            <Link
+              href="/auctions"
+              className="px-10 py-5 bg-black text-white rounded-full text-base font-medium"
+            >
+              Browse Auctions
+            </Link>
+
+            <Link
+              href="/sell"
+              className="px-10 py-5 border border-gray-300 rounded-full text-base font-medium bg-white"
+            >
+              Sell a Property
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* FEATURED */}
       {featured && (
         <section className="border-t border-b border-gray-100 bg-gray-50">
@@ -99,7 +134,7 @@ export default async function HomePage() {
               <StatusBadge status={getTimeStatus(featured.endAt)} />
             </div>
 
-            <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden shadow-sm">
+            <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden">
               <div className="h-[460px]">
                 <AuctionImage src={getPrimaryImage(featured)} />
               </div>
@@ -127,9 +162,14 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* LIVE */}
+      {/* LIVE AUCTIONS */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-24">
+
+          <h2 className="text-4xl font-semibold text-gray-900 mb-12">
+            Live Auctions
+          </h2>
+
           <div className="grid md:grid-cols-3 gap-10">
             {live.slice(0, 3).map((auction) => (
               <div
@@ -163,6 +203,7 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
