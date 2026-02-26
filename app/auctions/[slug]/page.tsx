@@ -3,23 +3,6 @@ import { prisma } from "@/lib/db";
 import AuctionClient from "./AuctionClient";
 import BidHistoryServer from "./BidHistoryServer";
 
-function buildImageUrl(imagesPath: string | null, file: string) {
-  if (!imagesPath) return null;
-  if (!imagesPath.startsWith("/")) {
-    return `/${imagesPath}/${file}`;
-  }
-  return `${imagesPath}/${file}`;
-}
-
-function getPrimaryImage(images: unknown, imagesPath: string | null): string | null {
-  if (!Array.isArray(images) || images.length === 0) return null;
-
-  const files = images as string[];
-  const primary = files.find((f) => f.startsWith("01-")) ?? files[0];
-
-  return buildImageUrl(imagesPath, primary);
-}
-
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -38,6 +21,12 @@ function getMomentumText(lastBidAt?: Date | null) {
   if (diff < 1440) return "Momentum: bidding active today";
 
   return "Momentum: bidding activity started";
+}
+
+// ⭐ SAFE JSON → STRING[] NORMALIZER
+function normalizeImages(images: unknown): string[] {
+  if (!Array.isArray(images)) return [];
+  return images.filter((img): img is string => typeof img === "string");
 }
 
 export default async function AuctionPage({
@@ -71,7 +60,10 @@ export default async function AuctionPage({
 
   const minimumBid = highestBid + (auction.bidIncrement ?? 0);
 
-  const image = getPrimaryImage(auction.images, auction.imagesPath);
+  // ⭐ NORMALIZED IMAGES
+  const images = normalizeImages(auction.images);
+
+  const image = auction.coverImage || images[0] || null;
 
   const latestBid = await prisma.bid.findFirst({
     where: { auctionId: auction.id },
@@ -81,8 +73,6 @@ export default async function AuctionPage({
 
   return (
     <main className="bg-gray-50 min-h-screen">
-
-      {/* AUTHORITY STRIP */}
       <section className="border-b border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap gap-4 text-sm text-gray-700">
           <div className="flex items-center gap-2">
@@ -100,7 +90,6 @@ export default async function AuctionPage({
         </div>
       </section>
 
-      {/* ENERGY BAR */}
       <section className="bg-black text-white border-b border-black">
         <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm font-medium">
@@ -109,16 +98,9 @@ export default async function AuctionPage({
           </div>
 
           <div className="text-sm text-gray-200">
-            {auction.bidCount > 0 ? (
-              <>
-                <span className="text-white font-semibold">
-                  {auction.bidCount}
-                </span>{" "}
-                bids placed
-              </>
-            ) : (
-              "No bids yet — be the first to bid"
-            )}
+            {auction.bidCount > 0
+              ? `${auction.bidCount} bids placed`
+              : "No bids yet — be the first to bid"}
           </div>
 
           <div className="text-sm text-gray-200">
@@ -134,16 +116,6 @@ export default async function AuctionPage({
         </div>
       </section>
 
-      {/* ⭐ PROCESS CONFIDENCE LAYER (NEW) */}
-      <section className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-5 grid md:grid-cols-3 gap-4 text-sm text-gray-700">
-          <div>① Highest bid wins (seller approval)</div>
-          <div>② Buyer & seller proceed to escrow</div>
-          <div>③ Closing handled off-platform</div>
-        </div>
-      </section>
-
-      {/* AUCTION CONTENT */}
       <AuctionClient
         auction={{
           id: auction.id,
@@ -157,8 +129,8 @@ export default async function AuctionPage({
           arv: auction.arv,
           endsAt: auction.endAt?.toISOString(),
           image,
-          imagesPath: auction.imagesPath || "",
-          images: auction.images || [],
+          imagesPath: "",
+          images,
           propertyType: auction.propertyType,
           beds: auction.beds,
           baths: auction.baths,
@@ -172,9 +144,7 @@ export default async function AuctionPage({
       {auction.bidCount > 0 && (
         <div className="max-w-6xl mx-auto px-6 pb-20">
           <section className="bg-white rounded-2xl border shadow-sm p-6">
-            <h2 className="text-lg font-semibold mb-4">
-              Bid History
-            </h2>
+            <h2 className="text-lg font-semibold mb-4">Bid History</h2>
             <BidHistoryServer auctionId={auction.id} />
           </section>
         </div>
