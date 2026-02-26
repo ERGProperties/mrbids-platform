@@ -5,18 +5,25 @@ import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 
 /* ---------- IMAGE HELPERS ---------- */
 
-function normalizeImages(images: unknown): string[] {
-  if (!Array.isArray(images)) return [];
-
-  return images.filter(
-    (img): img is string =>
-      typeof img === "string" && img.startsWith("http")
-  );
-}
-
 function getPrimaryImage(auction: any) {
-  if (auction.coverImage) return auction.coverImage;
-  return normalizeImages(auction.images)[0] || null;
+  // Always prefer cover image if valid
+  if (
+    typeof auction.coverImage === "string" &&
+    auction.coverImage.startsWith("http")
+  ) {
+    return auction.coverImage;
+  }
+
+  // fallback to images array
+  if (!Array.isArray(auction.images)) return null;
+
+  const first = auction.images.find(
+    (img: unknown) =>
+      typeof img === "string" &&
+      img.startsWith("http")
+  );
+
+  return first || null;
 }
 
 function AuctionImage({ src }: { src: string | null }) {
@@ -28,6 +35,10 @@ function AuctionImage({ src }: { src: string | null }) {
           alt=""
           className="h-full w-full object-cover"
           loading="lazy"
+          onError={(e) => {
+            console.error("Image failed:", src);
+            (e.currentTarget as HTMLImageElement).style.display = "none";
+          }}
         />
       ) : (
         <div className="h-full w-full flex items-center justify-center text-sm text-gray-400">
@@ -38,7 +49,7 @@ function AuctionImage({ src }: { src: string | null }) {
   );
 }
 
-/* ---------- TIME ---------- */
+/* ---------- TIME HELPERS ---------- */
 
 function getTimeStatus(endAt?: Date | null) {
   if (!endAt) return "LIVE NOW";
@@ -64,7 +75,9 @@ function StatusBadge({ status }: { status: string }) {
       : "bg-green-100 text-green-700";
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}>
+    <span
+      className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}
+    >
       {status}
     </span>
   );
@@ -102,6 +115,7 @@ export default async function HomePage() {
             <Link href="/auctions" className="px-10 py-5 bg-black text-white rounded-full">
               Browse Auctions
             </Link>
+
             <Link href="/sell" className="px-10 py-5 border rounded-full">
               Sell a Property
             </Link>
@@ -109,7 +123,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* MARKETPLACE ACTIVITY */}
+      {/* MARKETPLACE STRIP */}
       <section className="border-y bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap gap-8 text-sm text-gray-700">
           <span>● Multiple auctions live now</span>
@@ -119,7 +133,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* AUTHORITY */}
+      {/* AUTHORITY SECTION */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-3 gap-14">
           <div>
@@ -145,7 +159,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* FEATURED */}
+      {/* FEATURED AUCTION */}
       {featured && (
         <section className="border-y bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 py-24">
@@ -166,7 +180,8 @@ export default async function HomePage() {
                 <h2 className="text-4xl font-semibold">{featured.title}</h2>
 
                 <p className="mt-4 text-sm text-gray-600">
-                  {featured.addressLine}<br />
+                  {featured.addressLine}
+                  <br />
                   {featured.cityStateZip}
                 </p>
 
@@ -212,6 +227,12 @@ export default async function HomePage() {
                     {auction.title}
                   </h3>
 
+                  <p className="mt-2 text-sm text-gray-600">
+                    {auction.addressLine}
+                    <br />
+                    {auction.cityStateZip}
+                  </p>
+
                   <p className="mt-3 text-sm text-gray-600">
                     Ends in {formatTimeRemaining(auction.endAt)}
                   </p>
@@ -230,7 +251,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* TRUST */}
+      {/* TRUST SECTION */}
       <section className="border-t bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-4 gap-12 text-center">
           <div>
