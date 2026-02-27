@@ -1,6 +1,4 @@
-// auth update
-
-import EmailProvider from "next-auth/providers/email";
+/import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import type { NextAuthOptions } from "next-auth";
@@ -15,12 +13,13 @@ export const authOptions: NextAuthOptions = {
     EmailProvider({
       from: process.env.EMAIL_FROM!,
 
-      async sendVerificationRequest({ identifier, url, provider }) {
+      async sendVerificationRequest({ identifier, url }) {
         console.log("🔥 SEND VERIFICATION CALLED", identifier);
 
         try {
           const result = await resend.emails.send({
-            from: provider.from!,
+            // ⭐ CRITICAL FIX
+            from: process.env.EMAIL_FROM!, // must be plain email
             to: identifier,
             subject: "Sign in to MrBids",
             html: `
@@ -32,7 +31,7 @@ export const authOptions: NextAuthOptions = {
           console.log("✅ RESEND RESULT:", result);
         } catch (err) {
           console.error("❌ RESEND ERROR:", err);
-          throw err; // IMPORTANT: let NextAuth fail properly
+          throw err;
         }
       },
     }),
