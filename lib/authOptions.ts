@@ -1,4 +1,4 @@
-/import EmailProvider from "next-auth/providers/email";
+import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import type { NextAuthOptions } from "next-auth";
@@ -18,8 +18,7 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const result = await resend.emails.send({
-            // ⭐ CRITICAL FIX
-            from: process.env.EMAIL_FROM!, // must be plain email
+            from: process.env.EMAIL_FROM!,
             to: identifier,
             subject: "Sign in to MrBids",
             html: `
