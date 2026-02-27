@@ -51,18 +51,34 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
+  // ⭐ MAGIC-LINK LOOP FIX
   session: {
-    strategy: "database",
+    strategy: "jwt",
   },
 
   pages: {
     signIn: "/signin",
   },
 
-  // ⭐ IMPORTANT FIX — prevents redirect loop
   callbacks: {
     async redirect({ baseUrl }) {
       return `${baseUrl}/auctions`;
+    },
+  },
+
+  // ⭐ COOKIE STABILITY (prevents silent auth failure)
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-next-auth.session-token"
+          : "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
     },
   },
 };
