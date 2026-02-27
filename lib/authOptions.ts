@@ -14,35 +14,24 @@ export const authOptions: NextAuthOptions = {
       from: process.env.EMAIL_FROM!,
 
       async sendVerificationRequest({ identifier, url, provider }) {
-        // 🔥 DEBUG LOG (check Vercel logs)
         console.log("🔥 SEND VERIFICATION CALLED", identifier);
 
-        await resend.emails.send({
-          from: provider.from!,
-          to: identifier,
-          subject: "Sign in to MrBids",
-          html: `
-            <div style="font-family: Arial, sans-serif; line-height:1.5;">
+        try {
+          const result = await resend.emails.send({
+            from: provider.from!,
+            to: identifier,
+            subject: "Sign in to MrBids",
+            html: `
               <h2>Sign in to MrBids</h2>
-              <p>Click the button below to securely sign in:</p>
-              <p>
-                <a href="${url}" style="
-                  display:inline-block;
-                  padding:10px 16px;
-                  background:#000;
-                  color:#fff;
-                  text-decoration:none;
-                  border-radius:6px;
-                ">
-                  Sign in
-                </a>
-              </p>
-              <p>If you did not request this email, you can safely ignore it.</p>
-            </div>
-          `,
-        });
+              <p><a href="${url}">Sign in</a></p>
+            `,
+          });
 
-        console.log("✅ RESEND EMAIL SENT");
+          console.log("✅ RESEND RESULT:", result);
+        } catch (err) {
+          console.error("❌ RESEND ERROR:", err);
+          throw err; // IMPORTANT: let NextAuth fail properly
+        }
       },
     }),
   ],
