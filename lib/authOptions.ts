@@ -51,9 +51,9 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  // ⭐ STABLE MAGIC LINK SESSIONS
+  // ⭐ EMAIL PROVIDER WORKS BEST WITH DATABASE SESSIONS
   session: {
-    strategy: "jwt",
+    strategy: "database",
   },
 
   pages: {
@@ -61,23 +61,6 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    // ⭐ keeps JWT alive after email login
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = (user as any).id;
-        token.email = user.email;
-      }
-      return token;
-    },
-
-    // ⭐ makes session readable on client
-    async session({ session, token }) {
-      if (token && session.user) {
-        (session.user as any).id = token.id;
-      }
-      return session;
-    },
-
     // ⭐ post-login destination
     async redirect({ baseUrl }) {
       return `${baseUrl}/auctions`;
