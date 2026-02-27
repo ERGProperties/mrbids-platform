@@ -1,6 +1,6 @@
 import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "@/lib/db";
+import { prisma } from "@/lib/prisma"; // ⭐ IMPORTANT FIX
 import type { NextAuthOptions } from "next-auth";
 import { Resend } from "resend";
 
@@ -19,8 +19,23 @@ export const authOptions: NextAuthOptions = {
           to: identifier,
           subject: "Sign in to MrBids",
           html: `
-            <p>Click below to sign in to your MrBids account:</p>
-            <p><a href="${url}">Sign in</a></p>
+            <div style="font-family: Arial, sans-serif; line-height:1.5;">
+              <h2>Sign in to MrBids</h2>
+              <p>Click the button below to securely sign in to your account:</p>
+              <p>
+                <a href="${url}" style="
+                  display:inline-block;
+                  padding:10px 16px;
+                  background:#000;
+                  color:#fff;
+                  text-decoration:none;
+                  border-radius:6px;
+                ">
+                  Sign in
+                </a>
+              </p>
+              <p>If you did not request this email, you can safely ignore it.</p>
+            </div>
           `,
         });
       },
