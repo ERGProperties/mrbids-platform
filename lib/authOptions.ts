@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    // ⭐ CRITICAL — keeps JWT alive after email login
+    // ⭐ keeps JWT alive after email login
     async jwt({ token, user }) {
       if (user) {
         token.id = (user as any).id;
@@ -70,7 +70,7 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
 
-    // ⭐ CRITICAL — makes session readable on client
+    // ⭐ makes session readable on client
     async session({ session, token }) {
       if (token && session.user) {
         (session.user as any).id = token.id;
@@ -78,25 +78,9 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
 
-    // ⭐ POST LOGIN DESTINATION
+    // ⭐ post-login destination
     async redirect({ baseUrl }) {
       return `${baseUrl}/auctions`;
-    },
-  },
-
-  // ⭐ COOKIE STABILITY
-  cookies: {
-    sessionToken: {
-      name:
-        process.env.NODE_ENV === "production"
-          ? "__Secure-next-auth.session-token"
-          : "next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
     },
   },
 };
