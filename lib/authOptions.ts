@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  // ⭐ MAGIC-LINK LOOP FIX
+  // ⭐ STABLE MAGIC LINK SESSIONS
   session: {
     strategy: "jwt",
   },
@@ -61,12 +61,30 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
+    // ⭐ CRITICAL — keeps JWT alive after email login
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = (user as any).id;
+        token.email = user.email;
+      }
+      return token;
+    },
+
+    // ⭐ CRITICAL — makes session readable on client
+    async session({ session, token }) {
+      if (token && session.user) {
+        (session.user as any).id = token.id;
+      }
+      return session;
+    },
+
+    // ⭐ POST LOGIN DESTINATION
     async redirect({ baseUrl }) {
       return `${baseUrl}/auctions`;
     },
   },
 
-  // ⭐ COOKIE STABILITY (prevents silent auth failure)
+  // ⭐ COOKIE STABILITY
   cookies: {
     sessionToken: {
       name:
