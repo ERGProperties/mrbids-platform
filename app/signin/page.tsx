@@ -13,9 +13,10 @@ export default function SignInPage() {
 
     setLoading(true);
 
+    // ⭐ IMPORTANT FIX:
+    // remove callbackUrl so NextAuth handles magic-link redirect correctly
     await signIn("email", {
       email,
-      callbackUrl: "/auctions",
     });
 
     setLoading(false);
