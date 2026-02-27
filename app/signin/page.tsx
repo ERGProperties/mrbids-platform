@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 
 export default function SignInPage() {
   const { data: session, status } = useSession();
+
+  console.log("SESSION STATUS:", status, session);
+
   const [email, setEmail] = useState("");
 
   // ⭐ CRITICAL FIX — wait until session is fully loaded
