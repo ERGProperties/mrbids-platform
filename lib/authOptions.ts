@@ -1,6 +1,6 @@
 import EmailProvider from "next-auth/providers/email";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "@/lib/prisma"; // ⭐ IMPORTANT FIX
+import { prisma } from "@/lib/prisma";
 import type { NextAuthOptions } from "next-auth";
 import { Resend } from "resend";
 
@@ -14,6 +14,9 @@ export const authOptions: NextAuthOptions = {
       from: process.env.EMAIL_FROM!,
 
       async sendVerificationRequest({ identifier, url, provider }) {
+        // 🔥 DEBUG LOG (check Vercel logs)
+        console.log("🔥 SEND VERIFICATION CALLED", identifier);
+
         await resend.emails.send({
           from: provider.from!,
           to: identifier,
@@ -21,7 +24,7 @@ export const authOptions: NextAuthOptions = {
           html: `
             <div style="font-family: Arial, sans-serif; line-height:1.5;">
               <h2>Sign in to MrBids</h2>
-              <p>Click the button below to securely sign in to your account:</p>
+              <p>Click the button below to securely sign in:</p>
               <p>
                 <a href="${url}" style="
                   display:inline-block;
@@ -38,6 +41,8 @@ export const authOptions: NextAuthOptions = {
             </div>
           `,
         });
+
+        console.log("✅ RESEND EMAIL SENT");
       },
     }),
   ],
