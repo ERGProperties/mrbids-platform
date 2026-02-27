@@ -22,8 +22,23 @@ export const authOptions: NextAuthOptions = {
             to: identifier,
             subject: "Sign in to MrBids",
             html: `
-              <h2>Sign in to MrBids</h2>
-              <p><a href="${url}">Sign in</a></p>
+              <div style="font-family: Arial, sans-serif; line-height:1.5;">
+                <h2>Sign in to MrBids</h2>
+                <p>Click below to securely sign in:</p>
+                <p>
+                  <a href="${url}" style="
+                    display:inline-block;
+                    padding:10px 16px;
+                    background:#000;
+                    color:#fff;
+                    text-decoration:none;
+                    border-radius:6px;
+                  ">
+                    Sign in
+                  </a>
+                </p>
+                <p>If you did not request this email, you can safely ignore it.</p>
+              </div>
             `,
           });
 
@@ -42,5 +57,12 @@ export const authOptions: NextAuthOptions = {
 
   pages: {
     signIn: "/signin",
+  },
+
+  // ⭐ IMPORTANT FIX — prevents redirect loop
+  callbacks: {
+    async redirect({ baseUrl }) {
+      return `${baseUrl}/auctions`;
+    },
   },
 };
