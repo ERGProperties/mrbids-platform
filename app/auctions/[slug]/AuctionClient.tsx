@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import BidForm from "./BidForm";
 import { useSession } from "next-auth/react";
 import AuctionCountdown from "@/components/auction/AuctionCountdown";
@@ -14,11 +14,14 @@ export default function AuctionClient({
 }) {
   const { data: session } = useSession();
 
+  // ⭐ LIVE AUCTION STATE (updates from stream)
+  const [liveAuction, setLiveAuction] = useState(auction);
+
   const imageList =
-    Array.isArray(auction.images) && auction.images.length
-      ? auction.images
-      : auction.image
-      ? [auction.image]
+    Array.isArray(liveAuction.images) && liveAuction.images.length
+      ? liveAuction.images
+      : liveAuction.image
+      ? [liveAuction.image]
       : [];
 
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -27,10 +30,33 @@ export default function AuctionClient({
   const selectedImage =
     imageList.length > 0 ? imageList[selectedIndex] : null;
 
-  // ⭐ DEV MODE BYPASS
-  // Allows bidding while building locally.
-  // Production still requires verification.
+  // ⭐ TEMP DEV MODE (remove later)
   const isVerified = true;
+
+  // ⭐ LIVE STREAM CONNECTION (Server-Sent Events)
+  useEffect(() => {
+    const eventSource = new EventSource(
+      `/api/auctions/${auction.slug}/stream`
+    );
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        setLiveAuction(data);
+      } catch (err) {
+        console.error("Stream parse error:", err);
+      }
+    };
+
+    eventSource.onerror = () => {
+      console.error("Stream connection lost");
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [auction.slug]);
 
   function goPrev() {
     if (!imageList.length) return;
@@ -46,7 +72,6 @@ export default function AuctionClient({
     );
   }
 
-  // ⭐ MOBILE SWIPE
   function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
     touchStartX.current = e.touches[0].clientX;
   }
@@ -74,17 +99,17 @@ export default function AuctionClient({
           </p>
 
           <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-gray-900">
-            {auction.title || "Untitled Property"}
+            {liveAuction.title || "Untitled Property"}
           </h1>
 
           <p className="mt-3 text-base text-gray-600">
-            {auction.addressLine && (
+            {liveAuction.addressLine && (
               <>
-                {auction.addressLine}
+                {liveAuction.addressLine}
                 <br />
               </>
             )}
-            {auction.cityStateZip || "Location Pending"}
+            {liveAuction.cityStateZip || "Location Pending"}
           </p>
         </div>
 
@@ -135,27 +160,6 @@ export default function AuctionClient({
               )}
             </div>
 
-            {/* THUMBNAILS */}
-            {imageList.length > 1 && (
-              <div className="flex gap-3 mb-8 overflow-x-auto">
-                {imageList.map((img: string, i: number) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedIndex(i)}
-                    className={`border rounded-lg overflow-hidden ${
-                      i === selectedIndex ? "ring-2 ring-black" : ""
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      className="w-24 h-16 object-cover"
-                      alt=""
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-
             {/* PROPERTY DETAILS */}
             <div className="bg-white border rounded-2xl p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">
@@ -163,10 +167,10 @@ export default function AuctionClient({
               </h2>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-700">
-                <div>Beds: {auction.beds ?? "-"}</div>
-                <div>Baths: {auction.baths ?? "-"}</div>
-                <div>Sqft: {auction.sqft ?? "-"}</div>
-                <div>Type: {auction.propertyType ?? "-"}</div>
+                <div>Beds: {liveAuction.beds ?? "-"}</div>
+                <div>Baths: {liveAuction.baths ?? "-"}</div>
+                <div>Sqft: {liveAuction.sqft ?? "-"}</div>
+                <div>Type: {liveAuction.propertyType ?? "-"}</div>
               </div>
             </div>
 
@@ -177,7 +181,7 @@ export default function AuctionClient({
               </h2>
 
               <p className="text-gray-700 whitespace-pre-line">
-                {auction.description || "No description provided."}
+                {liveAuction.description || "No description provided."}
               </p>
             </div>
           </div>
@@ -190,12 +194,13 @@ export default function AuctionClient({
                 Current Highest Bid
               </p>
 
+              {/* ⭐ LIVE UPDATING BID */}
               <p className="text-3xl font-semibold mt-1">
-                ${auction.highestBid?.toLocaleString()}
+                ${liveAuction.highestBid?.toLocaleString()}
               </p>
 
               <div className="mt-4 text-sm text-gray-600">
-                <AuctionCountdown endsAt={auction.endsAt} />
+                <AuctionCountdown endsAt={liveAuction.endsAt} />
               </div>
 
               <div className="mt-6">
@@ -210,9 +215,9 @@ export default function AuctionClient({
                   </button>
                 ) : isVerified ? (
                   <BidForm
-                    slug={auction.slug}
+                    slug={liveAuction.slug}
                     minimumBid={minimumBid}
-                    currentBid={auction.highestBid || 0}
+                    currentBid={liveAuction.highestBid || 0}
                   />
                 ) : (
                   <p className="text-sm text-gray-600">
