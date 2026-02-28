@@ -34,6 +34,11 @@ export async function POST(
         bids: {
           orderBy: { amount: "desc" },
           take: 1,
+          select: {
+            id: true,
+            amount: true,
+            bidderId: true,
+          },
         },
       },
     });
