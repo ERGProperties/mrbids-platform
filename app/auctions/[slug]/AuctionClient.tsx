@@ -27,7 +27,11 @@ export default function AuctionClient({
   const selectedImage =
     imageList.length > 0 ? imageList[selectedIndex] : null;
 
+  // ⭐ DEV MODE BYPASS
+  // Allows bidding while building locally.
+  // Production still requires verification.
   const isVerified =
+    process.env.NODE_ENV !== "production" ||
     session?.user?.isVerifiedBidder === true;
 
   function goPrev() {
@@ -108,7 +112,6 @@ export default function AuctionClient({
 
                   {imageList.length > 1 && (
                     <>
-                      {/* LEFT ARROW */}
                       <button
                         onClick={goPrev}
                         className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full hover:bg-black/80 transition"
@@ -117,7 +120,6 @@ export default function AuctionClient({
                         ←
                       </button>
 
-                      {/* RIGHT ARROW */}
                       <button
                         onClick={goNext}
                         className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full hover:bg-black/80 transition"
@@ -220,6 +222,7 @@ export default function AuctionClient({
                   </p>
                 )}
               </div>
+
             </div>
           </aside>
         </div>
