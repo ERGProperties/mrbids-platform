@@ -27,36 +27,37 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4">
+    <main className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-200 flex items-center justify-center px-4">
 
-      <div className="w-full max-w-5xl grid md:grid-cols-2 bg-white rounded-3xl shadow-lg overflow-hidden border">
+      <div className="w-full max-w-5xl grid md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-gray-200 bg-white/80 backdrop-blur">
 
-        {/* LEFT SIDE — BRAND */}
-        <div className="hidden md:flex flex-col justify-center bg-black text-white p-10">
-          <h1 className="text-3xl font-semibold mb-4">
-            MrBids
-          </h1>
+        {/* LEFT — BRAND SIDE */}
+        <div className="hidden md:flex flex-col justify-between bg-black text-white p-10">
+          <div>
+            <h1 className="text-4xl font-semibold tracking-tight">
+              MrBids
+            </h1>
 
-          <p className="text-gray-300 text-sm leading-relaxed">
-            Private real estate auctions made simple.
-            <br />
-            Secure bidding. Verified buyers. Real results.
-          </p>
+            <p className="mt-4 text-gray-300 text-sm leading-relaxed max-w-sm">
+              A modern real estate auction platform built for serious buyers
+              and verified bidding.
+            </p>
+          </div>
 
-          <div className="mt-8 text-xs text-gray-400">
+          <div className="text-xs text-gray-400">
             🔒 Secure email authentication
           </div>
         </div>
 
-        {/* RIGHT SIDE — SIGN IN */}
-        <div className="p-8 md:p-10 flex flex-col justify-center">
+        {/* RIGHT — SIGN IN CARD */}
+        <div className="p-8 md:p-12 flex flex-col justify-center">
 
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-            Sign in to continue
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
+            Welcome back
           </h2>
 
-          <p className="text-sm text-gray-600 mb-6">
-            Enter your email and we’ll send you a secure magic link.
+          <p className="mt-2 text-sm text-gray-600 mb-6">
+            Enter your email to receive a secure magic link.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
