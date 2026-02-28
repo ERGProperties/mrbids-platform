@@ -95,7 +95,6 @@ model User {
   createdAt DateTime @default(now())
 
   isVerifiedBidder Boolean @default(false)
-  stripeCustomerId String?
 
   bids      Bid[]
   accounts  Account[]
