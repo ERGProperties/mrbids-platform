@@ -60,12 +60,18 @@ model Auction {
 
   bids          Bid[]
 
+  // ⭐ SELLER RELATION (NEW)
+  sellerId      String?
+  seller        User? @relation("SellerAuctions", fields: [sellerId], references: [id])
+
   serviceFeeAmount Int?
   serviceFeeStatus ServiceFeeStatus?
   serviceFeePaidAt DateTime?
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([sellerId])
 }
 
 model Bid {
@@ -87,7 +93,7 @@ model User {
 
   // ⭐ REQUIRED FOR NEXTAUTH EMAIL PROVIDER
   name          String?
-  email         String?   @unique
+  email         String? @unique
   emailVerified DateTime?
   image         String?
 
@@ -97,6 +103,10 @@ model User {
   isVerifiedBidder Boolean @default(false)
 
   bids      Bid[]
+
+  // ⭐ AUCTIONS CREATED BY THIS USER (NEW)
+  auctions  Auction[] @relation("SellerAuctions")
+
   accounts  Account[]
   sessions  Session[]
 }
