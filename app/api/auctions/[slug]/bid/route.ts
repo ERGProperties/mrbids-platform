@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
+import { emitNotificationEvent } from "@/lib/notifications/emitEvent";
 
 export async function POST(
   req: Request,
@@ -44,7 +45,9 @@ export async function POST(
       );
     }
 
-    const highestBid = auction.bids[0]?.amount || 0;
+    // ⭐ Previous highest bid (before new bid)
+    const previousHighestBid = auction.bids[0] || null;
+    const highestBid = previousHighestBid?.amount || 0;
 
     if (amount <= highestBid) {
       return NextResponse.json(
@@ -66,7 +69,7 @@ export async function POST(
     }
 
     // ⭐ Create bid
-    await prisma.bid.create({
+    const newBid = await prisma.bid.create({
       data: {
         amount,
         auctionId: auction.id,
@@ -83,6 +86,27 @@ export async function POST(
         },
       },
     });
+
+    // ⭐ NEW HIGHEST BID EVENT
+    await emitNotificationEvent({
+      type: "NEW_HIGHEST_BID",
+      userId: user.id,
+      auctionId: auction.id,
+      bidAmount: newBid.amount,
+    });
+
+    // ⭐ OUTBID EVENT
+    if (
+      previousHighestBid &&
+      previousHighestBid.bidderId !== user.id
+    ) {
+      await emitNotificationEvent({
+        type: "OUTBID",
+        userId: previousHighestBid.bidderId,
+        auctionId: auction.id,
+        bidAmount: newBid.amount,
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
