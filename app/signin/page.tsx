@@ -27,65 +27,62 @@ export default function SignInPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-200 flex items-center justify-center px-4">
+    <main className="min-h-screen relative overflow-hidden bg-black flex items-center justify-center px-4">
 
-      <div className="w-full max-w-5xl grid md:grid-cols-2 rounded-3xl overflow-hidden shadow-2xl border border-gray-200 bg-white/80 backdrop-blur">
+      {/* BACKGROUND GLOW */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800 opacity-90" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-white/10 blur-3xl rounded-full" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-white/10 blur-3xl rounded-full" />
 
-        {/* LEFT — BRAND SIDE */}
-        <div className="hidden md:flex flex-col justify-between bg-black text-white p-10">
-          <div>
-            <h1 className="text-4xl font-semibold tracking-tight">
-              MrBids
-            </h1>
+      {/* CARD */}
+      <div className="relative w-full max-w-md bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 p-8 md:p-10">
 
-            <p className="mt-4 text-gray-300 text-sm leading-relaxed max-w-sm">
-              A modern real estate auction platform built for serious buyers
-              and verified bidding.
-            </p>
-          </div>
-
-          <div className="text-xs text-gray-400">
-            🔒 Secure email authentication
-          </div>
+        {/* BRAND */}
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
+            MrBids
+          </h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Secure access for verified real estate bidders
+          </p>
         </div>
 
-        {/* RIGHT — SIGN IN CARD */}
-        <div className="p-8 md:p-12 flex flex-col justify-center">
+        {/* TITLE */}
+        <h2 className="text-2xl font-semibold text-gray-900 text-center">
+          Sign in to continue
+        </h2>
 
-          <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
-            Welcome back
-          </h2>
+        <p className="text-sm text-gray-600 text-center mt-2 mb-6">
+          We’ll email you a secure magic link.
+        </p>
 
-          <p className="mt-2 text-sm text-gray-600 mb-6">
-            Enter your email to receive a secure magic link.
-          </p>
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+          />
 
-            <input
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-            />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-black text-white py-3 text-sm font-medium hover:bg-gray-900 transition disabled:opacity-60"
+          >
+            {loading ? "Sending magic link..." : "Send Magic Link"}
+          </button>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-xl bg-black text-white py-3 text-sm font-medium hover:bg-gray-900 transition disabled:opacity-60"
-            >
-              {loading ? "Sending magic link..." : "Send Magic Link"}
-            </button>
+        </form>
 
-          </form>
+        {/* TRUST TEXT */}
+        <p className="mt-6 text-xs text-gray-500 text-center">
+          🔒 Magic links expire automatically for your security.
+        </p>
 
-          <p className="mt-6 text-xs text-gray-500 text-center">
-            Magic links expire automatically for your security.
-          </p>
-
-        </div>
       </div>
     </main>
   );
