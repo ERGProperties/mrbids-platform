@@ -14,7 +14,7 @@ export default function AuctionClient({
 }) {
   const { data: session } = useSession();
 
-  // ⭐ LIVE AUCTION STATE (updates from stream)
+  // ⭐ LIVE AUCTION STATE
   const [liveAuction, setLiveAuction] = useState(auction);
 
   const imageList =
@@ -33,7 +33,7 @@ export default function AuctionClient({
   // ⭐ TEMP DEV MODE (remove later)
   const isVerified = true;
 
-  // ⭐ LIVE STREAM CONNECTION (Server-Sent Events)
+  // ⭐ LIVE STREAM CONNECTION (SAFE MERGE FIX)
   useEffect(() => {
     const eventSource = new EventSource(
       `/api/auctions/${auction.slug}/stream`
@@ -42,7 +42,12 @@ export default function AuctionClient({
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        setLiveAuction(data);
+
+        // 🔥 MERGE INSTEAD OF REPLACE
+        setLiveAuction((prev: any) => ({
+          ...prev,
+          ...data,
+        }));
       } catch (err) {
         console.error("Stream parse error:", err);
       }
@@ -78,6 +83,7 @@ export default function AuctionClient({
 
   function onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
     if (touchStartX.current == null) return;
+
     const delta =
       e.changedTouches[0].clientX - touchStartX.current;
 
@@ -194,7 +200,6 @@ export default function AuctionClient({
                 Current Highest Bid
               </p>
 
-              {/* ⭐ LIVE UPDATING BID */}
               <p className="text-3xl font-semibold mt-1">
                 ${liveAuction.highestBid?.toLocaleString()}
               </p>
