@@ -27,20 +27,9 @@ export async function POST(
       );
     }
 
-    // ⭐ Find auction by slug
+    // ⭐ Find auction
     const auction = await prisma.auction.findUnique({
       where: { slug: params.slug },
-      include: {
-        bids: {
-          orderBy: { amount: "desc" },
-          take: 1,
-          select: {
-            id: true,
-            amount: true,
-            bidderId: true,
-          },
-        },
-      },
     });
 
     if (!auction) {
@@ -50,8 +39,17 @@ export async function POST(
       );
     }
 
-    // ⭐ Previous highest bid (before new bid)
-    const previousHighestBid = auction.bids[0] || null;
+    // ⭐ ALWAYS fetch previous highest bid fresh
+    const previousHighestBid = await prisma.bid.findFirst({
+      where: { auctionId: auction.id },
+      orderBy: { amount: "desc" },
+      select: {
+        id: true,
+        amount: true,
+        bidderId: true,
+      },
+    });
+
     const highestBid = previousHighestBid?.amount || 0;
 
     if (amount <= highestBid) {
@@ -82,7 +80,7 @@ export async function POST(
       },
     });
 
-    // ⭐ Update auction bid count
+    // ⭐ Update bid count
     await prisma.auction.update({
       where: { id: auction.id },
       data: {
@@ -92,8 +90,7 @@ export async function POST(
       },
     });
 
-    // ⭐ NEW HIGHEST BID EVENT
-    // only fire when bidder actually changes
+    // ⭐ NEW HIGHEST BID EMAIL
     if (
       !previousHighestBid ||
       previousHighestBid.bidderId !== user.id
@@ -106,7 +103,7 @@ export async function POST(
       });
     }
 
-    // ⭐ OUTBID EVENT
+    // ⭐ OUTBID EMAIL
     if (
       previousHighestBid &&
       previousHighestBid.bidderId !== user.id
