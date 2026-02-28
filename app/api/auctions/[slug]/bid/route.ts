@@ -93,12 +93,18 @@ export async function POST(
     });
 
     // ⭐ NEW HIGHEST BID EVENT
-    await emitNotificationEvent({
-      type: "NEW_HIGHEST_BID",
-      userId: user.id,
-      auctionId: auction.id,
-      bidAmount: newBid.amount,
-    });
+    // only fire when bidder actually changes
+    if (
+      !previousHighestBid ||
+      previousHighestBid.bidderId !== user.id
+    ) {
+      await emitNotificationEvent({
+        type: "NEW_HIGHEST_BID",
+        userId: user.id,
+        auctionId: auction.id,
+        bidAmount: newBid.amount,
+      });
+    }
 
     // ⭐ OUTBID EVENT
     if (
