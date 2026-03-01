@@ -40,7 +40,7 @@ export async function POST(
     }
 
     // ⭐ NEW — prevent bids after auction ends
-    if (auction.endsAt <= new Date()) {
+    if (auction.endAt <= new Date()) {
       return NextResponse.json(
         { error: "Auction has ended" },
         { status: 400 }
