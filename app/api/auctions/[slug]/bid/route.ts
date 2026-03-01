@@ -95,6 +95,8 @@ export async function POST(
       const SOFT_CLOSE_EXTENSION_MS =
         SOFT_CLOSE_EXTENSION_MINUTES * 60 * 1000;
 
+      let auctionExtended = false;
+
       if (
         msRemaining > 0 &&
         msRemaining <= SOFT_CLOSE_WINDOW_MS
@@ -108,6 +110,8 @@ export async function POST(
             ),
           },
         });
+
+        auctionExtended = true;
       }
 
       // ⭐ Update bid count
@@ -124,6 +128,7 @@ export async function POST(
         auction,
         newBid,
         previousHighestBid,
+        auctionExtended,
       };
     });
 
@@ -153,7 +158,10 @@ export async function POST(
       });
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+      extended: result.auctionExtended,
+    });
   } catch (err: any) {
     console.error("BID API ERROR:", err);
 
