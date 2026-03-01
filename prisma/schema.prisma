@@ -60,7 +60,6 @@ model Auction {
 
   bids          Bid[]
 
-  // ⭐ SELLER RELATION
   sellerId      String?
   seller        User? @relation("SellerAuctions", fields: [sellerId], references: [id])
 
@@ -68,7 +67,6 @@ model Auction {
   serviceFeeStatus ServiceFeeStatus?
   serviceFeePaidAt DateTime?
 
-  // ⭐ NOTIFICATION LOCK FLAGS (NEW)
   endingSoonSent   Boolean @default(false)
   endedEmailsSent  Boolean @default(false)
 
@@ -95,7 +93,6 @@ model Bid {
 model User {
   id        String   @id @default(cuid())
 
-  // ⭐ REQUIRED FOR NEXTAUTH EMAIL PROVIDER
   name          String?
   email         String? @unique
   emailVerified DateTime?
@@ -107,12 +104,26 @@ model User {
   isVerifiedBidder Boolean @default(false)
 
   bids      Bid[]
-
-  // ⭐ AUCTIONS CREATED BY THIS USER
   auctions  Auction[] @relation("SellerAuctions")
+
+  // ⭐ PUSH SUBSCRIPTIONS (NEW)
+  pushSubscriptions PushSubscription[]
 
   accounts  Account[]
   sessions  Session[]
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+
+  createdAt DateTime @default(now())
 }
 
 model Account {
