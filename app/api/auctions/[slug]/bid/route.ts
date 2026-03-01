@@ -39,6 +39,14 @@ export async function POST(
       );
     }
 
+    // ⭐ NEW — prevent bids after auction ends
+    if (auction.endsAt <= new Date()) {
+      return NextResponse.json(
+        { error: "Auction has ended" },
+        { status: 400 }
+      );
+    }
+
     // ⭐ ALWAYS fetch previous highest bid fresh
     const previousHighestBid = await prisma.bid.findFirst({
       where: { auctionId: auction.id },
