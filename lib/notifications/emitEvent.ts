@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "./email";
+import { sendPushNotification } from "./push";
 
 export type NotificationEvent =
   | "NEW_HIGHEST_BID"
@@ -29,6 +30,9 @@ export async function emitNotificationEvent(params: EmitEventParams) {
       return;
     }
 
+    // =========================
+    // NEW HIGHEST BID
+    // =========================
     if (params.type === "NEW_HIGHEST_BID") {
       try {
         await sendEmail({
@@ -47,6 +51,9 @@ export async function emitNotificationEvent(params: EmitEventParams) {
       }
     }
 
+    // =========================
+    // OUTBID
+    // =========================
     if (params.type === "OUTBID") {
       try {
         await sendEmail({
@@ -67,6 +74,30 @@ export async function emitNotificationEvent(params: EmitEventParams) {
         console.log("Outbid email sent:", user.email);
       } catch (err) {
         console.error("Outbid email failed:", err);
+      }
+
+      // ⭐ PUSH NOTIFICATIONS (NEW)
+      try {
+        const subscriptions =
+          await prisma.pushSubscription.findMany({
+            where: {
+              userId: user.id,
+            },
+          });
+
+        for (const sub of subscriptions) {
+          await sendPushNotification(sub, {
+            title: "You've been outbid 🔥",
+            body: "Someone placed a higher bid. Tap to bid again!",
+          });
+        }
+
+        console.log(
+          "Outbid push notifications sent:",
+          subscriptions.length
+        );
+      } catch (err) {
+        console.error("Outbid push failed:", err);
       }
     }
   } catch (err) {
