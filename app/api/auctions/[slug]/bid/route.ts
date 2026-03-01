@@ -39,7 +39,7 @@ export async function POST(
       );
     }
 
-    // ⭐ NEW — prevent bids after auction ends
+    // ⭐ Prevent bids after auction ends
     if (auction.endAt <= new Date()) {
       return NextResponse.json(
         { error: "Auction has ended" },
@@ -87,6 +87,24 @@ export async function POST(
         bidderId: user.id,
       },
     });
+
+    // ⭐ NEW — SOFT CLOSE LOGIC
+    const now = new Date();
+    const msRemaining = auction.endAt.getTime() - now.getTime();
+
+    const SOFT_CLOSE_WINDOW_MS = 5 * 60 * 1000;
+    const SOFT_CLOSE_EXTENSION_MS = 5 * 60 * 1000;
+
+    if (msRemaining > 0 && msRemaining <= SOFT_CLOSE_WINDOW_MS) {
+      await prisma.auction.update({
+        where: { id: auction.id },
+        data: {
+          endAt: new Date(
+            auction.endAt.getTime() + SOFT_CLOSE_EXTENSION_MS
+          ),
+        },
+      });
+    }
 
     // ⭐ Update bid count
     await prisma.auction.update({
