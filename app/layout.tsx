@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
-  manifest: "/site.webmanifest",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -29,6 +29,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* ⭐ PWA / Mobile App Meta */}
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#000000" />
+
+        {/* ⭐ Apple iOS PWA support */}
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black"
+        />
+        <meta name="apple-mobile-web-app-title" content="MrBids" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+      </head>
+
       <body className="bg-white text-gray-900 antialiased flex flex-col min-h-screen">
         <SessionProvider>
 
