@@ -1,26 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function BidForm({
   slug,
   minimumBid,
   currentBid,
+  onExtended,
 }: {
   slug: string;
   minimumBid: number;
   currentBid: number;
+  onExtended?: () => void;
 }) {
+  const router = useRouter();
+
   const [amount, setAmount] = useState(minimumBid);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   async function submitBid(e: React.FormEvent) {
     e.preventDefault();
+
     setLoading(true);
     setMessage("");
 
     try {
+      // ⭐ Submit bid
       const res = await fetch(`/api/auctions/${slug}/bid`, {
         method: "POST",
         headers: {
@@ -32,11 +39,22 @@ export default function BidForm({
       const data = await res.json();
 
       if (!res.ok) {
+        console.error("BID API ERROR:", data);
         setMessage(data.error || "Failed to place bid.");
-      } else {
-        setMessage("Bid placed successfully!");
+        return;
       }
-    } catch (err) {
+
+      // ⭐ NEW — trigger extension banner if soft close happened
+      if (data.extended && onExtended) {
+        onExtended();
+      }
+
+      setMessage("Bid placed successfully!");
+
+      // ⭐ NEW — refresh auction data (updates countdown + bids)
+      router.refresh();
+    } catch (err: any) {
+      console.error("BID ERROR:", err);
       setMessage("Something went wrong.");
     } finally {
       setLoading(false);
@@ -45,7 +63,6 @@ export default function BidForm({
 
   return (
     <form onSubmit={submitBid} className="space-y-4">
-
       <p className="text-sm text-gray-600">
         Minimum bid: ${minimumBid.toLocaleString()}
       </p>
