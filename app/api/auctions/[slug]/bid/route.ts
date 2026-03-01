@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { emitNotificationEvent } from "@/lib/notifications/emitEvent";
+import {
+  SOFT_CLOSE_WINDOW_MINUTES,
+  SOFT_CLOSE_EXTENSION_MINUTES,
+} from "@/lib/auctionConfig";
 
 export async function POST(
   req: Request,
@@ -27,6 +31,7 @@ export async function POST(
       );
     }
 
+    // ⭐ Find user
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
@@ -39,18 +44,21 @@ export async function POST(
     }
 
     const result = await prisma.$transaction(async (tx) => {
-      // ⭐ Find auction INSIDE transaction
+      // ⭐ Find auction inside transaction
       const auction = await tx.auction.findUnique({
         where: { slug: params.slug },
       });
 
-      if (!auction) throw new Error("Auction not found");
+      if (!auction) {
+        throw new Error("Auction not found");
+      }
 
+      // ⭐ Prevent bids after auction ends
       if (auction.endAt <= new Date()) {
         throw new Error("Auction has ended");
       }
 
-      // ⭐ Get highest bid fresh
+      // ⭐ Always fetch highest bid fresh
       const previousHighestBid = await tx.bid.findFirst({
         where: { auctionId: auction.id },
         orderBy: { amount: "desc" },
@@ -76,19 +84,27 @@ export async function POST(
         },
       });
 
-      // ⭐ SOFT CLOSE (safe now)
+      // ⭐ SOFT CLOSE LOGIC
       const now = new Date();
-      const msRemaining = auction.endAt.getTime() - now.getTime();
+      const msRemaining =
+        auction.endAt.getTime() - now.getTime();
 
-      const SOFT_CLOSE_WINDOW_MS = 5 * 60 * 1000;
-      const SOFT_CLOSE_EXTENSION_MS = 5 * 60 * 1000;
+      const SOFT_CLOSE_WINDOW_MS =
+        SOFT_CLOSE_WINDOW_MINUTES * 60 * 1000;
 
-      if (msRemaining > 0 && msRemaining <= SOFT_CLOSE_WINDOW_MS) {
+      const SOFT_CLOSE_EXTENSION_MS =
+        SOFT_CLOSE_EXTENSION_MINUTES * 60 * 1000;
+
+      if (
+        msRemaining > 0 &&
+        msRemaining <= SOFT_CLOSE_WINDOW_MS
+      ) {
         await tx.auction.update({
           where: { id: auction.id },
           data: {
             endAt: new Date(
-              auction.endAt.getTime() + SOFT_CLOSE_EXTENSION_MS
+              auction.endAt.getTime() +
+                SOFT_CLOSE_EXTENSION_MS
             ),
           },
         });
@@ -104,10 +120,14 @@ export async function POST(
         },
       });
 
-      return { auction, newBid, previousHighestBid };
+      return {
+        auction,
+        newBid,
+        previousHighestBid,
+      };
     });
 
-    // ⭐ Notifications OUTSIDE transaction (best practice)
+    // ⭐ NEW HIGHEST BID EMAIL
     if (
       !result.previousHighestBid ||
       result.previousHighestBid.bidderId !== user.id
@@ -120,6 +140,7 @@ export async function POST(
       });
     }
 
+    // ⭐ OUTBID EMAIL
     if (
       result.previousHighestBid &&
       result.previousHighestBid.bidderId !== user.id

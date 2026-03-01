@@ -1,0 +1,2 @@
+export const SOFT_CLOSE_WINDOW_MINUTES = 5;
+export const SOFT_CLOSE_EXTENSION_MINUTES = 5;
