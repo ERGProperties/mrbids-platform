@@ -6,7 +6,9 @@ export async function GET() {
   try {
     const now = new Date();
 
-    // windows: 1hr, 15min, 5min
+    // =========================
+    // ENDING SOON EMAILS
+    // =========================
     const windows = [
       60 * 60 * 1000,
       15 * 60 * 1000,
@@ -19,17 +21,15 @@ export async function GET() {
 
       const auctions = await prisma.auction.findMany({
         where: {
+          status: "LIVE",
           endAt: {
             gte: start,
             lte: end,
           },
-          status: "LIVE",
         },
         include: {
           bids: {
-            select: {
-              bidderId: true,
-            },
+            select: { bidderId: true },
           },
         },
       });
@@ -52,7 +52,6 @@ export async function GET() {
             html: `
               <h2>Auction ending soon</h2>
               <p>${auction.title}</p>
-              <p>Ends at: ${auction.endAt?.toISOString()}</p>
               <p>
                 <a href="https://mrbids.com/auctions/${auction.slug}">
                   View auction
@@ -64,9 +63,112 @@ export async function GET() {
       }
     }
 
+    // =========================
+    // AUCTION ENDED EMAILS
+    // =========================
+    const endedAuctions = await prisma.auction.findMany({
+      where: {
+        status: "LIVE",
+        endAt: {
+          lte: now,
+        },
+      },
+      include: {
+        bids: {
+          orderBy: { amount: "desc" },
+        },
+      },
+    });
+
+    for (const auction of endedAuctions) {
+      const highestBid = auction.bids[0] || null;
+
+      // mark auction closed
+      await prisma.auction.update({
+        where: { id: auction.id },
+        data: {
+          status: "CLOSED",
+          finalPrice: highestBid?.amount ?? null,
+        },
+      });
+
+      const bidderIds = [
+        ...new Set(auction.bids.map((b) => b.bidderId)),
+      ];
+
+      // ---------- WINNER ----------
+      if (highestBid) {
+        const winner = await prisma.user.findUnique({
+          where: { id: highestBid.bidderId },
+        });
+
+        if (winner?.email) {
+          await sendEmail({
+            to: winner.email,
+            subject: "🎉 You won the auction!",
+            html: `
+              <h2>Congratulations — you won!</h2>
+              <p>${auction.title}</p>
+              <p>Winning bid: $${highestBid.amount}</p>
+              <p>
+                <a href="https://mrbids.com/auctions/${auction.slug}">
+                  View auction
+                </a>
+              </p>
+            `,
+          });
+        }
+      }
+
+      // ---------- LOSERS ----------
+      for (const bidderId of bidderIds) {
+        if (bidderId === highestBid?.bidderId) continue;
+
+        const user = await prisma.user.findUnique({
+          where: { id: bidderId },
+        });
+
+        if (!user?.email) continue;
+
+        await sendEmail({
+          to: user.email,
+          subject: "Auction ended — you were outbid",
+          html: `
+            <h2>This auction has ended</h2>
+            <p>${auction.title}</p>
+            <p>Final price: $${highestBid?.amount ?? "N/A"}</p>
+            <p>
+              <a href="https://mrbids.com/auctions/${auction.slug}">
+                View results
+              </a>
+            </p>
+          `,
+        });
+      }
+
+      // ---------- SELLER ----------
+      if (auction.sellerId) {
+        const seller = await prisma.user.findUnique({
+          where: { id: auction.sellerId },
+        });
+
+        if (seller?.email) {
+          await sendEmail({
+            to: seller.email,
+            subject: "Your auction has ended",
+            html: `
+              <h2>Your auction has ended</h2>
+              <p>${auction.title}</p>
+              <p>Final price: $${highestBid?.amount ?? "No bids"}</p>
+            `,
+          });
+        }
+      }
+    }
+
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("ENDING SOON ERROR:", err);
+    console.error("NOTIFICATION CRON ERROR:", err);
     return NextResponse.json(
       { error: "Server error" },
       { status: 500 }
