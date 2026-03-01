@@ -60,13 +60,17 @@ model Auction {
 
   bids          Bid[]
 
-  // ⭐ SELLER RELATION (NEW)
+  // ⭐ SELLER RELATION
   sellerId      String?
   seller        User? @relation("SellerAuctions", fields: [sellerId], references: [id])
 
   serviceFeeAmount Int?
   serviceFeeStatus ServiceFeeStatus?
   serviceFeePaidAt DateTime?
+
+  // ⭐ NOTIFICATION LOCK FLAGS (NEW)
+  endingSoonSent   Boolean @default(false)
+  endedEmailsSent  Boolean @default(false)
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -104,7 +108,7 @@ model User {
 
   bids      Bid[]
 
-  // ⭐ AUCTIONS CREATED BY THIS USER (NEW)
+  // ⭐ AUCTIONS CREATED BY THIS USER
   auctions  Auction[] @relation("SellerAuctions")
 
   accounts  Account[]

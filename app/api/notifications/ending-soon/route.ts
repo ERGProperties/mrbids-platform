@@ -22,6 +22,7 @@ export async function GET() {
       const auctions = await prisma.auction.findMany({
         where: {
           status: "LIVE",
+          endingSoonSent: false,
           endAt: {
             gte: start,
             lte: end,
@@ -60,6 +61,14 @@ export async function GET() {
             `,
           });
         }
+
+        // ⭐ LOCK so this only sends once
+        await prisma.auction.update({
+          where: { id: auction.id },
+          data: {
+            endingSoonSent: true,
+          },
+        });
       }
     }
 
@@ -69,6 +78,7 @@ export async function GET() {
     const endedAuctions = await prisma.auction.findMany({
       where: {
         status: "LIVE",
+        endedEmailsSent: false,
         endAt: {
           lte: now,
         },
@@ -83,12 +93,13 @@ export async function GET() {
     for (const auction of endedAuctions) {
       const highestBid = auction.bids[0] || null;
 
-      // mark auction closed
+      // close auction + lock emails
       await prisma.auction.update({
         where: { id: auction.id },
         data: {
           status: "CLOSED",
           finalPrice: highestBid?.amount ?? null,
+          endedEmailsSent: true,
         },
       });
 
