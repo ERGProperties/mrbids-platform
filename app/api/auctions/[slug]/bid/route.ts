@@ -27,47 +27,6 @@ export async function POST(
       );
     }
 
-    // ⭐ Find auction
-    const auction = await prisma.auction.findUnique({
-      where: { slug: params.slug },
-    });
-
-    if (!auction) {
-      return NextResponse.json(
-        { error: "Auction not found" },
-        { status: 404 }
-      );
-    }
-
-    // ⭐ Prevent bids after auction ends
-    if (auction.endAt <= new Date()) {
-      return NextResponse.json(
-        { error: "Auction has ended" },
-        { status: 400 }
-      );
-    }
-
-    // ⭐ ALWAYS fetch previous highest bid fresh
-    const previousHighestBid = await prisma.bid.findFirst({
-      where: { auctionId: auction.id },
-      orderBy: { amount: "desc" },
-      select: {
-        id: true,
-        amount: true,
-        bidderId: true,
-      },
-    });
-
-    const highestBid = previousHighestBid?.amount || 0;
-
-    if (amount <= highestBid) {
-      return NextResponse.json(
-        { error: "Bid must be higher than current bid" },
-        { status: 400 }
-      );
-    }
-
-    // ⭐ Find user
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
@@ -79,76 +38,107 @@ export async function POST(
       );
     }
 
-    // ⭐ Create bid
-    const newBid = await prisma.bid.create({
-      data: {
-        amount,
-        auctionId: auction.id,
-        bidderId: user.id,
-      },
-    });
+    const result = await prisma.$transaction(async (tx) => {
+      // ⭐ Find auction INSIDE transaction
+      const auction = await tx.auction.findUnique({
+        where: { slug: params.slug },
+      });
 
-    // ⭐ NEW — SOFT CLOSE LOGIC
-    const now = new Date();
-    const msRemaining = auction.endAt.getTime() - now.getTime();
+      if (!auction) throw new Error("Auction not found");
 
-    const SOFT_CLOSE_WINDOW_MS = 5 * 60 * 1000;
-    const SOFT_CLOSE_EXTENSION_MS = 5 * 60 * 1000;
+      if (auction.endAt <= new Date()) {
+        throw new Error("Auction has ended");
+      }
 
-    if (msRemaining > 0 && msRemaining <= SOFT_CLOSE_WINDOW_MS) {
-      await prisma.auction.update({
-        where: { id: auction.id },
-        data: {
-          endAt: new Date(
-            auction.endAt.getTime() + SOFT_CLOSE_EXTENSION_MS
-          ),
+      // ⭐ Get highest bid fresh
+      const previousHighestBid = await tx.bid.findFirst({
+        where: { auctionId: auction.id },
+        orderBy: { amount: "desc" },
+        select: {
+          id: true,
+          amount: true,
+          bidderId: true,
         },
       });
-    }
 
-    // ⭐ Update bid count
-    await prisma.auction.update({
-      where: { id: auction.id },
-      data: {
-        bidCount: {
-          increment: 1,
+      const highestBid = previousHighestBid?.amount || 0;
+
+      if (amount <= highestBid) {
+        throw new Error("Bid must be higher than current bid");
+      }
+
+      // ⭐ Create bid
+      const newBid = await tx.bid.create({
+        data: {
+          amount,
+          auctionId: auction.id,
+          bidderId: user.id,
         },
-      },
+      });
+
+      // ⭐ SOFT CLOSE (safe now)
+      const now = new Date();
+      const msRemaining = auction.endAt.getTime() - now.getTime();
+
+      const SOFT_CLOSE_WINDOW_MS = 5 * 60 * 1000;
+      const SOFT_CLOSE_EXTENSION_MS = 5 * 60 * 1000;
+
+      if (msRemaining > 0 && msRemaining <= SOFT_CLOSE_WINDOW_MS) {
+        await tx.auction.update({
+          where: { id: auction.id },
+          data: {
+            endAt: new Date(
+              auction.endAt.getTime() + SOFT_CLOSE_EXTENSION_MS
+            ),
+          },
+        });
+      }
+
+      // ⭐ Update bid count
+      await tx.auction.update({
+        where: { id: auction.id },
+        data: {
+          bidCount: {
+            increment: 1,
+          },
+        },
+      });
+
+      return { auction, newBid, previousHighestBid };
     });
 
-    // ⭐ NEW HIGHEST BID EMAIL
+    // ⭐ Notifications OUTSIDE transaction (best practice)
     if (
-      !previousHighestBid ||
-      previousHighestBid.bidderId !== user.id
+      !result.previousHighestBid ||
+      result.previousHighestBid.bidderId !== user.id
     ) {
       await emitNotificationEvent({
         type: "NEW_HIGHEST_BID",
         userId: user.id,
-        auctionId: auction.id,
-        bidAmount: newBid.amount,
+        auctionId: result.auction.id,
+        bidAmount: result.newBid.amount,
       });
     }
 
-    // ⭐ OUTBID EMAIL
     if (
-      previousHighestBid &&
-      previousHighestBid.bidderId !== user.id
+      result.previousHighestBid &&
+      result.previousHighestBid.bidderId !== user.id
     ) {
       await emitNotificationEvent({
         type: "OUTBID",
-        userId: previousHighestBid.bidderId,
-        auctionId: auction.id,
-        bidAmount: newBid.amount,
+        userId: result.previousHighestBid.bidderId,
+        auctionId: result.auction.id,
+        bidAmount: result.newBid.amount,
       });
     }
 
     return NextResponse.json({ success: true });
-  } catch (err) {
+  } catch (err: any) {
     console.error("BID API ERROR:", err);
 
     return NextResponse.json(
-      { error: "Server error placing bid" },
-      { status: 500 }
+      { error: err.message || "Server error placing bid" },
+      { status: 400 }
     );
   }
 }
