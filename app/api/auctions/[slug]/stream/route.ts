@@ -10,59 +10,84 @@ export async function GET(
 ) {
   const slug = params.slug
 
-  // 👀 increment watcher count
   viewers[slug] = (viewers[slug] || 0) + 1
 
   const stream = new ReadableStream({
-    async start(controller) {
+    start(controller) {
+      let closed = false
+
       const send = async () => {
-        const auction = await prisma.auction.findUnique({
-          where: { slug },
-          include: {
-            bids: {
-              orderBy: { amount: "desc" },
-              take: 1,
+        // ⭐ CRITICAL SAFETY CHECK
+        if (closed) return
+
+        try {
+          const auction = await prisma.auction.findUnique({
+            where: { slug },
+            include: {
+              bids: {
+                orderBy: { amount: "desc" },
+                take: 1,
+              },
             },
-          },
-        })
+          })
 
-        if (!auction) return
+          if (!auction || closed) return
 
-        const payload = {
-          highestBid:
-            auction.bids[0]?.amount ??
-            auction.finalPrice ??
-            auction.startingBid,
-          endsAt: auction.endAt.toISOString(),
-          bidCount: auction.bidCount,
-          watchers: viewers[slug] || 1,
+          const payload = {
+            highestBid:
+              auction.bids[0]?.amount ??
+              auction.finalPrice ??
+              auction.startingBid ??
+              0,
+            endsAt: auction.endAt
+              ? auction.endAt.toISOString()
+              : null,
+            bidCount: auction.bidCount ?? 0,
+            watchers: viewers[slug] || 1,
+          }
+
+          // ⭐ prevents enqueue after close
+          if (!closed) {
+            controller.enqueue(
+              `data: ${JSON.stringify(payload)}\n\n`
+            )
+          }
+        } catch (err) {
+          console.error("Stream send error:", err)
         }
-
-        controller.enqueue(
-          `data: ${JSON.stringify(payload)}\n\n`
-        )
       }
 
-      await send()
+      // send immediately
+      send()
 
       const interval = setInterval(send, 2000)
 
-      req.signal.addEventListener("abort", () => {
+      const cleanup = () => {
+        if (closed) return
+        closed = true
+
         clearInterval(interval)
 
-        // 👀 decrement watcher count
         viewers[slug] = Math.max(
           0,
           (viewers[slug] || 1) - 1
         )
-      })
+
+        try {
+          controller.close()
+        } catch {
+          // ignore already closed
+        }
+      }
+
+      req.signal.addEventListener("abort", cleanup)
     },
   })
 
   return new Response(stream, {
     headers: {
       "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
+      "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
     },
   })

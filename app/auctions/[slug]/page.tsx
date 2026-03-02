@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import AuctionClient from "./AuctionClient";
 import BidHistoryServer from "./BidHistoryServer";
@@ -27,6 +28,61 @@ function normalizeImages(images: unknown): string[] {
   if (!Array.isArray(images)) return [];
   return images.filter((img): img is string => typeof img === "string");
 }
+
+/* =========================
+   STEP 1 — SEO METADATA
+   ========================= */
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const auction = await prisma.auction.findUnique({
+    where: { slug: params.slug },
+    select: {
+      title: true,
+      addressLine: true,
+      cityStateZip: true,
+      description: true,
+      coverImage: true,
+    },
+  });
+
+  if (!auction) {
+    return {
+      title: "Auction Not Found | MrBids",
+    };
+  }
+
+  const title =
+    auction.title ||
+    `${auction.addressLine ?? ""} ${auction.cityStateZip ?? ""}`.trim();
+
+  const description =
+    auction.description?.slice(0, 160) ||
+    "Live real estate auction with transparent bidding and soft-close protection.";
+
+  return {
+    title: `${title} | Live Real Estate Auction | MrBids`,
+    description,
+    openGraph: {
+      title: `${title} | MrBids`,
+      description,
+      images: auction.coverImage ? [auction.coverImage] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${title} | MrBids`,
+      description,
+      images: auction.coverImage ? [auction.coverImage] : [],
+    },
+  };
+}
+
+/* =========================
+   PAGE COMPONENT
+   ========================= */
 
 export default async function AuctionPage({
   params,
@@ -127,7 +183,7 @@ export default async function AuctionPage({
         </div>
       </section>
 
-      {/* AUCTION CONTENT */}
+      {/* SAFE SERIALIZED CLIENT DATA */}
       <AuctionClient
         auction={{
           id: auction.id,
@@ -135,20 +191,23 @@ export default async function AuctionPage({
           title: auction.title,
           addressLine: auction.addressLine,
           cityStateZip: auction.cityStateZip,
-          startingBid: auction.startingBid,
-          bidIncrement: auction.bidIncrement,
-          highestBid,
-          arv: auction.arv,
-          endsAt: auction.endAt?.toISOString(),
-          image,
-          imagesPath: "",
-          images,
+          description: auction.description,
           propertyType: auction.propertyType,
           beds: auction.beds,
           baths: auction.baths,
           sqft: auction.sqft,
-          description: auction.description,
-          leadingBidderId: auction.bids[0]?.bidderId ?? null,
+          arv: auction.arv,
+          images,
+          image,
+          highestBid,
+          bidCount: auction.bidCount,
+          endAt: auction.endAt
+            ? auction.endAt.toISOString()
+            : null,
+          bidIncrement: auction.bidIncrement,
+          startingBid: auction.startingBid,
+          leadingBidderId:
+            auction.bids[0]?.bidderId ?? null,
         }}
         minimumBid={minimumBid}
       />

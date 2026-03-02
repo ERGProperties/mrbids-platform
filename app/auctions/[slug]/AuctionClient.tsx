@@ -15,12 +15,11 @@ export default function AuctionClient({
   const { data: session } = useSession();
 
   const [liveAuction, setLiveAuction] = useState(auction);
-  const [showExtensionBanner, setShowExtensionBanner] =
-    useState(false);
   const [flashBid, setFlashBid] = useState(false);
 
   const imageList =
-    Array.isArray(liveAuction.images) && liveAuction.images.length
+    Array.isArray(liveAuction.images) &&
+    liveAuction.images.length
       ? liveAuction.images
       : liveAuction.image
       ? [liveAuction.image]
@@ -32,20 +31,10 @@ export default function AuctionClient({
   const selectedImage =
     imageList.length > 0 ? imageList[selectedIndex] : null;
 
-  const isVerified = true;
-
-  // ⭐ normalize end date (supports BOTH fields)
   const auctionEnd =
     liveAuction.endAt || liveAuction.endsAt;
 
-  useEffect(() => {
-    if (!showExtensionBanner) return;
-    const t = setTimeout(() => {
-      setShowExtensionBanner(false);
-    }, 6000);
-    return () => clearTimeout(t);
-  }, [showExtensionBanner]);
-
+  /* LIVE STREAM */
   useEffect(() => {
     const eventSource = new EventSource(
       `/api/auctions/${auction.slug}/stream`
@@ -66,19 +55,16 @@ export default function AuctionClient({
 
           return {
             ...prev,
-            ...data,
-            endAt: data.endAt
-              ? new Date(data.endAt)
-              : prev.endAt,
+            highestBid:
+              data.highestBid ?? prev.highestBid,
+            bidCount: data.bidCount ?? prev.bidCount,
+            watchers: data.watchers ?? prev.watchers,
+            endAt: data.endsAt ?? prev.endAt,
           };
         });
       } catch (err) {
         console.error("Stream parse error:", err);
       }
-    };
-
-    eventSource.onerror = () => {
-      console.warn("Stream reconnecting...");
     };
 
     return () => eventSource.close();
@@ -116,13 +102,8 @@ export default function AuctionClient({
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
-        {showExtensionBanner && (
-          <div className="mb-6 rounded-xl border border-yellow-300 bg-yellow-100 p-3 text-sm font-medium text-yellow-800">
-            ⏱ Auction extended due to active bidding!
-          </div>
-        )}
-
-        <div className="mb-10 border-b border-gray-200 pb-6">
+        {/* LIVE HEADER */}
+        <div className="mb-8 border-b pb-6">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
@@ -133,16 +114,21 @@ export default function AuctionClient({
             </p>
           </div>
 
-          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-gray-900">
-            {liveAuction.title || "Untitled Property"}
+          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight">
+            {liveAuction.title}
           </h1>
+
+          <p className="mt-2 text-gray-600">
+            {liveAuction.addressLine} {liveAuction.cityStateZip}
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
 
+          {/* IMAGE SECTION */}
           <div>
             <div
-              className="relative bg-white border rounded-2xl overflow-hidden mb-6"
+              className="relative bg-white border rounded-2xl overflow-hidden"
               onTouchStart={onTouchStart}
               onTouchEnd={onTouchEnd}
             >
@@ -157,9 +143,66 @@ export default function AuctionClient({
                   No Image Available
                 </div>
               )}
+
+              {imageList.length > 1 && (
+                <>
+                  <button
+                    onClick={goPrev}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full"
+                  >
+                    ←
+                  </button>
+                  <button
+                    onClick={goNext}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full"
+                  >
+                    →
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* PROPERTY INFO */}
+            <div className="mt-6 bg-white border rounded-2xl p-6">
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="rounded-xl bg-gray-50 p-4 border">
+                  <p className="text-xs uppercase text-gray-500">Type</p>
+                  <p className="text-sm font-semibold mt-1">
+                    {liveAuction.propertyType || "—"}
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-gray-50 p-4 border">
+                  <p className="text-xs uppercase text-gray-500">Beds</p>
+                  <p className="text-sm font-semibold mt-1">
+                    {liveAuction.beds || "—"}
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-gray-50 p-4 border">
+                  <p className="text-xs uppercase text-gray-500">Baths</p>
+                  <p className="text-sm font-semibold mt-1">
+                    {liveAuction.baths || "—"}
+                  </p>
+                </div>
+
+                <div className="rounded-xl bg-gray-50 p-4 border">
+                  <p className="text-xs uppercase text-gray-500">Sqft</p>
+                  <p className="text-sm font-semibold mt-1">
+                    {liveAuction.sqft || "—"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-line">
+                {liveAuction.description}
+              </div>
+
             </div>
           </div>
 
+          {/* BID PANEL */}
           <aside className="lg:sticky lg:top-24 h-fit">
             <div className="bg-white border rounded-2xl p-6 shadow-sm">
 
@@ -169,21 +212,19 @@ export default function AuctionClient({
 
               <p
                 className={`text-3xl font-semibold mt-1 transition ${
-                  flashBid ? "scale-105 text-green-600" : ""
+                  flashBid ? "text-green-600 scale-105" : ""
                 }`}
               >
                 ${liveAuction.highestBid?.toLocaleString()}
               </p>
 
-              <div className="mt-4 text-sm text-gray-600">
+              <div className="mt-4">
                 {auctionEnd ? (
                   <AuctionCountdown
                     endsAt={new Date(auctionEnd)}
                   />
                 ) : (
-                  <p className="text-sm text-gray-500">
-                    Loading countdown...
-                  </p>
+                  <p>Loading countdown...</p>
                 )}
               </div>
 
@@ -193,24 +234,22 @@ export default function AuctionClient({
                     slug={liveAuction.slug}
                     minimumBid={minimumBid}
                     currentBid={liveAuction.highestBid || 0}
-                    onExtended={() =>
-                      setShowExtensionBanner(true)
-                    }
                   />
                 ) : (
                   <button
                     onClick={() =>
                       (window.location.href = "/api/auth/signin")
                     }
-                    className="w-full bg-black text-white rounded-xl py-3 font-medium"
+                    className="w-full bg-black text-white rounded-xl py-3"
                   >
-                    Create Account / Sign In to Bid
+                    Sign In to Bid
                   </button>
                 )}
               </div>
 
             </div>
           </aside>
+
         </div>
       </div>
     </main>
