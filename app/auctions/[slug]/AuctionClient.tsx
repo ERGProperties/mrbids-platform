@@ -17,6 +17,10 @@ export default function AuctionClient({
   // ⭐ LIVE AUCTION STATE
   const [liveAuction, setLiveAuction] = useState(auction);
 
+  // ⭐ NEW — soft close extension banner
+  const [showExtensionBanner, setShowExtensionBanner] =
+    useState(false);
+
   const imageList =
     Array.isArray(liveAuction.images) && liveAuction.images.length
       ? liveAuction.images
@@ -33,7 +37,18 @@ export default function AuctionClient({
   // ⭐ TEMP DEV MODE (remove later)
   const isVerified = true;
 
-  // ⭐ LIVE STREAM CONNECTION (SAFE MERGE FIX)
+  // ⭐ AUTO-HIDE EXTENSION BANNER
+  useEffect(() => {
+    if (!showExtensionBanner) return;
+
+    const t = setTimeout(() => {
+      setShowExtensionBanner(false);
+    }, 6000);
+
+    return () => clearTimeout(t);
+  }, [showExtensionBanner]);
+
+  // ⭐ LIVE STREAM CONNECTION (AUTO RECONNECT SAFE)
   useEffect(() => {
     const eventSource = new EventSource(
       `/api/auctions/${auction.slug}/stream`
@@ -53,9 +68,9 @@ export default function AuctionClient({
       }
     };
 
+    // ⭐ FIX — allow browser auto reconnect
     eventSource.onerror = () => {
-      console.error("Stream connection lost");
-      eventSource.close();
+      console.warn("Stream reconnecting...");
     };
 
     return () => {
@@ -97,6 +112,13 @@ export default function AuctionClient({
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
+
+        {/* ⭐ EXTENSION BANNER */}
+        {showExtensionBanner && (
+          <div className="mb-6 rounded-xl border border-yellow-300 bg-yellow-100 p-3 text-sm font-medium text-yellow-800">
+            ⏱ Auction extended due to active bidding!
+          </div>
+        )}
 
         {/* HEADER */}
         <div className="mb-10 border-b border-gray-200 pb-6">
@@ -205,7 +227,8 @@ export default function AuctionClient({
               </p>
 
               <div className="mt-4 text-sm text-gray-600">
-                <AuctionCountdown endsAt={liveAuction.endsAt} />
+                {/* ⭐ FIXED — matches backend */}
+                <AuctionCountdown endsAt={liveAuction.endAt} />
               </div>
 
               <div className="mt-6">
@@ -223,6 +246,9 @@ export default function AuctionClient({
                     slug={liveAuction.slug}
                     minimumBid={minimumBid}
                     currentBid={liveAuction.highestBid || 0}
+                    onExtended={() =>
+                      setShowExtensionBanner(true)
+                    }
                   />
                 ) : (
                   <p className="text-sm text-gray-600">
