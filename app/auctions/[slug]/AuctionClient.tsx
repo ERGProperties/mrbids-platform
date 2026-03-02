@@ -67,6 +67,10 @@ export default function AuctionClient({
       }
     };
 
+    eventSource.onerror = () => {
+      console.warn("Stream reconnecting...");
+    };
+
     return () => eventSource.close();
   }, [auction.slug]);
 
@@ -102,8 +106,10 @@ export default function AuctionClient({
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
-        {/* LIVE HEADER */}
+        {/* HEADER */}
         <div className="mb-8 border-b pb-6">
+
+          {/* LIVE LABEL */}
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
@@ -121,6 +127,25 @@ export default function AuctionClient({
           <p className="mt-2 text-gray-600">
             {liveAuction.addressLine} {liveAuction.cityStateZip}
           </p>
+
+          {/* MARKETPLACE AUTHORITY LAYER */}
+          <div className="mt-5 flex flex-wrap gap-3 text-sm">
+            <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
+              <span className="text-green-600">✔</span>
+              Verified Seller
+            </div>
+
+            <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
+              <span className="text-green-600">✔</span>
+              Admin Reviewed Listing
+            </div>
+
+            <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
+              <span className="text-green-600">✔</span>
+              Transparent Bid History
+            </div>
+          </div>
+
         </div>
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
