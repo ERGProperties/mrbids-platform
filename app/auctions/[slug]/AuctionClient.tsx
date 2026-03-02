@@ -48,7 +48,7 @@ export default function AuctionClient({
     return () => clearTimeout(t);
   }, [showExtensionBanner]);
 
-  // ⭐ LIVE STREAM CONNECTION (FIXED DATE HANDLING)
+  // ⭐ LIVE STREAM CONNECTION (SAFE + STABLE)
   useEffect(() => {
     const eventSource = new EventSource(
       `/api/auctions/${auction.slug}/stream`
@@ -58,7 +58,7 @@ export default function AuctionClient({
       try {
         const data = JSON.parse(event.data);
 
-        // ⭐ FIX — always convert endAt to Date
+        // ⭐ SAFE MERGE + DATE FIX
         setLiveAuction((prev: any) => ({
           ...prev,
           ...data,
@@ -168,7 +168,6 @@ export default function AuctionClient({
                       <button
                         onClick={goPrev}
                         className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full hover:bg-black/80 transition"
-                        aria-label="Previous image"
                       >
                         ←
                       </button>
@@ -176,7 +175,6 @@ export default function AuctionClient({
                       <button
                         onClick={goNext}
                         className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white w-10 h-10 rounded-full hover:bg-black/80 transition"
-                        aria-label="Next image"
                       >
                         →
                       </button>
@@ -229,7 +227,16 @@ export default function AuctionClient({
               </p>
 
               <div className="mt-4 text-sm text-gray-600">
-                <AuctionCountdown endsAt={liveAuction.endAt} />
+                {/* ⭐ SAFE COUNTDOWN GUARD */}
+                {liveAuction.endAt ? (
+                  <AuctionCountdown
+                    endsAt={new Date(liveAuction.endAt)}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-500">
+                    Loading countdown...
+                  </p>
+                )}
               </div>
 
               <div className="mt-6">
