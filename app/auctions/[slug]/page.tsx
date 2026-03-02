@@ -30,6 +30,36 @@ function normalizeImages(images: unknown): string[] {
 }
 
 /* =========================
+   STEP 2 — STRUCTURED DATA
+   ========================= */
+
+function buildStructuredData(
+  auction: any,
+  highestBid: number,
+  image: string | null
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: auction.title,
+    description: auction.description,
+    image: image ? [image] : [],
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: auction.addressLine,
+      addressLocality: auction.cityStateZip,
+      addressCountry: "US",
+    },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "USD",
+      price: highestBid,
+      availability: "https://schema.org/InStock",
+    },
+  };
+}
+
+/* =========================
    STEP 1 — SEO METADATA
    ========================= */
 
@@ -120,6 +150,12 @@ export default async function AuctionPage({
   const images = normalizeImages(auction.images);
   const image = auction.coverImage || images[0] || null;
 
+  const structuredData = buildStructuredData(
+    auction,
+    highestBid,
+    image
+  );
+
   const latestBid = await prisma.bid.findFirst({
     where: { auctionId: auction.id },
     orderBy: { createdAt: "desc" },
@@ -128,6 +164,14 @@ export default async function AuctionPage({
 
   return (
     <main className="bg-gray-50 min-h-screen">
+
+      {/* STEP 2 SEO — JSON LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
 
       {/* AUTHORITY STRIP */}
       <section className="border-b border-gray-200 bg-white">
@@ -183,7 +227,7 @@ export default async function AuctionPage({
         </div>
       </section>
 
-      {/* SAFE SERIALIZED CLIENT DATA */}
+      {/* CLIENT DATA */}
       <AuctionClient
         auction={{
           id: auction.id,
