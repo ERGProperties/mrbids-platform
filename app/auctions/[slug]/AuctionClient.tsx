@@ -21,6 +21,9 @@ export default function AuctionClient({
   const [showExtensionBanner, setShowExtensionBanner] =
     useState(false);
 
+  // ⭐ LIVE BID FLASH
+  const [flashBid, setFlashBid] = useState(false);
+
   const imageList =
     Array.isArray(liveAuction.images) && liveAuction.images.length
       ? liveAuction.images
@@ -48,7 +51,7 @@ export default function AuctionClient({
     return () => clearTimeout(t);
   }, [showExtensionBanner]);
 
-  // ⭐ LIVE STREAM CONNECTION (SAFE + STABLE)
+  // ⭐ LIVE STREAM CONNECTION
   useEffect(() => {
     const eventSource = new EventSource(
       `/api/auctions/${auction.slug}/stream`
@@ -58,14 +61,25 @@ export default function AuctionClient({
       try {
         const data = JSON.parse(event.data);
 
-        // ⭐ SAFE MERGE + DATE FIX
-        setLiveAuction((prev: any) => ({
-          ...prev,
-          ...data,
-          endAt: data.endAt
-            ? new Date(data.endAt)
-            : prev.endAt,
-        }));
+        setLiveAuction((prev: any) => {
+          // ⭐ FLASH WHEN BID CHANGES
+          if (
+            data.highestBid &&
+            data.highestBid !== prev.highestBid
+          ) {
+            setFlashBid(true);
+            setTimeout(() => setFlashBid(false), 600);
+          }
+
+          return {
+            ...prev,
+            ...data,
+            // ⭐ ALWAYS SAFE DATE
+            endAt: data.endAt
+              ? new Date(data.endAt)
+              : prev.endAt,
+          };
+        });
       } catch (err) {
         console.error("Stream parse error:", err);
       }
@@ -125,9 +139,18 @@ export default function AuctionClient({
 
         {/* HEADER */}
         <div className="mb-10 border-b border-gray-200 pb-6">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-gray-500 font-medium">
-            LIVE AUCTION
-          </p>
+
+          {/* ⭐ LIVE PULSE BADGE */}
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+            </span>
+
+            <p className="text-[11px] uppercase tracking-[0.25em] text-gray-500 font-medium">
+              LIVE AUCTION
+            </p>
+          </div>
 
           <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight text-gray-900">
             {liveAuction.title || "Untitled Property"}
@@ -222,12 +245,15 @@ export default function AuctionClient({
                 Current Highest Bid
               </p>
 
-              <p className="text-3xl font-semibold mt-1">
+              <p
+                className={`text-3xl font-semibold mt-1 transition ${
+                  flashBid ? "scale-105 text-green-600" : ""
+                }`}
+              >
                 ${liveAuction.highestBid?.toLocaleString()}
               </p>
 
               <div className="mt-4 text-sm text-gray-600">
-                {/* ⭐ SAFE COUNTDOWN GUARD */}
                 {liveAuction.endAt ? (
                   <AuctionCountdown
                     endsAt={new Date(liveAuction.endAt)}
