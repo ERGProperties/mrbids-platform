@@ -17,7 +17,7 @@ export default function AuctionClient({
   // ⭐ LIVE AUCTION STATE
   const [liveAuction, setLiveAuction] = useState(auction);
 
-  // ⭐ NEW — soft close extension banner
+  // ⭐ EXTENSION BANNER
   const [showExtensionBanner, setShowExtensionBanner] =
     useState(false);
 
@@ -48,7 +48,7 @@ export default function AuctionClient({
     return () => clearTimeout(t);
   }, [showExtensionBanner]);
 
-  // ⭐ LIVE STREAM CONNECTION (AUTO RECONNECT SAFE)
+  // ⭐ LIVE STREAM CONNECTION (FIXED DATE HANDLING)
   useEffect(() => {
     const eventSource = new EventSource(
       `/api/auctions/${auction.slug}/stream`
@@ -58,17 +58,20 @@ export default function AuctionClient({
       try {
         const data = JSON.parse(event.data);
 
-        // 🔥 MERGE INSTEAD OF REPLACE
+        // ⭐ FIX — always convert endAt to Date
         setLiveAuction((prev: any) => ({
           ...prev,
           ...data,
+          endAt: data.endAt
+            ? new Date(data.endAt)
+            : prev.endAt,
         }));
       } catch (err) {
         console.error("Stream parse error:", err);
       }
     };
 
-    // ⭐ FIX — allow browser auto reconnect
+    // ⭐ allow browser auto reconnect
     eventSource.onerror = () => {
       console.warn("Stream reconnecting...");
     };
@@ -146,7 +149,6 @@ export default function AuctionClient({
 
           {/* LEFT SIDE */}
           <div>
-
             {/* IMAGE */}
             <div
               className="relative bg-white border rounded-2xl overflow-hidden mb-6"
@@ -227,7 +229,6 @@ export default function AuctionClient({
               </p>
 
               <div className="mt-4 text-sm text-gray-600">
-                {/* ⭐ FIXED — matches backend */}
                 <AuctionCountdown endsAt={liveAuction.endAt} />
               </div>
 
