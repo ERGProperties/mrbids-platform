@@ -128,6 +128,11 @@ export default function AuctionClient({
             {liveAuction.addressLine} {liveAuction.cityStateZip}
           </p>
 
+          {/* ⚡ WHOLESALER CONVERSION TWEAK */}
+          <p className="mt-2 text-sm text-gray-500 font-medium">
+            Investor Deal • Buyers Compete Live • Seller Controls Approval
+          </p>
+
           {/* MARKETPLACE AUTHORITY LAYER */}
           <div className="mt-5 flex flex-wrap gap-3 text-sm">
             <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
@@ -245,9 +250,7 @@ export default function AuctionClient({
 
               <div className="mt-4">
                 {auctionEnd ? (
-                  <AuctionCountdown
-                    endsAt={new Date(auctionEnd)}
-                  />
+                  <AuctionCountdown endsAt={new Date(auctionEnd)} />
                 ) : (
                   <p>Loading countdown...</p>
                 )}
