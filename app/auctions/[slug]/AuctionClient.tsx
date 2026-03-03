@@ -272,6 +272,16 @@ export default function AuctionClient({
                 )}
               </div>
 
+              {/* HOW MRBIDS WORKS */}
+              <div className="mt-6 border-t pt-5 text-sm text-gray-600 space-y-2">
+                <p className="font-medium text-gray-800">
+                  How MrBids Works
+                </p>
+                <p>① Place bids transparently in real time</p>
+                <p>② Highest bid wins (seller approval)</p>
+                <p>③ Closing handled securely via escrow</p>
+              </div>
+
             </div>
           </aside>
 
