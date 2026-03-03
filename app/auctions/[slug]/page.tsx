@@ -133,10 +133,6 @@ export default async function AuctionPage({
 
   const now = new Date();
 
-  if (auction.endAt && now > auction.endAt) {
-    redirect(`/auctions/${auction.slug}/result`);
-  }
-
   const hasBids = auction.bidCount > 0;
 
   const highestBid =
