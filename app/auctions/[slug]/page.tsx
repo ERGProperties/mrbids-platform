@@ -29,10 +29,6 @@ function normalizeImages(images: unknown): string[] {
   return images.filter((img): img is string => typeof img === "string");
 }
 
-/* =========================
-   STEP 2 — STRUCTURED DATA
-   ========================= */
-
 function buildStructuredData(
   auction: any,
   highestBid: number,
@@ -59,10 +55,6 @@ function buildStructuredData(
   };
 }
 
-/* =========================
-   STEP 1 — SEO METADATA
-   ========================= */
-
 export async function generateMetadata({
   params,
 }: {
@@ -80,9 +72,7 @@ export async function generateMetadata({
   });
 
   if (!auction) {
-    return {
-      title: "Auction Not Found | MrBids",
-    };
+    return { title: "Auction Not Found | MrBids" };
   }
 
   const title =
@@ -109,10 +99,6 @@ export async function generateMetadata({
     },
   };
 }
-
-/* =========================
-   PAGE COMPONENT
-   ========================= */
 
 export default async function AuctionPage({
   params,
@@ -159,7 +145,6 @@ export default async function AuctionPage({
   return (
     <main className="bg-gray-50 min-h-screen">
 
-      {/* STEP 2 SEO — JSON LD */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -194,16 +179,6 @@ export default async function AuctionPage({
         </div>
       </section>
 
-      {/* PROCESS CONFIDENCE LAYER */}
-      <section className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-5 grid md:grid-cols-3 gap-4 text-sm text-gray-700">
-          <div>① Highest bid wins (seller approval)</div>
-          <div>② Buyer & seller proceed to escrow</div>
-          <div>③ Closing handled off-platform</div>
-        </div>
-      </section>
-
-      {/* CLIENT DATA */}
       <AuctionClient
         auction={{
           id: auction.id,

@@ -109,18 +109,7 @@ export default function AuctionClient({
         {/* HEADER */}
         <div className="mb-8 border-b pb-6">
 
-          {/* LIVE LABEL */}
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
-            </span>
-            <p className="text-[11px] uppercase tracking-[0.25em] text-gray-500 font-medium">
-              LIVE AUCTION
-            </p>
-          </div>
-
-          <h1 className="mt-3 text-4xl md:text-5xl font-semibold tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
             {liveAuction.title}
           </h1>
 
@@ -195,33 +184,10 @@ export default function AuctionClient({
             {/* PROPERTY INFO */}
             <div className="mt-6 bg-white border rounded-2xl p-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="rounded-xl bg-gray-50 p-4 border">
-                  <p className="text-xs uppercase text-gray-500">Type</p>
-                  <p className="text-sm font-semibold mt-1">
-                    {liveAuction.propertyType || "—"}
-                  </p>
-                </div>
-
-                <div className="rounded-xl bg-gray-50 p-4 border">
-                  <p className="text-xs uppercase text-gray-500">Beds</p>
-                  <p className="text-sm font-semibold mt-1">
-                    {liveAuction.beds || "—"}
-                  </p>
-                </div>
-
-                <div className="rounded-xl bg-gray-50 p-4 border">
-                  <p className="text-xs uppercase text-gray-500">Baths</p>
-                  <p className="text-sm font-semibold mt-1">
-                    {liveAuction.baths || "—"}
-                  </p>
-                </div>
-
-                <div className="rounded-xl bg-gray-50 p-4 border">
-                  <p className="text-xs uppercase text-gray-500">Sqft</p>
-                  <p className="text-sm font-semibold mt-1">
-                    {liveAuction.sqft || "—"}
-                  </p>
-                </div>
+                <InfoCard label="Type" value={liveAuction.propertyType} />
+                <InfoCard label="Beds" value={liveAuction.beds} />
+                <InfoCard label="Baths" value={liveAuction.baths} />
+                <InfoCard label="Sqft" value={liveAuction.sqft} />
               </div>
 
               <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-line">
@@ -238,7 +204,6 @@ export default function AuctionClient({
                 Current Highest Bid
               </p>
 
-              {/* WHOLESALER HOOK */}
               <p className="text-xs text-gray-500 mt-1">
                 Highest bid wins — seller chooses whether to accept.
               </p>
@@ -294,5 +259,23 @@ export default function AuctionClient({
         </div>
       </div>
     </main>
+  );
+}
+
+/* SMALL HELPER */
+function InfoCard({
+  label,
+  value,
+}: {
+  label: string;
+  value: any;
+}) {
+  return (
+    <div className="rounded-xl bg-gray-50 p-4 border">
+      <p className="text-xs uppercase text-gray-500">{label}</p>
+      <p className="text-sm font-semibold mt-1">
+        {value || "—"}
+      </p>
+    </div>
   );
 }
