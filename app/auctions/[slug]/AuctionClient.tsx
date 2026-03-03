@@ -128,12 +128,12 @@ export default function AuctionClient({
             {liveAuction.addressLine} {liveAuction.cityStateZip}
           </p>
 
-          {/* ⚡ WHOLESALER CONVERSION TWEAK */}
+          {/* WHOLESALER POSITIONING */}
           <p className="mt-2 text-sm text-gray-500 font-medium">
             Investor Deal • Buyers Compete Live • Seller Controls Approval
           </p>
 
-          {/* MARKETPLACE AUTHORITY LAYER */}
+          {/* AUTHORITY BADGES */}
           <div className="mt-5 flex flex-wrap gap-3 text-sm">
             <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
               <span className="text-green-600">✔</span>
@@ -194,7 +194,6 @@ export default function AuctionClient({
 
             {/* PROPERTY INFO */}
             <div className="mt-6 bg-white border rounded-2xl p-6">
-
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="rounded-xl bg-gray-50 p-4 border">
                   <p className="text-xs uppercase text-gray-500">Type</p>
@@ -228,7 +227,6 @@ export default function AuctionClient({
               <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-line">
                 {liveAuction.description}
               </div>
-
             </div>
           </div>
 
@@ -240,8 +238,13 @@ export default function AuctionClient({
                 Current Highest Bid
               </p>
 
+              {/* WHOLESALER HOOK */}
+              <p className="text-xs text-gray-500 mt-1">
+                Highest bid wins — seller chooses whether to accept.
+              </p>
+
               <p
-                className={`text-3xl font-semibold mt-1 transition ${
+                className={`text-3xl font-semibold mt-2 transition ${
                   flashBid ? "text-green-600 scale-105" : ""
                 }`}
               >

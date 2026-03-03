@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import AuctionClient from "./AuctionClient";
@@ -131,8 +131,6 @@ export default async function AuctionPage({
 
   if (!auction) notFound();
 
-  const now = new Date();
-
   const hasBids = auction.bidCount > 0;
 
   const highestBid =
@@ -168,24 +166,6 @@ export default async function AuctionPage({
           __html: JSON.stringify(structuredData),
         }}
       />
-
-      {/* AUTHORITY STRIP */}
-      <section className="border-b border-gray-200 bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex flex-wrap gap-4 text-sm text-gray-700">
-          <div className="flex items-center gap-2">
-            <span className="text-green-600">✔</span>
-            Verified Seller
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-600">✔</span>
-            Admin Reviewed Listing
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-green-600">✔</span>
-            Transparent Bid History
-          </div>
-        </div>
-      </section>
 
       {/* ENERGY BAR */}
       <section className="bg-black text-white border-b border-black">
