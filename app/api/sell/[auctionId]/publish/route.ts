@@ -30,6 +30,7 @@ export async function POST(
   request: Request,
   { params }: { params: { auctionId: string } }
 ) {
+
   const auction = await prisma.auction.findUnique({
     where: { id: params.auctionId },
   });
@@ -42,7 +43,7 @@ export async function POST(
   }
 
   // =========================
-  // READY CHECK
+  // READY CHECK (Guardrail)
   // =========================
   if (
     !auction.title ||
@@ -51,10 +52,38 @@ export async function POST(
     auction.startingBid == null ||
     auction.bidIncrement == null ||
     !auction.propertyType ||
-    !auction.description
+    !auction.description ||
+    !auction.durationDays ||
+    !Array.isArray(auction.images) ||
+    auction.images.length === 0
   ) {
     return NextResponse.json(
-      { error: "Auction not ready to publish" },
+      {
+        error:
+          "Auction missing required information. Please complete all fields and upload at least one image.",
+      },
+      { status: 400 }
+    );
+  }
+
+  // =========================
+  // DUPLICATE PROPERTY CHECK
+  // =========================
+  const existingListing = await prisma.auction.findFirst({
+    where: {
+      addressLine: auction.addressLine,
+      cityStateZip: auction.cityStateZip,
+      status: "LIVE",
+      id: { not: auction.id },
+    },
+  });
+
+  if (existingListing) {
+    return NextResponse.json(
+      {
+        error:
+          "A live auction already exists for this property.",
+      },
       { status: 400 }
     );
   }
@@ -68,8 +97,7 @@ export async function POST(
   );
 
   // =========================
-  // ⭐ AUTO IMAGE PATH
-  // (matches /public/images/auctions/[slug])
+  // Auto image path
   // =========================
   const imagesPath =
     auction.imagesPath ||
@@ -81,7 +109,7 @@ export async function POST(
   );
 
   // =========================
-  // Publish
+  // Publish auction
   // =========================
   const startAt = new Date();
 
@@ -97,9 +125,8 @@ export async function POST(
       status: "LIVE",
       startAt,
       endAt,
-
       imagesPath,
-      coverImage, // ⭐ AUTO SET
+      coverImage,
     },
   });
 

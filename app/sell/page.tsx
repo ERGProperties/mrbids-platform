@@ -1,28 +1,38 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/authOptions";
 
 export default async function SellPage() {
-  // Try to find an existing draft first
+  const session = await getServerSession(authOptions);
+
+  // Not logged in → NextAuth signin
+  if (!session?.user?.id) {
+    redirect("/api/auth/signin?callbackUrl=/sell");
+  }
+
+  const userId = session.user.id;
+
   const existingDraft = await prisma.auction.findFirst({
     where: {
       status: "DRAFT",
+      sellerId: userId,
     },
     orderBy: {
       createdAt: "desc",
     },
   });
 
-  // If draft exists → resume it
   if (existingDraft) {
     redirect(`/sell/${existingDraft.id}/step-1`);
   }
 
-  // Otherwise create a new draft
   const auction = await prisma.auction.create({
     data: {
       title: "",
-      slug: `draft-${Date.now()}`,
+      slug: null,
       status: "DRAFT",
+      sellerId: userId,
     },
   });
 
