@@ -30,8 +30,16 @@ export default async function BidHistoryServer({
           <span className="text-sm">
             ${bid.amount.toLocaleString()}
           </span>
+
           <span className="text-xs text-gray-500">
-            {new Date(bid.createdAt).toLocaleString()}
+            {new Date(bid.createdAt).toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+              timeZone: "America/Chicago",
+              timeZoneName: "short",
+            })}
           </span>
         </div>
       ))}
