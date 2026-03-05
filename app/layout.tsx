@@ -30,19 +30,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* ⭐ PWA / Mobile App Meta */}
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#000000" />
 
-        {/* ⭐ Modern PWA support */}
         <meta name="mobile-web-app-capable" content="yes" />
 
-        {/* ⭐ Apple iOS PWA support */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black"
-        />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="apple-mobile-web-app-title" content="MrBids" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
@@ -76,7 +70,7 @@ export default function RootLayout({
                 </Link>
 
                 <Link
-                  href="/sell"
+                  href="/sell-property"
                   className="text-sm font-medium text-gray-700 hover:text-gray-900 transition"
                 >
                   Sell a Property
@@ -87,7 +81,6 @@ export default function RootLayout({
           </header>
 
           {/* ================= MAIN ================= */}
-          {/* Header height = h-20 (80px) */}
           <main className="flex-grow pt-[80px] relative">
             {children}
           </main>
@@ -118,7 +111,7 @@ export default function RootLayout({
                     </Link>
                   </li>
                   <li>
-                    <Link href="/sell" className="hover:underline">
+                    <Link href="/sell-property" className="hover:underline">
                       Sell a Property
                     </Link>
                   </li>
