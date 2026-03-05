@@ -130,7 +130,7 @@ export default async function HomePage() {
               Browse Auctions
             </Link>
 
-            <Link href="/sell" className="px-10 py-5 border rounded-full">
+            <Link href="/sell-property" className="px-10 py-5 border rounded-full">
               Sell a Property
             </Link>
           </div>
