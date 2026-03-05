@@ -18,8 +18,7 @@ export default function AuctionClient({
   const [flashBid, setFlashBid] = useState(false);
 
   const imageList =
-    Array.isArray(liveAuction.images) &&
-    liveAuction.images.length
+    Array.isArray(liveAuction.images) && liveAuction.images.length
       ? liveAuction.images
       : liveAuction.image
       ? [liveAuction.image]
@@ -96,9 +95,11 @@ export default function AuctionClient({
     if (touchStartX.current == null) return;
     const delta =
       e.changedTouches[0].clientX - touchStartX.current;
+
     if (Math.abs(delta) > 50) {
       delta > 0 ? goPrev() : goNext();
     }
+
     touchStartX.current = null;
   }
 
@@ -124,6 +125,7 @@ export default function AuctionClient({
 
           {/* AUTHORITY BADGES */}
           <div className="mt-5 flex flex-wrap gap-3 text-sm">
+
             <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
               <span className="text-green-600">✔</span>
               Verified Seller
@@ -138,6 +140,7 @@ export default function AuctionClient({
               <span className="text-green-600">✔</span>
               Transparent Bid History
             </div>
+
           </div>
 
         </div>
@@ -171,6 +174,7 @@ export default function AuctionClient({
                   >
                     ←
                   </button>
+
                   <button
                     onClick={goNext}
                     className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full"
@@ -179,10 +183,12 @@ export default function AuctionClient({
                   </button>
                 </>
               )}
+
             </div>
 
             {/* PROPERTY INFO */}
             <div className="mt-6 bg-white border rounded-2xl p-6">
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <InfoCard label="Type" value={liveAuction.propertyType} />
                 <InfoCard label="Beds" value={liveAuction.beds} />
@@ -193,11 +199,13 @@ export default function AuctionClient({
               <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-line">
                 {liveAuction.description}
               </div>
+
             </div>
           </div>
 
           {/* BID PANEL */}
           <aside className="lg:sticky lg:top-24 h-fit">
+
             <div className="bg-white border rounded-2xl p-6 shadow-sm">
 
               <p className="text-sm text-gray-500">
@@ -225,6 +233,7 @@ export default function AuctionClient({
               </div>
 
               <div className="mt-6">
+
                 {session ? (
                   <BidForm
                     slug={liveAuction.slug}
@@ -234,29 +243,35 @@ export default function AuctionClient({
                 ) : (
                   <button
                     onClick={() =>
-                      (window.location.href = "/api/auth/signin")
+                      (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction.slug}`)
                     }
                     className="w-full bg-black text-white rounded-xl py-3"
                   >
                     Sign In to Bid
                   </button>
                 )}
+
               </div>
 
               {/* HOW MRBIDS WORKS */}
               <div className="mt-6 border-t pt-5 text-sm text-gray-600 space-y-2">
+
                 <p className="font-medium text-gray-800">
                   How MrBids Works
                 </p>
+
                 <p>① Place bids transparently in real time</p>
                 <p>② Highest bid wins (seller approval)</p>
                 <p>③ Closing handled securely via escrow</p>
+
               </div>
 
             </div>
+
           </aside>
 
         </div>
+
       </div>
     </main>
   );
@@ -272,7 +287,10 @@ function InfoCard({
 }) {
   return (
     <div className="rounded-xl bg-gray-50 p-4 border">
-      <p className="text-xs uppercase text-gray-500">{label}</p>
+      <p className="text-xs uppercase text-gray-500">
+        {label}
+      </p>
+
       <p className="text-sm font-semibold mt-1">
         {value || "—"}
       </p>
