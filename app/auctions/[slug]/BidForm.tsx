@@ -27,7 +27,6 @@ export default function BidForm({
     setMessage("");
 
     try {
-      // ⭐ Submit bid
       const res = await fetch(`/api/auctions/${slug}/bid`, {
         method: "POST",
         headers: {
@@ -35,6 +34,12 @@ export default function BidForm({
         },
         body: JSON.stringify({ amount }),
       });
+
+      // ⭐ NEW — redirect to signin if not authenticated
+      if (res.status === 401) {
+        router.push(`/signin?callbackUrl=/auctions/${slug}`);
+        return;
+      }
 
       const data = await res.json();
 
@@ -44,14 +49,13 @@ export default function BidForm({
         return;
       }
 
-      // ⭐ NEW — trigger extension banner if soft close happened
+      // trigger extension banner if soft close happened
       if (data.extended && onExtended) {
         onExtended();
       }
 
       setMessage("Bid placed successfully!");
 
-      // ⭐ NEW — refresh auction data (updates countdown + bids)
       router.refresh();
     } catch (err: any) {
       console.error("BID ERROR:", err);
