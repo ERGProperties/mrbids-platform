@@ -51,7 +51,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  // ⭐ EMAIL PROVIDER WORKS BEST WITH DATABASE SESSIONS
+  // EMAIL PROVIDER WORKS BEST WITH DATABASE SESSIONS
   session: {
     strategy: "database",
   },
@@ -61,8 +61,19 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    // ⭐ post-login destination
-    async redirect({ baseUrl }) {
+    async redirect({ url, baseUrl }) {
+
+      // Allow callback URLs from our own domain
+      if (url.startsWith(baseUrl)) {
+        return url;
+      }
+
+      // Allow relative callback URLs
+      if (url.startsWith("/")) {
+        return `${baseUrl}${url}`;
+      }
+
+      // Default redirect if none provided
       return `${baseUrl}/auctions`;
     },
   },
