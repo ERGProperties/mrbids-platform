@@ -25,6 +25,7 @@ export const authOptions: NextAuthOptions = {
               <div style="font-family: Arial, sans-serif; line-height:1.5;">
                 <h2>Sign in to MrBids</h2>
                 <p>Click below to securely sign in:</p>
+
                 <p>
                   <a href="${url}" style="
                     display:inline-block;
@@ -33,11 +34,19 @@ export const authOptions: NextAuthOptions = {
                     color:#fff;
                     text-decoration:none;
                     border-radius:6px;
+                    font-weight:600;
                   ">
                     Sign in
                   </a>
                 </p>
-                <p>If you did not request this email, you can safely ignore it.</p>
+
+                <p style="font-size:12px;color:#666;">
+                  This secure magic link will expire automatically.
+                </p>
+
+                <p style="font-size:12px;color:#666;">
+                  If you did not request this email, you can safely ignore it.
+                </p>
               </div>
             `,
           });
@@ -51,7 +60,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  // EMAIL PROVIDER WORKS BEST WITH DATABASE SESSIONS
   session: {
     strategy: "database",
   },
@@ -63,17 +71,17 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async redirect({ url, baseUrl }) {
 
-      // Allow callback URLs from our own domain
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-
-      // Allow relative callback URLs
+      // Allow relative URLs like /sell or /auctions/slug
       if (url.startsWith("/")) {
         return `${baseUrl}${url}`;
       }
 
-      // Default redirect if none provided
+      // Allow full URLs from our own domain
+      if (new URL(url).origin === baseUrl) {
+        return url;
+      }
+
+      // Fallback if something unexpected happens
       return `${baseUrl}/auctions`;
     },
   },
