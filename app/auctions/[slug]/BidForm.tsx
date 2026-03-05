@@ -35,9 +35,9 @@ export default function BidForm({
         body: JSON.stringify({ amount }),
       });
 
-      // ⭐ NEW — redirect to signin if not authenticated
+      // ⭐ If user is not authenticated, redirect to signin
       if (res.status === 401) {
-        router.push(`/signin?callbackUrl=/auctions/${slug}`);
+        window.location.href = `/signin?callbackUrl=/auctions/${slug}`;
         return;
       }
 
@@ -49,13 +49,14 @@ export default function BidForm({
         return;
       }
 
-      // trigger extension banner if soft close happened
+      // ⭐ Trigger extension banner if soft close happened
       if (data.extended && onExtended) {
         onExtended();
       }
 
       setMessage("Bid placed successfully!");
 
+      // ⭐ Refresh auction page to update bids + countdown
       router.refresh();
     } catch (err: any) {
       console.error("BID ERROR:", err);
