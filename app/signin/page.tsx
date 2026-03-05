@@ -2,17 +2,22 @@
 
 import { signIn, useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function SignInPage() {
   const { status } = useSession();
+  const searchParams = useSearchParams();
+
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const callbackUrl = searchParams.get("callbackUrl") || "/auctions";
+
   useEffect(() => {
     if (status === "authenticated") {
-      window.location.href = "/auctions";
+      window.location.href = callbackUrl;
     }
-  }, [status]);
+  }, [status, callbackUrl]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,7 +25,7 @@ export default function SignInPage() {
 
     await signIn("email", {
       email,
-      callbackUrl: "/auctions",
+      callbackUrl,
     });
 
     setLoading(false);
@@ -29,7 +34,7 @@ export default function SignInPage() {
   return (
     <main className="min-h-screen relative overflow-hidden bg-black flex items-center justify-center px-4">
 
-      {/* BACKGROUND GLOW */}
+      {/* BACKGROUND */}
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800 opacity-90" />
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-white/10 blur-3xl rounded-full" />
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-white/10 blur-3xl rounded-full" />
