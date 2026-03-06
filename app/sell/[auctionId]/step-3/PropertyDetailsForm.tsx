@@ -28,8 +28,15 @@ export default function PropertyDetailsForm({ auction }: Props) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // ⭐ PREVIEW CONTEXT
   const { setPreviewData } = useSellerPreview();
+
+  const isValid =
+    propertyType &&
+    beds &&
+    baths &&
+    sqft &&
+    condition &&
+    description;
 
   // ===== LIVE PREVIEW UPDATE =====
   useEffect(() => {
@@ -133,6 +140,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
         ← Go Back
       </button>
 
+      {/* Property Type */}
       <select
         className="w-full border rounded-lg px-4 py-2"
         value={propertyType}
@@ -143,8 +151,12 @@ export default function PropertyDetailsForm({ auction }: Props) {
         <option value="Multi Family">Multi Family</option>
         <option value="Condo">Condo</option>
         <option value="Townhome">Townhome</option>
+        <option value="Mixed Use">Mixed Use</option>
+        <option value="Commercial">Commercial</option>
+        <option value="Vacant Lot">Vacant Lot</option>
       </select>
 
+      {/* Bedrooms */}
       <input
         type="number"
         placeholder="Bedrooms"
@@ -153,6 +165,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
         onChange={(e) => setBeds(e.target.value)}
       />
 
+      {/* Bathrooms */}
       <input
         type="number"
         placeholder="Bathrooms"
@@ -161,6 +174,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
         onChange={(e) => setBaths(e.target.value)}
       />
 
+      {/* Square Feet */}
       <input
         type="number"
         placeholder="Square Feet"
@@ -169,6 +183,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
         onChange={(e) => setSqft(e.target.value)}
       />
 
+      {/* Condition */}
       <select
         className="w-full border rounded-lg px-4 py-2"
         value={condition}
@@ -180,6 +195,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
         <option value="Heavy Rehab">Heavy Rehab</option>
       </select>
 
+      {/* AI Description */}
       <button
         onClick={generateDescription}
         disabled={loading}
@@ -190,6 +206,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
           : "✨ Generate Description"}
       </button>
 
+      {/* Description */}
       <textarea
         rows={6}
         className="w-full border rounded-lg px-4 py-2"
@@ -197,11 +214,12 @@ export default function PropertyDetailsForm({ auction }: Props) {
         onChange={(e) => setDescription(e.target.value)}
       />
 
+      {/* Save Status */}
       <div className="text-sm text-gray-500">
         {saving ? "Saving..." : "All changes saved"}
       </div>
 
-      {/* Navigation Buttons */}
+      {/* Navigation */}
       <div className="flex justify-between pt-4">
 
         <button
@@ -214,7 +232,11 @@ export default function PropertyDetailsForm({ auction }: Props) {
 
         <Link
           href={`/sell/${auction.id}/step-4`}
-          className="px-6 py-3 bg-black text-white rounded-lg text-sm"
+          className={`px-6 py-3 rounded-lg text-sm font-medium transition ${
+            isValid
+              ? "bg-black text-white hover:bg-gray-900"
+              : "bg-gray-300 text-gray-500 pointer-events-none"
+          }`}
         >
           Continue →
         </Link>

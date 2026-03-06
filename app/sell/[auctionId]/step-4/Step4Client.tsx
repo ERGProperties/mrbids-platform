@@ -28,6 +28,8 @@ export default function Step4Client({
 
   const { setPreviewData } = useSellerPreview();
 
+  const isValid = images.length > 0;
+
   useEffect(() => {
     setPreviewData({
       coverImage: coverImage || undefined,
@@ -61,6 +63,7 @@ export default function Step4Client({
         </p>
       </div>
 
+      {/* Upload Component */}
       <ImageUpload
         auction={auction}
         onUploadComplete={(newImages) => {
@@ -68,6 +71,7 @@ export default function Step4Client({
         }}
       />
 
+      {/* Image Grid */}
       {images.length > 0 && (
         <div className="mt-8">
           <h2 className="text-sm font-medium text-gray-700 mb-3">
@@ -92,6 +96,14 @@ export default function Step4Client({
         </div>
       )}
 
+      {/* Save Helper */}
+      {!isValid && (
+        <p className="text-sm text-gray-500 mt-4">
+          Upload at least one photo to continue
+        </p>
+      )}
+
+      {/* Navigation */}
       <div className="mt-10 flex justify-between">
 
         <button
@@ -104,7 +116,11 @@ export default function Step4Client({
 
         <Link
           href={`/sell/${auction.id}/step-5`}
-          className="inline-block px-6 py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition"
+          className={`px-6 py-3 rounded-lg text-sm font-medium transition ${
+            isValid
+              ? "bg-black text-white hover:bg-gray-900"
+              : "bg-gray-300 text-gray-500 pointer-events-none"
+          }`}
         >
           Continue →
         </Link>

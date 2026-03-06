@@ -29,14 +29,20 @@ export default function Step2Form({ auction }: Props) {
   const [saving, setSaving] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
-  // ⭐ PREVIEW CONTEXT
   const { setPreviewData } = useSellerPreview();
+
+  const isValid =
+    startingBid &&
+    bidIncrement &&
+    reserveAmount &&
+    arv &&
+    durationDays;
 
   useEffect(() => {
     setInitialized(true);
   }, []);
 
-  // ===== LIVE PREVIEW UPDATE =====
+  // ===== LIVE PREVIEW =====
   useEffect(() => {
     let endDate: string | undefined;
 
@@ -100,7 +106,7 @@ export default function Step2Form({ auction }: Props) {
   return (
     <div className="space-y-6">
 
-      {/* Back Button */}
+      {/* Back */}
       <button
         type="button"
         onClick={() => router.push(`/sell/${auction.id}/step-1`)}
@@ -135,7 +141,7 @@ export default function Step2Form({ auction }: Props) {
         />
       </div>
 
-      {/* Reserve Amount */}
+      {/* Reserve */}
       <div>
         <label className="block text-sm mb-2 font-medium">
           Reserve Amount ($)
@@ -186,7 +192,7 @@ export default function Step2Form({ auction }: Props) {
         {saving ? "Saving..." : "All changes saved"}
       </div>
 
-      {/* Navigation Buttons */}
+      {/* Navigation */}
       <div className="flex justify-between pt-4">
 
         <button
@@ -199,7 +205,11 @@ export default function Step2Form({ auction }: Props) {
 
         <Link
           href={`/sell/${auction.id}/step-3`}
-          className="px-6 py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition"
+          className={`px-6 py-3 rounded-lg text-sm font-medium transition ${
+            isValid
+              ? "bg-black text-white hover:bg-gray-900"
+              : "bg-gray-300 text-gray-500 pointer-events-none"
+          }`}
         >
           Continue →
         </Link>
