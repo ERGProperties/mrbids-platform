@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
