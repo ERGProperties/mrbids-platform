@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSellerPreview } from "@/components/seller/SellerPreviewContext";
 
 interface Props {
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export default function Step2Form({ auction }: Props) {
+  const router = useRouter();
+
   const [startingBid, setStartingBid] = useState(
     auction.startingBid || ""
   );
@@ -97,6 +100,15 @@ export default function Step2Form({ auction }: Props) {
   return (
     <div className="space-y-6">
 
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={() => router.push(`/sell/${auction.id}/step-1`)}
+        className="text-sm text-gray-600 hover:text-black"
+      >
+        ← Go Back
+      </button>
+
       {/* Starting Bid */}
       <div>
         <label className="block text-sm mb-2 font-medium">
@@ -174,14 +186,24 @@ export default function Step2Form({ auction }: Props) {
         {saving ? "Saving..." : "All changes saved"}
       </div>
 
-      {/* Continue */}
-      <div className="pt-4">
+      {/* Navigation Buttons */}
+      <div className="flex justify-between pt-4">
+
+        <button
+          type="button"
+          onClick={() => router.push(`/sell/${auction.id}/step-1`)}
+          className="px-5 py-3 border rounded-lg text-sm font-medium hover:bg-gray-100 transition"
+        >
+          ← Back
+        </button>
+
         <Link
           href={`/sell/${auction.id}/step-3`}
-          className="inline-block px-6 py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition"
+          className="px-6 py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition"
         >
           Continue →
         </Link>
+
       </div>
 
     </div>

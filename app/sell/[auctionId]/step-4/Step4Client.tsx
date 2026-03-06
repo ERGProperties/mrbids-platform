@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ImageUpload from "./ImageUpload";
 import CoverImageGrid from "./CoverImageGrid";
 import { useSellerPreview } from "@/components/seller/SellerPreviewContext";
@@ -15,6 +16,8 @@ export default function Step4Client({
   auction,
   initialImages,
 }: Props) {
+  const router = useRouter();
+
   const [images, setImages] = useState<string[]>(
     initialImages || []
   );
@@ -39,6 +42,15 @@ export default function Step4Client({
 
   return (
     <>
+      {/* Back Button */}
+      <button
+        type="button"
+        onClick={() => router.push(`/sell/${auction.id}/step-3`)}
+        className="mb-4 text-sm text-gray-600 hover:text-black"
+      >
+        ← Go Back
+      </button>
+
       {/* Upload Guidance */}
       <div className="mb-3">
         <p className="text-sm text-gray-600">
@@ -80,13 +92,23 @@ export default function Step4Client({
         </div>
       )}
 
-      <div className="mt-10">
+      <div className="mt-10 flex justify-between">
+
+        <button
+          type="button"
+          onClick={() => router.push(`/sell/${auction.id}/step-3`)}
+          className="px-5 py-3 border rounded-lg text-sm font-medium hover:bg-gray-100 transition"
+        >
+          ← Back
+        </button>
+
         <Link
           href={`/sell/${auction.id}/step-5`}
           className="inline-block px-6 py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-900 transition"
         >
           Continue →
         </Link>
+
       </div>
     </>
   );
