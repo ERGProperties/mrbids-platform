@@ -2,7 +2,7 @@
 CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 
 -- CreateEnum
-CREATE TYPE "AuctionStatus" AS ENUM ('LIVE', 'CLOSED');
+CREATE TYPE "AuctionStatus" AS ENUM ('DRAFT', 'LIVE', 'CLOSED');
 
 -- CreateEnum
 CREATE TYPE "ServiceFeeStatus" AS ENUM ('PENDING', 'PAID', 'FAILED');
@@ -10,26 +10,38 @@ CREATE TYPE "ServiceFeeStatus" AS ENUM ('PENDING', 'PAID', 'FAILED');
 -- CreateTable
 CREATE TABLE "Auction" (
     "id" TEXT NOT NULL,
-    "slug" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "addressLine" TEXT NOT NULL,
-    "cityStateZip" TEXT NOT NULL,
-    "imagesPath" TEXT NOT NULL,
-    "images" JSONB NOT NULL,
-    "startingBid" INTEGER NOT NULL,
-    "bidIncrement" INTEGER NOT NULL,
+    "slug" TEXT,
+    "title" TEXT,
+    "addressLine" TEXT,
+    "cityStateZip" TEXT,
+    "imagesPath" TEXT,
+    "images" JSONB,
+    "coverImage" TEXT,
+    "propertyType" TEXT,
+    "beds" INTEGER,
+    "baths" DOUBLE PRECISION,
+    "sqft" INTEGER,
+    "condition" TEXT,
+    "description" TEXT,
+    "startingBid" INTEGER,
+    "bidIncrement" INTEGER,
+    "reserveAmount" INTEGER,
     "arv" INTEGER,
     "finalPrice" INTEGER,
-    "startAt" TIMESTAMP(3) NOT NULL,
-    "endAt" TIMESTAMP(3) NOT NULL,
-    "status" "AuctionStatus" NOT NULL DEFAULT 'LIVE',
+    "startAt" TIMESTAMP(3),
+    "endAt" TIMESTAMP(3),
+    "status" "AuctionStatus" NOT NULL DEFAULT 'DRAFT',
     "result" TEXT,
     "bidCount" INTEGER NOT NULL DEFAULT 0,
     "durationDays" INTEGER,
+    "sellerId" TEXT,
     "serviceFeeAmount" INTEGER,
     "serviceFeeStatus" "ServiceFeeStatus",
     "serviceFeePaidAt" TIMESTAMP(3),
+    "endingSoonSent" BOOLEAN NOT NULL DEFAULT false,
+    "endedEmailsSent" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Auction_pkey" PRIMARY KEY ("id")
 );
@@ -48,11 +60,27 @@ CREATE TABLE "Bid" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
+    "name" TEXT,
+    "email" TEXT,
+    "emailVerified" TIMESTAMP(3),
+    "image" TEXT,
     "role" "Role" NOT NULL DEFAULT 'USER',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "isVerifiedBidder" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PushSubscription" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "endpoint" TEXT NOT NULL,
+    "p256dh" TEXT NOT NULL,
+    "auth" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PushSubscription_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -94,10 +122,16 @@ CREATE TABLE "VerificationToken" (
 CREATE UNIQUE INDEX "Auction_slug_key" ON "Auction"("slug");
 
 -- CreateIndex
+CREATE INDEX "Auction_sellerId_idx" ON "Auction"("sellerId");
+
+-- CreateIndex
 CREATE INDEX "Bid_auctionId_createdAt_idx" ON "Bid"("auctionId", "createdAt");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PushSubscription_endpoint_key" ON "PushSubscription"("endpoint");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Account_provider_providerAccountId_key" ON "Account"("provider", "providerAccountId");
@@ -112,10 +146,16 @@ CREATE UNIQUE INDEX "VerificationToken_token_key" ON "VerificationToken"("token"
 CREATE UNIQUE INDEX "VerificationToken_identifier_token_key" ON "VerificationToken"("identifier", "token");
 
 -- AddForeignKey
+ALTER TABLE "Auction" ADD CONSTRAINT "Auction_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Bid" ADD CONSTRAINT "Bid_auctionId_fkey" FOREIGN KEY ("auctionId") REFERENCES "Auction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Bid" ADD CONSTRAINT "Bid_bidderId_fkey" FOREIGN KEY ("bidderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PushSubscription" ADD CONSTRAINT "PushSubscription_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
