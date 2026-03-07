@@ -155,6 +155,7 @@ export default async function AuctionPage({
       {/* ENERGY BAR */}
       <section className="bg-black text-white border-b border-black">
         <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+
           <div className="flex items-center gap-2 text-sm font-medium">
             <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
             LIVE AUCTION
@@ -171,11 +172,12 @@ export default async function AuctionPage({
           </div>
 
           <div className="text-sm text-gray-200">
-            {hasBids ? "Current Highest Bid:" : "Starting Bid:"}{" "}
+            Seller Suggested ARV:{" "}
             <span className="text-white font-semibold">
-              {formatCurrency(highestBid)}
+              {auction.arv ? formatCurrency(auction.arv) : "Not provided"}
             </span>
           </div>
+
         </div>
       </section>
 
@@ -217,6 +219,7 @@ export default async function AuctionPage({
           </section>
         </div>
       )}
+
     </main>
   );
 }
