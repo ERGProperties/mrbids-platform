@@ -131,15 +131,6 @@ export default function PropertyDetailsForm({ auction }: Props) {
   return (
     <div className="space-y-6">
 
-      {/* Back Button */}
-      <button
-        type="button"
-        onClick={() => router.push(`/sell/${auction.id}/step-2`)}
-        className="text-sm text-gray-600 hover:text-black"
-      >
-        ← Go Back
-      </button>
-
       {/* Property Type */}
       <select
         className="w-full border rounded-lg px-4 py-2"

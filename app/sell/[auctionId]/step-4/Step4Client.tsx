@@ -44,14 +44,6 @@ export default function Step4Client({
 
   return (
     <>
-      {/* Back Button */}
-      <button
-        type="button"
-        onClick={() => router.push(`/sell/${auction.id}/step-3`)}
-        className="mb-4 text-sm text-gray-600 hover:text-black"
-      >
-        ← Go Back
-      </button>
 
       {/* Upload Guidance */}
       <div className="mb-3">
@@ -126,6 +118,7 @@ export default function Step4Client({
         </Link>
 
       </div>
+
     </>
   );
 }

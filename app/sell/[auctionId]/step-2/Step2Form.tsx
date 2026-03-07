@@ -106,15 +106,6 @@ export default function Step2Form({ auction }: Props) {
   return (
     <div className="space-y-6">
 
-      {/* Back */}
-      <button
-        type="button"
-        onClick={() => router.push(`/sell/${auction.id}/step-1`)}
-        className="text-sm text-gray-600 hover:text-black"
-      >
-        ← Go Back
-      </button>
-
       {/* Starting Bid */}
       <div>
         <label className="block text-sm mb-2 font-medium">
