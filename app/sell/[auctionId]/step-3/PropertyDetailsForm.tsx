@@ -182,6 +182,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
       >
         <option value="">Condition</option>
         <option value="Turnkey">Turnkey</option>
+        <option value="light">Light Rehab</option>
         <option value="medium">Medium Rehab</option>
         <option value="heavy">Heavy Rehab</option>
         <option value="tear-down">Tear Down</option>
