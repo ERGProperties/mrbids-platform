@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { getAllAuctions } from "@/lib/repositories/auctionRepository";
+import AuctionCountdown from "@/components/auction/AuctionCountdown";
 
 /* ---------- IMAGE HELPERS ---------- */
 
@@ -57,22 +58,6 @@ function getTimeStatus(endAt?: Date | string | null) {
   if (diff < 1000 * 60 * 60 * 24) return "ENDING SOON";
 
   return "LIVE NOW";
-}
-
-function formatTimeRemaining(endAt?: Date | string | null) {
-  if (!endAt) return "—";
-
-  const end = new Date(endAt);
-  if (isNaN(end.getTime())) return "—";
-
-  const diff = end.getTime() - Date.now();
-
-  if (diff <= 0) return "Ended";
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-
-  return `${days}d ${hours}h`;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -200,12 +185,15 @@ export default async function HomePage() {
 
               <div className="p-12 flex flex-col justify-center">
                 <h2 className="text-4xl font-semibold">{featured?.title}</h2>
+
                 <p className="mt-4 text-sm text-gray-600">
-                  {featured?.addressLine}<br />{featured?.cityStateZip}
+                  {featured?.addressLine}<br />
+                  {featured?.cityStateZip}
                 </p>
-                <p className="mt-5 text-sm text-gray-600">
-                  Ends in {formatTimeRemaining(featured?.endAt)}
-                </p>
+
+                <div className="mt-5">
+                  <AuctionCountdown endAt={featured?.endAt} />
+                </div>
 
                 <Link
                   href={`/auctions/${featured?.slug}`}
@@ -238,15 +226,17 @@ export default async function HomePage() {
 
                 <div className="p-7">
                   <StatusBadge status={getTimeStatus(auction?.endAt)} />
+
                   <h3 className="mt-4 text-xl font-semibold">{auction?.title}</h3>
 
                   <p className="mt-2 text-sm text-gray-600">
-                    {auction?.addressLine}<br />{auction?.cityStateZip}
+                    {auction?.addressLine}<br />
+                    {auction?.cityStateZip}
                   </p>
 
-                  <p className="mt-3 text-sm text-gray-600">
-                    Ends in {formatTimeRemaining(auction?.endAt)}
-                  </p>
+                  <div className="mt-3">
+                    <AuctionCountdown endAt={auction?.endAt} />
+                  </div>
 
                   <Link
                     href={`/auctions/${auction?.slug}`}
@@ -268,14 +258,17 @@ export default async function HomePage() {
             <h3 className="font-semibold">Licensed Escrow</h3>
             <p className="mt-3 text-sm text-gray-600">Funds handled via third-party escrow.</p>
           </div>
+
           <div>
             <h3 className="font-semibold">Verified Participants</h3>
             <p className="mt-3 text-sm text-gray-600">Identity and access reviewed.</p>
           </div>
+
           <div>
             <h3 className="font-semibold">Admin Oversight</h3>
             <p className="mt-3 text-sm text-gray-600">Auctions monitored for fairness.</p>
           </div>
+
           <div>
             <h3 className="font-semibold">Audit Trail</h3>
             <p className="mt-3 text-sm text-gray-600">Every action is recorded.</p>
