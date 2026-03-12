@@ -61,7 +61,7 @@ export default async function AuctionsPage() {
   const live = auctions.filter((a) => a?.status === "LIVE");
   const past = auctions.filter((a) => a?.status === "CLOSED");
 
-  /* ---------- SORT LIVE AUCTIONS BY SOONEST ENDING ---------- */
+  /* ---------- SORT LIVE BY SOONEST ENDING ---------- */
 
   const sortedLive = [...live].sort((a, b) => {
     const aEnd = new Date(a?.endAt || 0).getTime();
@@ -69,16 +69,75 @@ export default async function AuctionsPage() {
     return aEnd - bEnd;
   });
 
+  /* ---------- ENDING SOON (24 HOURS) ---------- */
+
+  const endingSoon = sortedLive.filter((auction) => {
+    const end = new Date(auction?.endAt || 0).getTime();
+    return end - Date.now() < 1000 * 60 * 60 * 24 && end > Date.now();
+  });
+
+  /* ---------- REMAINING LIVE ---------- */
+
+  const remainingLive = sortedLive.filter(
+    (auction) => !endingSoon.some((a) => a.id === auction.id)
+  );
+
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-32">
 
-        <h1 className="text-3xl font-semibold mb-10">
+        {/* ENDING SOON */}
+
+        {endingSoon.length > 0 && (
+          <>
+            <h1 className="text-3xl font-semibold mb-10">
+              🔥 Ending Soon
+            </h1>
+
+            <div className="grid md:grid-cols-2 gap-8 mb-24">
+              {endingSoon.map((auction) => (
+                <div
+                  key={auction?.id}
+                  className="bg-white border rounded-2xl overflow-hidden"
+                >
+                  <AuctionImage src={getPrimaryImage(auction)} />
+
+                  <div className="p-6">
+                    <h2 className="text-lg font-semibold">
+                      {auction?.title ?? "Untitled Auction"}
+                    </h2>
+
+                    <p className="mt-2 text-sm text-gray-600">
+                      {auction?.addressLine ?? ""}
+                      <br />
+                      {auction?.cityStateZip ?? ""}
+                    </p>
+
+                    <p className="mt-3 text-sm text-gray-600">
+                      Ends in {formatTimeRemaining(auction?.endAt)}
+                    </p>
+
+                    <Link
+                      href={`/auctions/${auction?.slug}`}
+                      className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
+                    >
+                      View Live Auction
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* LIVE AUCTIONS */}
+
+        <h2 className="text-3xl font-semibold mb-10">
           Live Auctions
-        </h1>
+        </h2>
 
         <div className="grid md:grid-cols-2 gap-8 mb-24">
-          {sortedLive.map((auction) => (
+          {remainingLive.map((auction) => (
             <div
               key={auction?.id}
               className="bg-white border rounded-2xl overflow-hidden"
@@ -110,6 +169,8 @@ export default async function AuctionsPage() {
             </div>
           ))}
         </div>
+
+        {/* PAST AUCTIONS */}
 
         <h2 className="text-3xl font-semibold mb-10">
           Past Auctions
