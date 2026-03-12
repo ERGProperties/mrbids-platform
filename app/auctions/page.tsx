@@ -61,6 +61,14 @@ export default async function AuctionsPage() {
   const live = auctions.filter((a) => a?.status === "LIVE");
   const past = auctions.filter((a) => a?.status === "CLOSED");
 
+  /* ---------- SORT LIVE BY SOONEST ENDING ---------- */
+
+  const sortedLive = [...live].sort((a, b) => {
+    const aEnd = new Date(a?.endAt || 0).getTime();
+    const bEnd = new Date(b?.endAt || 0).getTime();
+    return aEnd - bEnd;
+  });
+
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-32">
@@ -70,7 +78,7 @@ export default async function AuctionsPage() {
         </h1>
 
         <div className="grid md:grid-cols-2 gap-8 mb-24">
-          {live.map((auction) => (
+          {sortedLive.map((auction) => (
             <div
               key={auction?.id}
               className="bg-white border rounded-2xl overflow-hidden"
