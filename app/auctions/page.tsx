@@ -5,7 +5,25 @@ import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 import { autoCloseExpiredAuctions } from "@/lib/auctionLifecycle";
 import { getPrimaryImage } from "@/lib/getPrimaryImage";
 
-/* ---------- TIME HELPERS ---------- */
+/* ---------- HELPERS ---------- */
+
+function formatCurrency(value?: number | null) {
+  if (!value) return "—";
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function getHighestBid(auction: any) {
+  if (!auction?.bids || auction.bids.length === 0) {
+    return auction?.startingBid;
+  }
+
+  return Math.max(...auction.bids.map((b: any) => b.amount));
+}
 
 function formatTimeRemaining(endAt?: Date | string | null) {
   if (!endAt) return "—";
@@ -61,7 +79,7 @@ export default async function AuctionsPage() {
   const live = auctions.filter((a) => a?.status === "LIVE");
   const past = auctions.filter((a) => a?.status === "CLOSED");
 
-  /* ---------- SORT LIVE BY SOONEST ENDING ---------- */
+  /* SORT LIVE BY SOONEST ENDING */
 
   const sortedLive = [...live].sort((a, b) => {
     const aEnd = new Date(a?.endAt || 0).getTime();
@@ -69,14 +87,14 @@ export default async function AuctionsPage() {
     return aEnd - bEnd;
   });
 
-  /* ---------- ENDING SOON (24 HOURS) ---------- */
+  /* ENDING SOON (24 HOURS) */
 
   const endingSoon = sortedLive.filter((auction) => {
     const end = new Date(auction?.endAt || 0).getTime();
     return end - Date.now() < 1000 * 60 * 60 * 24 && end > Date.now();
   });
 
-  /* ---------- REMAINING LIVE ---------- */
+  /* REMAINING LIVE */
 
   const remainingLive = sortedLive.filter(
     (auction) => !endingSoon.some((a) => a.id === auction.id)
@@ -103,6 +121,7 @@ export default async function AuctionsPage() {
                   <AuctionImage src={getPrimaryImage(auction)} />
 
                   <div className="p-6">
+
                     <h2 className="text-lg font-semibold">
                       {auction?.title ?? "Untitled Auction"}
                     </h2>
@@ -117,12 +136,33 @@ export default async function AuctionsPage() {
                       Ends in {formatTimeRemaining(auction?.endAt)}
                     </p>
 
+                    {/* CURRENT BID + ARV */}
+
+                    <div className="mt-4 text-sm space-y-1">
+
+                      <p>
+                        Current Bid:{" "}
+                        <span className="font-semibold">
+                          {formatCurrency(getHighestBid(auction))}
+                        </span>
+                      </p>
+
+                      <p>
+                        Seller ARV:{" "}
+                        <span className="font-semibold">
+                          {formatCurrency(auction?.arv)}
+                        </span>
+                      </p>
+
+                    </div>
+
                     <Link
                       href={`/auctions/${auction?.slug}`}
                       className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
                     >
                       View Live Auction
                     </Link>
+
                   </div>
                 </div>
               ))}
@@ -145,6 +185,7 @@ export default async function AuctionsPage() {
               <AuctionImage src={getPrimaryImage(auction)} />
 
               <div className="p-6">
+
                 <h2 className="text-lg font-semibold">
                   {auction?.title ?? "Untitled Auction"}
                 </h2>
@@ -159,12 +200,33 @@ export default async function AuctionsPage() {
                   Ends in {formatTimeRemaining(auction?.endAt)}
                 </p>
 
+                {/* CURRENT BID + ARV */}
+
+                <div className="mt-4 text-sm space-y-1">
+
+                  <p>
+                    Current Bid:{" "}
+                    <span className="font-semibold">
+                      {formatCurrency(getHighestBid(auction))}
+                    </span>
+                  </p>
+
+                  <p>
+                    Seller ARV:{" "}
+                    <span className="font-semibold">
+                      {formatCurrency(auction?.arv)}
+                    </span>
+                  </p>
+
+                </div>
+
                 <Link
                   href={`/auctions/${auction?.slug}`}
                   className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
                 >
                   View Live Auction
                 </Link>
+
               </div>
             </div>
           ))}
@@ -185,6 +247,7 @@ export default async function AuctionsPage() {
               <AuctionImage src={getPrimaryImage(auction)} />
 
               <div className="p-6">
+
                 <h2 className="text-lg font-semibold">
                   {auction?.title ?? "Untitled Auction"}
                 </h2>
@@ -205,6 +268,7 @@ export default async function AuctionsPage() {
                 >
                   View Auction Results
                 </Link>
+
               </div>
             </div>
           ))}
