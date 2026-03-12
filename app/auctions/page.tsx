@@ -61,7 +61,7 @@ export default async function AuctionsPage() {
   const live = auctions.filter((a) => a?.status === "LIVE");
   const past = auctions.filter((a) => a?.status === "CLOSED");
 
-  /* ---------- SORT LIVE BY SOONEST ENDING ---------- */
+  /* ---------- SORT LIVE AUCTIONS BY SOONEST ENDING ---------- */
 
   const sortedLive = [...live].sort((a, b) => {
     const aEnd = new Date(a?.endAt || 0).getTime();
@@ -90,14 +90,12 @@ export default async function AuctionsPage() {
                   {auction?.title ?? "Untitled Auction"}
                 </h2>
 
-                {/* ADDRESS */}
                 <p className="mt-2 text-sm text-gray-600">
                   {auction?.addressLine ?? ""}
                   <br />
                   {auction?.cityStateZip ?? ""}
                 </p>
 
-                {/* TIME REMAINING */}
                 <p className="mt-3 text-sm text-gray-600">
                   Ends in {formatTimeRemaining(auction?.endAt)}
                 </p>
