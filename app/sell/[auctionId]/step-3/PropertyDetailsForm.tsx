@@ -18,6 +18,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
   const [beds, setBeds] = useState(auction.beds || "");
   const [baths, setBaths] = useState(auction.baths || "");
   const [sqft, setSqft] = useState(auction.sqft || "");
+  const [yearBuilt, setYearBuilt] = useState(auction.yearBuilt || "");
   const [condition, setCondition] = useState(
     auction.condition || ""
   );
@@ -35,6 +36,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
     beds &&
     baths &&
     sqft &&
+    yearBuilt &&
     condition &&
     description;
 
@@ -71,6 +73,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
             beds,
             baths,
             sqft,
+            yearBuilt,
             condition,
             description,
           }),
@@ -88,6 +91,7 @@ export default function PropertyDetailsForm({ auction }: Props) {
     beds,
     baths,
     sqft,
+    yearBuilt,
     condition,
     description,
     auction.id,
@@ -172,6 +176,15 @@ export default function PropertyDetailsForm({ auction }: Props) {
         className="w-full border rounded-lg px-4 py-2"
         value={sqft}
         onChange={(e) => setSqft(e.target.value)}
+      />
+
+      {/* Year Built */}
+      <input
+        type="number"
+        placeholder="Year Built"
+        className="w-full border rounded-lg px-4 py-2"
+        value={yearBuilt}
+        onChange={(e) => setYearBuilt(e.target.value)}
       />
 
       {/* Condition */}
