@@ -29,6 +29,11 @@ export async function POST(
             ? null
             : Number(body.sqft),
 
+        yearBuilt:
+          body.yearBuilt === "" || body.yearBuilt == null
+            ? null
+            : Number(body.yearBuilt),
+
         condition:
           body.condition?.trim() || null,
 
