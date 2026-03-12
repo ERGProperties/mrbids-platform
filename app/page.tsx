@@ -120,11 +120,17 @@ export default async function HomePage() {
           </p>
 
           <div className="mt-14 flex gap-4">
-            <Link href="/auctions" className="px-10 py-5 bg-black text-white rounded-full">
+            <Link
+              href="/auctions"
+              className="px-10 py-5 bg-black text-white rounded-full"
+            >
               Browse Auctions
             </Link>
 
-            <Link href="/sell-property" className="px-10 py-5 border rounded-full">
+            <Link
+              href="/sell-property"
+              className="px-10 py-5 border rounded-full"
+            >
               Sell a Property
             </Link>
           </div>
@@ -187,12 +193,13 @@ export default async function HomePage() {
                 <h2 className="text-4xl font-semibold">{featured?.title}</h2>
 
                 <p className="mt-4 text-sm text-gray-600">
-                  {featured?.addressLine}<br />
+                  {featured?.addressLine}
+                  <br />
                   {featured?.cityStateZip}
                 </p>
 
                 <div className="mt-5">
-                  <AuctionCountdown endAt={featured?.endAt} />
+                  <AuctionCountdown endsAt={featured?.endAt} />
                 </div>
 
                 <Link
@@ -212,6 +219,7 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-6 py-24">
           <div className="flex items-center justify-between mb-12">
             <h2 className="text-4xl font-semibold">Live Auctions</h2>
+
             <Link href="/auctions" className="text-sm font-medium">
               View all →
             </Link>
@@ -219,7 +227,10 @@ export default async function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-10">
             {sortedLive.slice(0, 3).map((auction) => (
-              <div key={auction.id} className="border rounded-3xl overflow-hidden">
+              <div
+                key={auction.id}
+                className="border rounded-3xl overflow-hidden"
+              >
                 <div className="h-60">
                   <AuctionImage src={getPrimaryImage(auction)} />
                 </div>
@@ -227,15 +238,18 @@ export default async function HomePage() {
                 <div className="p-7">
                   <StatusBadge status={getTimeStatus(auction?.endAt)} />
 
-                  <h3 className="mt-4 text-xl font-semibold">{auction?.title}</h3>
+                  <h3 className="mt-4 text-xl font-semibold">
+                    {auction?.title}
+                  </h3>
 
                   <p className="mt-2 text-sm text-gray-600">
-                    {auction?.addressLine}<br />
+                    {auction?.addressLine}
+                    <br />
                     {auction?.cityStateZip}
                   </p>
 
                   <div className="mt-3">
-                    <AuctionCountdown endAt={auction?.endAt} />
+                    <AuctionCountdown endsAt={auction?.endAt} />
                   </div>
 
                   <Link
@@ -256,22 +270,30 @@ export default async function HomePage() {
         <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-4 gap-12 text-center">
           <div>
             <h3 className="font-semibold">Licensed Escrow</h3>
-            <p className="mt-3 text-sm text-gray-600">Funds handled via third-party escrow.</p>
+            <p className="mt-3 text-sm text-gray-600">
+              Funds handled via third-party escrow.
+            </p>
           </div>
 
           <div>
             <h3 className="font-semibold">Verified Participants</h3>
-            <p className="mt-3 text-sm text-gray-600">Identity and access reviewed.</p>
+            <p className="mt-3 text-sm text-gray-600">
+              Identity and access reviewed.
+            </p>
           </div>
 
           <div>
             <h3 className="font-semibold">Admin Oversight</h3>
-            <p className="mt-3 text-sm text-gray-600">Auctions monitored for fairness.</p>
+            <p className="mt-3 text-sm text-gray-600">
+              Auctions monitored for fairness.
+            </p>
           </div>
 
           <div>
             <h3 className="font-semibold">Audit Trail</h3>
-            <p className="mt-3 text-sm text-gray-600">Every action is recorded.</p>
+            <p className="mt-3 text-sm text-gray-600">
+              Every action is recorded.
+            </p>
           </div>
         </div>
       </section>
