@@ -103,7 +103,16 @@ export default async function HomePage() {
   }
 
   const live = auctions.filter((a) => a?.status === "LIVE");
-  const featured = live.length > 0 ? live[0] : null;
+
+  /* ---------- SORT BY SOONEST ENDING ---------- */
+
+  const sortedLive = [...live].sort((a, b) => {
+    const aEnd = new Date(a?.endAt || 0).getTime();
+    const bEnd = new Date(b?.endAt || 0).getTime();
+    return aEnd - bEnd;
+  });
+
+  const featured = sortedLive.length > 0 ? sortedLive[0] : null;
 
   return (
     <main className="bg-white">
@@ -221,7 +230,7 @@ export default async function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-10">
-            {live.slice(0, 3).map((auction) => (
+            {sortedLive.slice(0, 3).map((auction) => (
               <div key={auction.id} className="border rounded-3xl overflow-hidden">
                 <div className="h-60">
                   <AuctionImage src={getPrimaryImage(auction)} />
