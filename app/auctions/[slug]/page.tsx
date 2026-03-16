@@ -6,6 +6,7 @@ import BidHistoryServer from "./BidHistoryServer";
 import { getQuestionsForAuction } from "@/lib/repositories/questionRepository";
 import AskQuestion from "@/components/auction/AskQuestion";
 import AnswerQuestion from "@/components/auction/AnswerQuestion";
+import AuctionMessages from "@/components/auction/AuctionMessages";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -261,6 +262,15 @@ export default async function AuctionPage({
 
         </section>
       </div>
+
+      {/* POST-AUCTION MESSAGING */}
+      {auction.status === "CLOSED" && (
+        <div className="max-w-6xl mx-auto px-6 pb-20">
+          <section className="bg-white rounded-2xl border shadow-sm p-6 mt-6">
+            <AuctionMessages auctionId={auction.id} />
+          </section>
+        </div>
+      )}
 
     </main>
   );
