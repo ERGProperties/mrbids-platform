@@ -15,12 +15,8 @@ function getTimeRemaining(end: Date) {
   }
 
   const days = Math.floor(total / (1000 * 60 * 60 * 24));
-  const hours = Math.floor(
-    (total / (1000 * 60 * 60)) % 24
-  );
-  const minutes = Math.floor(
-    (total / (1000 * 60)) % 60
-  );
+  const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((total / (1000 * 60)) % 60);
 
   return {
     expired: false,
@@ -46,7 +42,6 @@ export default function AuctionCountdown({
     getTimeRemaining(end)
   );
 
-  // ⭐ prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -61,7 +56,6 @@ export default function AuctionCountdown({
     return () => clearInterval(interval);
   }, [end, mounted]);
 
-  // ⭐ render nothing until client mounts
   if (!mounted) {
     return <span>—</span>;
   }
@@ -71,8 +65,10 @@ export default function AuctionCountdown({
   }
 
   return (
-    <span className="text-sm font-medium text-gray-900">
-      {time.days}d {time.hours}h {time.minutes}m
-    </span>
+    <div className="flex items-center gap-1 text-sm font-medium text-gray-900">
+      <span>{time.days}d</span>
+      <span>{time.hours}h</span>
+      <span>{time.minutes}m</span>
+    </div>
   );
 }

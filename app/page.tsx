@@ -81,8 +81,9 @@ function formatTimeRemaining(endAt?: Date | string | null) {
 
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
 
-  return `${days}d ${hours}h`;
+  return `${days}d ${hours}h ${minutes}m`;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -205,8 +206,6 @@ export default async function HomePage() {
                   Ends in {formatTimeRemaining(featured?.endAt)}
                 </p>
 
-                {/* STARTING BID + ARV */}
-
                 <div className="mt-6 text-sm text-gray-700 space-y-1">
 
                   <p>
@@ -281,8 +280,6 @@ export default async function HomePage() {
                   <p className="mt-3 text-sm text-gray-600">
                     Ends in {formatTimeRemaining(auction?.endAt)}
                   </p>
-
-                  {/* STARTING BID + ARV */}
 
                   <div className="mt-4 text-sm space-y-1">
 
