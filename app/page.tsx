@@ -55,14 +55,6 @@ function formatCurrency(value?: number | null) {
   }).format(value);
 }
 
-function getHighestBid(auction: any) {
-  if (!auction?.bids || auction.bids.length === 0) {
-    return auction?.startingBid;
-  }
-
-  return Math.max(...auction.bids.map((b: any) => b.amount));
-}
-
 function getTimeStatus(endAt?: Date | string | null) {
   if (!endAt) return "LIVE NOW";
 
@@ -213,14 +205,14 @@ export default async function HomePage() {
                   Ends in {formatTimeRemaining(featured?.endAt)}
                 </p>
 
-                {/* CURRENT BID + ARV */}
+                {/* STARTING BID + ARV */}
 
                 <div className="mt-6 text-sm text-gray-700 space-y-1">
 
                   <p>
-                    Current Bid:{" "}
+                    Starting Bid:{" "}
                     <span className="font-semibold">
-                      {formatCurrency(getHighestBid(featured))}
+                      {formatCurrency(featured?.startingBid)}
                     </span>
                   </p>
 
@@ -290,14 +282,14 @@ export default async function HomePage() {
                     Ends in {formatTimeRemaining(auction?.endAt)}
                   </p>
 
-                  {/* CURRENT BID + ARV */}
+                  {/* STARTING BID + ARV */}
 
                   <div className="mt-4 text-sm space-y-1">
 
                     <p>
-                      Current Bid:{" "}
+                      Starting Bid:{" "}
                       <span className="font-semibold">
-                        {formatCurrency(getHighestBid(auction))}
+                        {formatCurrency(auction?.startingBid)}
                       </span>
                     </p>
 
