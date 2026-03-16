@@ -71,9 +71,9 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, user }) {
       if (session.user) {
+        // Ensure API routes can access user ID and email
         session.user.id = user.id;
-        session.user.email = user.email;
-        session.user.name = user.name;
+        session.user.email = user.email ?? undefined;
       }
 
       return session;
@@ -91,7 +91,7 @@ export const authOptions: NextAuthOptions = {
         return url;
       }
 
-      // Fallback if something unexpected happens
+      // Fallback
       return `${baseUrl}/auctions`;
     },
   },
