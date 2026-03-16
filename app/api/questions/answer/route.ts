@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/db";
 import { answerQuestion } from "@/lib/repositories/questionRepository";
 
 export async function POST(req: Request) {
 
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
     return NextResponse.json(
@@ -23,6 +24,17 @@ export async function POST(req: Request) {
     );
   }
 
+  const user = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "User not found" },
+      { status: 404 }
+    );
+  }
+
   const question = await prisma.question.findUnique({
     where: { id: questionId },
     include: {
@@ -37,23 +49,9 @@ export async function POST(req: Request) {
     );
   }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      email: session.user.email,
-    },
-  });
-
-  if (!user) {
-    return NextResponse.json(
-      { error: "User not found" },
-      { status: 404 }
-    );
-  }
-
-  // SECURITY CHECK
   if (question.auction.sellerId !== user.id) {
     return NextResponse.json(
-      { error: "Only the seller can answer questions." },
+      { error: "Only the seller can answer questions" },
       { status: 403 }
     );
   }

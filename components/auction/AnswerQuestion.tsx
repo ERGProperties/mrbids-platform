@@ -29,7 +29,7 @@ export default function AnswerQuestion({
       }),
     });
 
-    location.reload();
+    window.location.reload();
   }
 
   if (!showInput) {
