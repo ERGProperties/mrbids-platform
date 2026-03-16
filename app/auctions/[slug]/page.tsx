@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import AuctionClient from "./AuctionClient";
 import BidHistoryServer from "./BidHistoryServer";
+import { getQuestionsForAuction } from "@/lib/repositories/questionRepository";
+import AskQuestion from "@/components/auction/AskQuestion";
+import AnswerQuestion from "@/components/auction/AnswerQuestion";
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -117,6 +120,8 @@ export default async function AuctionPage({
 
   if (!auction) notFound();
 
+  const questions = await getQuestionsForAuction(auction.id);
+
   const hasBids = auction.bidCount > 0;
 
   const highestBid =
@@ -210,7 +215,7 @@ export default async function AuctionPage({
       />
 
       {auction.bidCount > 0 && (
-        <div className="max-w-6xl mx-auto px-6 pb-20">
+        <div className="max-w-6xl mx-auto px-6 pb-10">
           <section className="bg-white rounded-2xl border shadow-sm p-6">
             <h2 className="text-lg font-semibold mb-4">
               Bid History
@@ -219,6 +224,43 @@ export default async function AuctionPage({
           </section>
         </div>
       )}
+
+      {/* QUESTIONS & ANSWERS */}
+      <div className="max-w-6xl mx-auto px-6 pb-20">
+        <section className="bg-white rounded-2xl border shadow-sm p-6 mt-6">
+
+          <h2 className="text-lg font-semibold mb-4">
+            Questions & Answers
+          </h2>
+
+          {questions.length === 0 && (
+            <p className="text-gray-500 mb-4">
+              No questions yet. Be the first to ask!
+            </p>
+          )}
+
+          {questions.map((q) => (
+            <div key={q.id} className="border-b py-3">
+
+              <p className="font-medium">
+                Q: {q.question}
+              </p>
+
+              {q.answer ? (
+                <p className="text-gray-600 mt-1">
+                  A: {q.answer}
+                </p>
+              ) : (
+                <AnswerQuestion questionId={q.id} />
+              )}
+
+            </div>
+          ))}
+
+          <AskQuestion auctionId={auction.id} />
+
+        </section>
+      </div>
 
     </main>
   );
