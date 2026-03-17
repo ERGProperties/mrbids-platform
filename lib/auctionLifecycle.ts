@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { finalizeAuction } from "@/lib/auctions/finalizeAuction";
 
 export async function autoCloseExpiredAuctions() {
   const now = new Date();
@@ -8,14 +9,19 @@ export async function autoCloseExpiredAuctions() {
       status: "LIVE",
       endAt: { lt: now },
     },
+    select: {
+      id: true,
+    },
   });
 
   for (const auction of expired) {
-    await prisma.auction.update({
-      where: { id: auction.id },
-      data: {
-        status: "CLOSED",
-      },
-    });
+    try {
+      await finalizeAuction(auction.id);
+    } catch (err) {
+      console.error(
+        `Failed to finalize auction ${auction.id}:`,
+        err
+      );
+    }
   }
 }
