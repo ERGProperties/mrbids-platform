@@ -3,6 +3,10 @@
     {
       "path": "/api/notifications/ending-soon",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/close-auctions",
+      "schedule": "* * * * *"
     }
   ]
 }
