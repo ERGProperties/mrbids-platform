@@ -209,8 +209,14 @@ export default async function AuctionPage({
             : null,
           bidIncrement: auction.bidIncrement,
           startingBid: auction.startingBid,
+
+          // existing
           leadingBidderId:
             auction.bids[0]?.bidderId ?? null,
+
+          // ✅ NEW (for winner banner)
+          winnerId: auction.result ?? null,
+          status: auction.status,
         }}
         minimumBid={minimumBid}
       />
@@ -266,7 +272,10 @@ export default async function AuctionPage({
       {/* POST-AUCTION MESSAGING */}
       {auction.status === "CLOSED" && (
         <div className="max-w-6xl mx-auto px-6 pb-20">
-          <section className="bg-white rounded-2xl border shadow-sm p-6 mt-6">
+          <section
+            id="auction-messages"
+            className="bg-white rounded-2xl border shadow-sm p-6 mt-6"
+        >
             <AuctionMessages auctionId={auction.id} />
           </section>
         </div>

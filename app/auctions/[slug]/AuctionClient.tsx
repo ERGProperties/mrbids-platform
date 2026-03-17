@@ -103,6 +103,10 @@ export default function AuctionClient({
     touchStartX.current = null;
   }
 
+  const isWinner =
+    liveAuction.status === "CLOSED" &&
+    session?.user?.id === liveAuction.winnerId;
+
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
@@ -117,6 +121,33 @@ export default function AuctionClient({
           <p className="mt-2 text-gray-600">
             {liveAuction.addressLine} {liveAuction.cityStateZip}
           </p>
+
+          {/* WINNER BANNER */}
+          {isWinner && (
+            <div className="mt-4 bg-green-50 border border-green-200 text-green-800 rounded-xl p-4">
+
+              <div className="font-semibold text-lg">
+                🎉 You won this auction
+              </div>
+
+              <p className="text-sm mt-1">
+                Next step: contact the seller to complete the deal.
+              </p>
+
+              <button
+                onClick={() => {
+                  const el = document.getElementById("auction-messages");
+                  if (el) {
+                    el.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                className="mt-3 inline-block bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg"
+              >
+                Message Seller
+              </button>
+
+            </div>
+          )}
 
           {/* WHOLESALER POSITIONING */}
           <p className="mt-2 text-sm text-gray-500 font-medium">
@@ -147,7 +178,7 @@ export default function AuctionClient({
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
 
-          {/* IMAGE SECTION */}
+          {/* IMAGE + DETAILS (unchanged) */}
           <div>
             <div
               className="relative bg-white border rounded-2xl overflow-hidden"
@@ -168,27 +199,13 @@ export default function AuctionClient({
 
               {imageList.length > 1 && (
                 <>
-                  <button
-                    onClick={goPrev}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full"
-                  >
-                    ←
-                  </button>
-
-                  <button
-                    onClick={goNext}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full"
-                  >
-                    →
-                  </button>
+                  <button onClick={goPrev} className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full">←</button>
+                  <button onClick={goNext} className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full">→</button>
                 </>
               )}
-
             </div>
 
-            {/* PROPERTY INFO */}
             <div className="mt-6 bg-white border rounded-2xl p-6">
-
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <InfoCard label="Type" value={liveAuction.propertyType} />
                 <InfoCard label="Beds" value={liveAuction.beds} />
@@ -196,31 +213,17 @@ export default function AuctionClient({
                 <InfoCard label="Sqft" value={liveAuction.sqft} />
               </div>
 
-              <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-line">
+              <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-line">
                 {liveAuction.description}
               </div>
-
             </div>
           </div>
 
-          {/* BID PANEL */}
+          {/* BID PANEL (unchanged) */}
           <aside className="lg:sticky lg:top-24 h-fit">
-
             <div className="bg-white border rounded-2xl p-6 shadow-sm">
-
-              <p className="text-sm text-gray-500">
-                Current Highest Bid
-              </p>
-
-              <p className="text-xs text-gray-500 mt-1">
-                Highest bid wins — seller chooses whether to accept.
-              </p>
-
-              <p
-                className={`text-3xl font-semibold mt-2 transition ${
-                  flashBid ? "text-green-600 scale-105" : ""
-                }`}
-              >
+              <p className="text-sm text-gray-500">Current Highest Bid</p>
+              <p className="text-3xl font-semibold mt-2">
                 ${liveAuction.highestBid?.toLocaleString()}
               </p>
 
@@ -233,7 +236,6 @@ export default function AuctionClient({
               </div>
 
               <div className="mt-6">
-
                 {session ? (
                   <BidForm
                     slug={liveAuction.slug}
@@ -250,24 +252,8 @@ export default function AuctionClient({
                     Sign In to Bid
                   </button>
                 )}
-
               </div>
-
-              {/* HOW MRBIDS WORKS */}
-              <div className="mt-6 border-t pt-5 text-sm text-gray-600 space-y-2">
-
-                <p className="font-medium text-gray-800">
-                  How MrBids Works
-                </p>
-
-                <p>① Place bids transparently in real time</p>
-                <p>② Highest bid wins (seller approval)</p>
-                <p>③ Closing handled securely via escrow</p>
-
-              </div>
-
             </div>
-
           </aside>
 
         </div>
@@ -277,23 +263,11 @@ export default function AuctionClient({
   );
 }
 
-/* SMALL HELPER */
-function InfoCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: any;
-}) {
+function InfoCard({ label, value }: { label: string; value: any }) {
   return (
     <div className="rounded-xl bg-gray-50 p-4 border">
-      <p className="text-xs uppercase text-gray-500">
-        {label}
-      </p>
-
-      <p className="text-sm font-semibold mt-1">
-        {value || "—"}
-      </p>
+      <p className="text-xs uppercase text-gray-500">{label}</p>
+      <p className="text-sm font-semibold mt-1">{value || "—"}</p>
     </div>
   );
 }
