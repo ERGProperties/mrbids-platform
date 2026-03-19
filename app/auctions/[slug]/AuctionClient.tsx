@@ -202,14 +202,14 @@ export default function AuctionClient({
                 {liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              {/* 🔥 SMART BID DISPLAY */}
+              {/* 🔥 IMPROVED ZERO STATE */}
               {liveAuction?.bidCount > 0 ? (
                 <p className="text-sm text-gray-500 mt-2">
                   {liveAuction.bidCount} bids placed
                 </p>
               ) : (
                 <p className="text-sm text-gray-500 mt-2">
-                  Be the first to place a bid
+                  Active auction — place your bid
                 </p>
               )}
 
