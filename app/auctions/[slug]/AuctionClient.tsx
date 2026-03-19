@@ -33,12 +33,10 @@ export default function AuctionClient({
   const auctionEnd =
     liveAuction?.endAt || liveAuction?.endsAt;
 
-  // 🔥 URGENCY LOGIC
   const isEndingSoon =
     auctionEnd &&
     new Date(auctionEnd).getTime() - Date.now() < 1000 * 60 * 10;
 
-  // ✅ POLLING
   useEffect(() => {
     if (!auction?.slug) return;
 
@@ -126,7 +124,6 @@ export default function AuctionClient({
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
-        {/* HEADER */}
         <div className="mb-8 border-b pb-6">
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
             {liveAuction?.title || "Loading..."}
@@ -150,7 +147,7 @@ export default function AuctionClient({
           {/* LEFT */}
           <div>
 
-            {/* IMAGE */}
+            {/* IMAGE WITH ARROWS */}
             <div
               className="relative bg-white border rounded-2xl overflow-hidden"
               onTouchStart={onTouchStart}
@@ -166,6 +163,24 @@ export default function AuctionClient({
                 <div className="h-[420px] flex items-center justify-center text-gray-400">
                   No Image Available
                 </div>
+              )}
+
+              {imageList.length > 1 && (
+                <>
+                  <button
+                    onClick={goPrev}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/70 border border-white text-white px-3 py-2 rounded-full shadow-lg hover:bg-black"
+                  >
+                    ←
+                  </button>
+
+                  <button
+                    onClick={goNext}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/70 border border-white text-white px-3 py-2 rounded-full shadow-lg hover:bg-black"
+                  >
+                    →
+                  </button>
+                </>
               )}
             </div>
 
@@ -193,16 +208,10 @@ export default function AuctionClient({
                 Current Winning Bid
               </p>
 
-              <p
-                className={`text-3xl font-semibold mt-2 ${
-                  flashBid ? "text-green-600" : ""
-                }`}
-              >
-                $
-                {liveAuction?.highestBid?.toLocaleString?.() || 0}
+              <p className={`text-3xl font-semibold mt-2 ${flashBid ? "text-green-600" : ""}`}>
+                ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              {/* 🔥 IMPROVED ZERO STATE */}
               {liveAuction?.bidCount > 0 ? (
                 <p className="text-sm text-gray-500 mt-2">
                   {liveAuction.bidCount} bids placed
@@ -213,7 +222,6 @@ export default function AuctionClient({
                 </p>
               )}
 
-              {/* 🔥 URGENCY */}
               {isEndingSoon && (
                 <p className="text-red-600 font-semibold mt-2">
                   ⚠️ Ending soon — don’t miss this deal
