@@ -33,15 +33,19 @@ export default function AuctionClient({
   const auctionEnd =
     liveAuction.endAt || liveAuction.endsAt;
 
-  /* LIVE STREAM */
+  // ✅ POLLING (replaces stream)
   useEffect(() => {
-    const eventSource = new EventSource(
-      `/api/auctions/${auction.slug}/stream`
-    );
+    let isMounted = true;
 
-    eventSource.onmessage = (event) => {
+    const fetchAuction = async () => {
       try {
-        const data = JSON.parse(event.data);
+        const res = await fetch(`/api/auctions/${auction.slug}`);
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (!isMounted) return;
 
         setLiveAuction((prev: any) => {
           if (
@@ -57,20 +61,22 @@ export default function AuctionClient({
             highestBid:
               data.highestBid ?? prev.highestBid,
             bidCount: data.bidCount ?? prev.bidCount,
-            watchers: data.watchers ?? prev.watchers,
             endAt: data.endsAt ?? prev.endAt,
           };
         });
       } catch (err) {
-        console.error("Stream parse error:", err);
+        console.error("Polling error:", err);
       }
     };
 
-    eventSource.onerror = () => {
-      console.warn("Stream reconnecting...");
-    };
+    fetchAuction();
 
-    return () => eventSource.close();
+    const interval = setInterval(fetchAuction, 5000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, [auction.slug]);
 
   function goPrev() {
@@ -93,6 +99,7 @@ export default function AuctionClient({
 
   function onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
     if (touchStartX.current == null) return;
+
     const delta =
       e.changedTouches[0].clientX - touchStartX.current;
 
@@ -111,9 +118,7 @@ export default function AuctionClient({
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
-        {/* HEADER */}
         <div className="mb-8 border-b pb-6">
-
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
             {liveAuction.title}
           </h1>
@@ -122,63 +127,20 @@ export default function AuctionClient({
             {liveAuction.addressLine} {liveAuction.cityStateZip}
           </p>
 
-          {/* WINNER BANNER */}
           {isWinner && (
             <div className="mt-4 bg-green-50 border border-green-200 text-green-800 rounded-xl p-4">
-
               <div className="font-semibold text-lg">
                 🎉 You won this auction
               </div>
-
               <p className="text-sm mt-1">
                 Next step: contact the seller to complete the deal.
               </p>
-
-              <button
-                onClick={() => {
-                  const el = document.getElementById("auction-messages");
-                  if (el) {
-                    el.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-                className="mt-3 inline-block bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg"
-              >
-                Message Seller
-              </button>
-
             </div>
           )}
-
-          {/* WHOLESALER POSITIONING */}
-          <p className="mt-2 text-sm text-gray-500 font-medium">
-            Investor Deal • Buyers Compete Live • Seller Controls Approval
-          </p>
-
-          {/* AUTHORITY BADGES */}
-          <div className="mt-5 flex flex-wrap gap-3 text-sm">
-
-            <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
-              <span className="text-green-600">✔</span>
-              Verified Seller
-            </div>
-
-            <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
-              <span className="text-green-600">✔</span>
-              Admin Reviewed Listing
-            </div>
-
-            <div className="flex items-center gap-2 rounded-full border bg-white px-3 py-1.5">
-              <span className="text-green-600">✔</span>
-              Transparent Bid History
-            </div>
-
-          </div>
-
         </div>
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
 
-          {/* IMAGE + DETAILS (unchanged) */}
           <div>
             <div
               className="relative bg-white border rounded-2xl overflow-hidden"
@@ -196,30 +158,9 @@ export default function AuctionClient({
                   No Image Available
                 </div>
               )}
-
-              {imageList.length > 1 && (
-                <>
-                  <button onClick={goPrev} className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full">←</button>
-                  <button onClick={goNext} className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full">→</button>
-                </>
-              )}
-            </div>
-
-            <div className="mt-6 bg-white border rounded-2xl p-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <InfoCard label="Type" value={liveAuction.propertyType} />
-                <InfoCard label="Beds" value={liveAuction.beds} />
-                <InfoCard label="Baths" value={liveAuction.baths} />
-                <InfoCard label="Sqft" value={liveAuction.sqft} />
-              </div>
-
-              <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-line">
-                {liveAuction.description}
-              </div>
             </div>
           </div>
 
-          {/* BID PANEL (unchanged) */}
           <aside className="lg:sticky lg:top-24 h-fit">
             <div className="bg-white border rounded-2xl p-6 shadow-sm">
               <p className="text-sm text-gray-500">Current Highest Bid</p>
@@ -260,14 +201,5 @@ export default function AuctionClient({
 
       </div>
     </main>
-  );
-}
-
-function InfoCard({ label, value }: { label: string; value: any }) {
-  return (
-    <div className="rounded-xl bg-gray-50 p-4 border">
-      <p className="text-xs uppercase text-gray-500">{label}</p>
-      <p className="text-sm font-semibold mt-1">{value || "—"}</p>
-    </div>
   );
 }
