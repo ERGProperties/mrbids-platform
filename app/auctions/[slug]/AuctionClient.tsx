@@ -14,13 +14,13 @@ export default function AuctionClient({
 }) {
   const { data: session } = useSession();
 
-  const [liveAuction, setLiveAuction] = useState(auction);
+  const [liveAuction, setLiveAuction] = useState<any>(auction);
   const [flashBid, setFlashBid] = useState(false);
 
   const imageList =
-    Array.isArray(liveAuction.images) && liveAuction.images.length
+    Array.isArray(liveAuction?.images) && liveAuction.images.length
       ? liveAuction.images
-      : liveAuction.image
+      : liveAuction?.image
       ? [liveAuction.image]
       : [];
 
@@ -31,10 +31,12 @@ export default function AuctionClient({
     imageList.length > 0 ? imageList[selectedIndex] : null;
 
   const auctionEnd =
-    liveAuction.endAt || liveAuction.endsAt;
+    liveAuction?.endAt || liveAuction?.endsAt;
 
   // ✅ POLLING (replaces stream)
   useEffect(() => {
+    if (!auction?.slug) return;
+
     let isMounted = true;
 
     const fetchAuction = async () => {
@@ -45,9 +47,11 @@ export default function AuctionClient({
 
         const data = await res.json();
 
-        if (!isMounted) return;
+        if (!isMounted || !data) return;
 
         setLiveAuction((prev: any) => {
+          if (!prev) return prev;
+
           if (
             data.highestBid &&
             data.highestBid !== prev.highestBid
@@ -60,8 +64,10 @@ export default function AuctionClient({
             ...prev,
             highestBid:
               data.highestBid ?? prev.highestBid,
-            bidCount: data.bidCount ?? prev.bidCount,
-            endAt: data.endsAt ?? prev.endAt,
+            bidCount:
+              data.bidCount ?? prev.bidCount,
+            endAt:
+              data.endsAt ?? prev.endAt,
           };
         });
       } catch (err) {
@@ -70,14 +76,13 @@ export default function AuctionClient({
     };
 
     fetchAuction();
-
     const interval = setInterval(fetchAuction, 5000);
 
     return () => {
       isMounted = false;
       clearInterval(interval);
     };
-  }, [auction.slug]);
+  }, [auction?.slug]);
 
   function goPrev() {
     if (!imageList.length) return;
@@ -111,20 +116,22 @@ export default function AuctionClient({
   }
 
   const isWinner =
-    liveAuction.status === "CLOSED" &&
-    session?.user?.id === liveAuction.winnerId;
+    liveAuction?.status === "CLOSED" &&
+    session?.user?.id === liveAuction?.winnerId;
 
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
+        {/* HEADER */}
         <div className="mb-8 border-b pb-6">
+
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
-            {liveAuction.title}
+            {liveAuction?.title || "Loading..."}
           </h1>
 
           <p className="mt-2 text-gray-600">
-            {liveAuction.addressLine} {liveAuction.cityStateZip}
+            {liveAuction?.addressLine} {liveAuction?.cityStateZip}
           </p>
 
           {isWinner && (
@@ -137,11 +144,15 @@ export default function AuctionClient({
               </p>
             </div>
           )}
+
         </div>
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
 
+          {/* LEFT SIDE */}
           <div>
+
+            {/* IMAGE */}
             <div
               className="relative bg-white border rounded-2xl overflow-hidden"
               onTouchStart={onTouchStart}
@@ -158,14 +169,43 @@ export default function AuctionClient({
                   No Image Available
                 </div>
               )}
+
+              {imageList.length > 1 && (
+                <>
+                  <button onClick={goPrev} className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full">←</button>
+                  <button onClick={goNext} className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full">→</button>
+                </>
+              )}
             </div>
+
+            {/* ✅ DETAILS (RESTORED) */}
+            <div className="mt-6 bg-white border rounded-2xl p-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <InfoCard label="Type" value={liveAuction?.propertyType} />
+                <InfoCard label="Beds" value={liveAuction?.beds} />
+                <InfoCard label="Baths" value={liveAuction?.baths} />
+                <InfoCard label="Sqft" value={liveAuction?.sqft} />
+              </div>
+
+              <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-line">
+                {liveAuction?.description}
+              </div>
+            </div>
+
           </div>
 
+          {/* RIGHT SIDE */}
           <aside className="lg:sticky lg:top-24 h-fit">
             <div className="bg-white border rounded-2xl p-6 shadow-sm">
               <p className="text-sm text-gray-500">Current Highest Bid</p>
-              <p className="text-3xl font-semibold mt-2">
-                ${liveAuction.highestBid?.toLocaleString()}
+
+              <p
+                className={`text-3xl font-semibold mt-2 ${
+                  flashBid ? "text-green-600" : ""
+                }`}
+              >
+                $
+                {liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
               <div className="mt-4">
@@ -179,14 +219,14 @@ export default function AuctionClient({
               <div className="mt-6">
                 {session ? (
                   <BidForm
-                    slug={liveAuction.slug}
+                    slug={liveAuction?.slug}
                     minimumBid={minimumBid}
-                    currentBid={liveAuction.highestBid || 0}
+                    currentBid={liveAuction?.highestBid || 0}
                   />
                 ) : (
                   <button
                     onClick={() =>
-                      (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction.slug}`)
+                      (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction?.slug}`)
                     }
                     className="w-full bg-black text-white rounded-xl py-3"
                   >
@@ -201,5 +241,15 @@ export default function AuctionClient({
 
       </div>
     </main>
+  );
+}
+
+/* ✅ helper component */
+function InfoCard({ label, value }: { label: string; value: any }) {
+  return (
+    <div className="rounded-xl bg-gray-50 p-4 border">
+      <p className="text-xs uppercase text-gray-500">{label}</p>
+      <p className="text-sm font-semibold mt-1">{value || "—"}</p>
+    </div>
   );
 }
