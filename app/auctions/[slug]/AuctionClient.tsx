@@ -33,7 +33,12 @@ export default function AuctionClient({
   const auctionEnd =
     liveAuction?.endAt || liveAuction?.endsAt;
 
-  // ✅ POLLING (replaces stream)
+  // 🔥 URGENCY LOGIC
+  const isEndingSoon =
+    auctionEnd &&
+    new Date(auctionEnd).getTime() - Date.now() < 1000 * 60 * 10;
+
+  // ✅ POLLING
   useEffect(() => {
     if (!auction?.slug) return;
 
@@ -42,11 +47,9 @@ export default function AuctionClient({
     const fetchAuction = async () => {
       try {
         const res = await fetch(`/api/auctions/${auction.slug}`);
-
         if (!res.ok) return;
 
         const data = await res.json();
-
         if (!isMounted || !data) return;
 
         setLiveAuction((prev: any) => {
@@ -125,7 +128,6 @@ export default function AuctionClient({
 
         {/* HEADER */}
         <div className="mb-8 border-b pb-6">
-
           <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
             {liveAuction?.title || "Loading..."}
           </h1>
@@ -139,17 +141,13 @@ export default function AuctionClient({
               <div className="font-semibold text-lg">
                 🎉 You won this auction
               </div>
-              <p className="text-sm mt-1">
-                Next step: contact the seller to complete the deal.
-              </p>
             </div>
           )}
-
         </div>
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
 
-          {/* LEFT SIDE */}
+          {/* LEFT */}
           <div>
 
             {/* IMAGE */}
@@ -169,16 +167,9 @@ export default function AuctionClient({
                   No Image Available
                 </div>
               )}
-
-              {imageList.length > 1 && (
-                <>
-                  <button onClick={goPrev} className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full">←</button>
-                  <button onClick={goNext} className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-2 rounded-full">→</button>
-                </>
-              )}
             </div>
 
-            {/* ✅ DETAILS (RESTORED) */}
+            {/* DETAILS */}
             <div className="mt-6 bg-white border rounded-2xl p-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <InfoCard label="Type" value={liveAuction?.propertyType} />
@@ -194,10 +185,13 @@ export default function AuctionClient({
 
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* RIGHT */}
           <aside className="lg:sticky lg:top-24 h-fit">
             <div className="bg-white border rounded-2xl p-6 shadow-sm">
-              <p className="text-sm text-gray-500">Current Highest Bid</p>
+
+              <p className="text-sm text-gray-500">
+                Current Winning Bid
+              </p>
 
               <p
                 className={`text-3xl font-semibold mt-2 ${
@@ -208,6 +202,28 @@ export default function AuctionClient({
                 {liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
+              {/* 🔥 SMART BID DISPLAY */}
+              {liveAuction?.bidCount > 0 ? (
+                <p className="text-sm text-gray-500 mt-2">
+                  {liveAuction.bidCount} bids placed
+                </p>
+              ) : (
+                <p className="text-sm text-gray-500 mt-2">
+                  Be the first to place a bid
+                </p>
+              )}
+
+              {/* 🔥 URGENCY */}
+              {isEndingSoon && (
+                <p className="text-red-600 font-semibold mt-2">
+                  ⚠️ Ending soon — don’t miss this deal
+                </p>
+              )}
+
+              <p className="text-xs text-gray-400 mt-1">
+                You must outbid to win
+              </p>
+
               <div className="mt-4">
                 {auctionEnd ? (
                   <AuctionCountdown endsAt={new Date(auctionEnd)} />
@@ -215,6 +231,10 @@ export default function AuctionClient({
                   <p>Loading countdown...</p>
                 )}
               </div>
+
+              <p className="text-sm text-gray-600 mt-4">
+                Highest bidder wins if seller accepts
+              </p>
 
               <div className="mt-6">
                 {session ? (
@@ -234,6 +254,7 @@ export default function AuctionClient({
                   </button>
                 )}
               </div>
+
             </div>
           </aside>
 
@@ -244,7 +265,6 @@ export default function AuctionClient({
   );
 }
 
-/* ✅ helper component */
 function InfoCard({ label, value }: { label: string; value: any }) {
   return (
     <div className="rounded-xl bg-gray-50 p-4 border">
