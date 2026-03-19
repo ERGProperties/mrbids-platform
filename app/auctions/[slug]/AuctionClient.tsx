@@ -16,6 +16,10 @@ export default function AuctionClient({
 
   const [liveAuction, setLiveAuction] = useState<any>(auction);
   const [flashBid, setFlashBid] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [zoomOpen, setZoomOpen] = useState(false);
+
+  const touchStartX = useRef<number | null>(null);
 
   const imageList =
     Array.isArray(liveAuction?.images) && liveAuction.images.length
@@ -23,9 +27,6 @@ export default function AuctionClient({
       : liveAuction?.image
       ? [liveAuction.image]
       : [];
-
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const touchStartX = useRef<number | null>(null);
 
   const selectedImage =
     imageList.length > 0 ? imageList[selectedIndex] : null;
@@ -37,6 +38,7 @@ export default function AuctionClient({
     auctionEnd &&
     new Date(auctionEnd).getTime() - Date.now() < 1000 * 60 * 10;
 
+  /* POLLING */
   useEffect(() => {
     if (!auction?.slug) return;
 
@@ -86,14 +88,12 @@ export default function AuctionClient({
   }, [auction?.slug]);
 
   function goPrev() {
-    if (!imageList.length) return;
     setSelectedIndex((prev) =>
       prev === 0 ? imageList.length - 1 : prev - 1
     );
   }
 
   function goNext() {
-    if (!imageList.length) return;
     setSelectedIndex((prev) =>
       prev === imageList.length - 1 ? 0 : prev + 1
     );
@@ -124,22 +124,15 @@ export default function AuctionClient({
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
+        {/* HEADER */}
         <div className="mb-8 border-b pb-6">
-          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight">
-            {liveAuction?.title || "Loading..."}
+          <h1 className="text-4xl md:text-5xl font-semibold">
+            {liveAuction?.title}
           </h1>
 
-          <p className="mt-2 text-gray-600">
+          <p className="text-gray-600 mt-2">
             {liveAuction?.addressLine} {liveAuction?.cityStateZip}
           </p>
-
-          {isWinner && (
-            <div className="mt-4 bg-green-50 border border-green-200 text-green-800 rounded-xl p-4">
-              <div className="font-semibold text-lg">
-                🎉 You won this auction
-              </div>
-            </div>
-          )}
         </div>
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
@@ -147,16 +140,16 @@ export default function AuctionClient({
           {/* LEFT */}
           <div>
 
-            {/* IMAGE WITH ARROWS */}
+            {/* IMAGE */}
             <div
-              className="relative bg-white border rounded-2xl overflow-hidden"
+              className="relative bg-white border rounded-2xl overflow-hidden cursor-pointer"
+              onClick={() => setZoomOpen(true)}
               onTouchStart={onTouchStart}
               onTouchEnd={onTouchEnd}
             >
               {selectedImage ? (
                 <img
                   src={selectedImage}
-                  alt="Property"
                   className="w-full h-[420px] object-cover"
                 />
               ) : (
@@ -168,20 +161,42 @@ export default function AuctionClient({
               {imageList.length > 1 && (
                 <>
                   <button
-                    onClick={goPrev}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/70 border border-white text-white px-3 py-2 rounded-full shadow-lg hover:bg-black"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goPrev();
+                    }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/70 border border-white text-white px-3 py-2 rounded-full"
                   >
                     ←
                   </button>
 
                   <button
-                    onClick={goNext}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/70 border border-white text-white px-3 py-2 rounded-full shadow-lg hover:bg-black"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goNext();
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/70 border border-white text-white px-3 py-2 rounded-full"
                   >
                     →
                   </button>
                 </>
               )}
+            </div>
+
+            {/* THUMBNAILS */}
+            <div className="flex gap-2 mt-3 overflow-x-auto">
+              {imageList.map((img: string, i: number) => (
+                <img
+                  key={i}
+                  src={img}
+                  onClick={() => setSelectedIndex(i)}
+                  className={`h-20 w-28 object-cover rounded-lg cursor-pointer border-2 ${
+                    i === selectedIndex
+                      ? "border-black"
+                      : "border-transparent"
+                  }`}
+                />
+              ))}
             </div>
 
             {/* DETAILS */}
@@ -193,7 +208,7 @@ export default function AuctionClient({
                 <InfoCard label="Sqft" value={liveAuction?.sqft} />
               </div>
 
-              <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-line">
+              <div className="prose text-gray-700 whitespace-pre-line">
                 {liveAuction?.description}
               </div>
             </div>
@@ -201,14 +216,14 @@ export default function AuctionClient({
           </div>
 
           {/* RIGHT */}
-          <aside className="lg:sticky lg:top-24 h-fit">
-            <div className="bg-white border rounded-2xl p-6 shadow-sm">
+          <aside className="lg:sticky lg:top-24">
+            <div className="bg-white border rounded-2xl p-6">
 
               <p className="text-sm text-gray-500">
                 Current Winning Bid
               </p>
 
-              <p className={`text-3xl font-semibold mt-2 ${flashBid ? "text-green-600" : ""}`}>
+              <p className={`text-3xl mt-2 ${flashBid ? "text-green-600" : ""}`}>
                 ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
@@ -223,40 +238,30 @@ export default function AuctionClient({
               )}
 
               {isEndingSoon && (
-                <p className="text-red-600 font-semibold mt-2">
+                <p className="text-red-600 mt-2">
                   ⚠️ Ending soon — don’t miss this deal
                 </p>
               )}
 
-              <p className="text-xs text-gray-400 mt-1">
-                You must outbid to win
-              </p>
-
               <div className="mt-4">
-                {auctionEnd ? (
+                {auctionEnd && (
                   <AuctionCountdown endsAt={new Date(auctionEnd)} />
-                ) : (
-                  <p>Loading countdown...</p>
                 )}
               </div>
-
-              <p className="text-sm text-gray-600 mt-4">
-                Highest bidder wins if seller accepts
-              </p>
 
               <div className="mt-6">
                 {session ? (
                   <BidForm
-                    slug={liveAuction?.slug}
+                    slug={liveAuction.slug}
                     minimumBid={minimumBid}
-                    currentBid={liveAuction?.highestBid || 0}
+                    currentBid={liveAuction.highestBid || 0}
                   />
                 ) : (
                   <button
                     onClick={() =>
-                      (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction?.slug}`)
+                      (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction.slug}`)
                     }
-                    className="w-full bg-black text-white rounded-xl py-3"
+                    className="w-full bg-black text-white py-3 rounded-xl"
                   >
                     Sign In to Bid
                   </button>
@@ -268,6 +273,19 @@ export default function AuctionClient({
 
         </div>
 
+        {/* ZOOM MODAL */}
+        {zoomOpen && selectedImage && (
+          <div
+            className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"
+            onClick={() => setZoomOpen(false)}
+          >
+            <img
+              src={selectedImage}
+              className="max-h-[90%] max-w-[90%]"
+            />
+          </div>
+        )}
+
       </div>
     </main>
   );
@@ -275,9 +293,9 @@ export default function AuctionClient({
 
 function InfoCard({ label, value }: { label: string; value: any }) {
   return (
-    <div className="rounded-xl bg-gray-50 p-4 border">
-      <p className="text-xs uppercase text-gray-500">{label}</p>
-      <p className="text-sm font-semibold mt-1">{value || "—"}</p>
+    <div className="bg-gray-50 p-4 rounded-xl border">
+      <p className="text-xs text-gray-500">{label}</p>
+      <p className="font-semibold mt-1">{value || "—"}</p>
     </div>
   );
 }
