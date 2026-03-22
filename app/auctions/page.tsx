@@ -17,6 +17,7 @@ function formatCurrency(value?: number | null) {
   }).format(value);
 }
 
+/* 🔥 UPDATED: NOW INCLUDES MINUTES */
 function formatTimeRemaining(endAt?: Date | string | null) {
   if (!endAt) return "—";
 
@@ -27,10 +28,21 @@ function formatTimeRemaining(endAt?: Date | string | null) {
 
   if (diff <= 0) return "Ended";
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const totalMinutes = Math.floor(diff / (1000 * 60));
 
-  return `${days}d ${hours}h`;
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+
+  return `${minutes}m`;
+}
+
+/* 🔥 WATCHING COUNT */
+function getWatchingCount(bidCount: number) {
+  return Math.max(3, Math.min(8, bidCount + 2));
 }
 
 /* ---------- IMAGE ---------- */
@@ -71,22 +83,16 @@ export default async function AuctionsPage() {
   const live = auctions.filter((a) => a?.status === "LIVE");
   const past = auctions.filter((a) => a?.status === "CLOSED");
 
-  /* SORT LIVE BY SOONEST ENDING */
-
   const sortedLive = [...live].sort((a, b) => {
     const aEnd = new Date(a?.endAt || 0).getTime();
     const bEnd = new Date(b?.endAt || 0).getTime();
     return aEnd - bEnd;
   });
 
-  /* ENDING SOON (24 HOURS) */
-
   const endingSoon = sortedLive.filter((auction) => {
     const end = new Date(auction?.endAt || 0).getTime();
     return end - Date.now() < 1000 * 60 * 60 * 24 && end > Date.now();
   });
-
-  /* REMAINING LIVE */
 
   const remainingLive = sortedLive.filter(
     (auction) => !endingSoon.some((a) => a.id === auction.id)
@@ -105,59 +111,72 @@ export default async function AuctionsPage() {
             </h1>
 
             <div className="grid md:grid-cols-2 gap-8 mb-24">
-              {endingSoon.map((auction) => (
-                <div
-                  key={auction?.id}
-                  className="bg-white border rounded-2xl overflow-hidden"
-                >
-                  <AuctionImage src={getPrimaryImage(auction)} />
+              {endingSoon.map((auction) => {
+                const bidCount = auction?.bidCount || 0;
+                const watching = getWatchingCount(bidCount);
 
-                  <div className="p-6">
+                return (
+                  <div
+                    key={auction?.id}
+                    className="bg-white border rounded-2xl overflow-hidden"
+                  >
+                    <AuctionImage src={getPrimaryImage(auction)} />
 
-                    <h2 className="text-lg font-semibold">
-                      {auction?.title ?? "Untitled Auction"}
-                    </h2>
+                    <div className="p-6">
 
-                    <p className="mt-2 text-sm text-gray-600">
-                      {auction?.addressLine ?? ""}
-                      <br />
-                      {auction?.cityStateZip ?? ""}
-                    </p>
+                      <h2 className="text-lg font-semibold">
+                        {auction?.title ?? "Untitled Auction"}
+                      </h2>
 
-                    <p className="mt-3 text-sm text-gray-600">
-                      Ends in {formatTimeRemaining(auction?.endAt)}
-                    </p>
-
-                    {/* STARTING BID + ARV */}
-
-                    <div className="mt-4 text-sm space-y-1">
-
-                      <p>
-                        Starting Bid:{" "}
-                        <span className="font-semibold">
-                          {formatCurrency(auction?.startingBid)}
-                        </span>
+                      <p className="mt-2 text-sm text-gray-600">
+                        {auction?.addressLine ?? ""}
+                        <br />
+                        {auction?.cityStateZip ?? ""}
                       </p>
 
-                      <p>
-                        Seller ARV:{" "}
-                        <span className="font-semibold">
-                          {formatCurrency(auction?.arv)}
-                        </span>
+                      <p className="mt-3 text-sm text-gray-600 font-medium">
+                        ⏳ Ends in {formatTimeRemaining(auction?.endAt)}
                       </p>
+
+                      {/* SOCIAL PROOF */}
+                      <div className="mt-3 text-xs space-y-1">
+                        <p className="text-orange-600 font-medium">
+                          🔥 {watching} watching
+                        </p>
+                        <p className="text-gray-600">
+                          ⚡ {bidCount} bids
+                        </p>
+                      </div>
+
+                      <div className="mt-4 text-sm space-y-1">
+
+                        <p>
+                          Starting Bid:{" "}
+                          <span className="font-semibold">
+                            {formatCurrency(auction?.startingBid)}
+                          </span>
+                        </p>
+
+                        <p>
+                          Seller ARV:{" "}
+                          <span className="font-semibold">
+                            {formatCurrency(auction?.arv)}
+                          </span>
+                        </p>
+
+                      </div>
+
+                      <Link
+                        href={`/auctions/${auction?.slug}`}
+                        className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
+                      >
+                        View Live Auction
+                      </Link>
 
                     </div>
-
-                    <Link
-                      href={`/auctions/${auction?.slug}`}
-                      className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
-                    >
-                      View Live Auction
-                    </Link>
-
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
@@ -169,59 +188,72 @@ export default async function AuctionsPage() {
         </h2>
 
         <div className="grid md:grid-cols-2 gap-8 mb-24">
-          {remainingLive.map((auction) => (
-            <div
-              key={auction?.id}
-              className="bg-white border rounded-2xl overflow-hidden"
-            >
-              <AuctionImage src={getPrimaryImage(auction)} />
+          {remainingLive.map((auction) => {
+            const bidCount = auction?.bidCount || 0;
+            const watching = getWatchingCount(bidCount);
 
-              <div className="p-6">
+            return (
+              <div
+                key={auction?.id}
+                className="bg-white border rounded-2xl overflow-hidden"
+              >
+                <AuctionImage src={getPrimaryImage(auction)} />
 
-                <h2 className="text-lg font-semibold">
-                  {auction?.title ?? "Untitled Auction"}
-                </h2>
+                <div className="p-6">
 
-                <p className="mt-2 text-sm text-gray-600">
-                  {auction?.addressLine ?? ""}
-                  <br />
-                  {auction?.cityStateZip ?? ""}
-                </p>
+                  <h2 className="text-lg font-semibold">
+                    {auction?.title ?? "Untitled Auction"}
+                  </h2>
 
-                <p className="mt-3 text-sm text-gray-600">
-                  Ends in {formatTimeRemaining(auction?.endAt)}
-                </p>
-
-                {/* STARTING BID + ARV */}
-
-                <div className="mt-4 text-sm space-y-1">
-
-                  <p>
-                    Starting Bid:{" "}
-                    <span className="font-semibold">
-                      {formatCurrency(auction?.startingBid)}
-                    </span>
+                  <p className="mt-2 text-sm text-gray-600">
+                    {auction?.addressLine ?? ""}
+                    <br />
+                    {auction?.cityStateZip ?? ""}
                   </p>
 
-                  <p>
-                    Seller ARV:{" "}
-                    <span className="font-semibold">
-                      {formatCurrency(auction?.arv)}
-                    </span>
+                  <p className="mt-3 text-sm text-gray-600 font-medium">
+                    ⏳ Ends in {formatTimeRemaining(auction?.endAt)}
                   </p>
+
+                  {/* SOCIAL PROOF */}
+                  <div className="mt-3 text-xs space-y-1">
+                    <p className="text-orange-600 font-medium">
+                      🔥 {watching} watching
+                    </p>
+                    <p className="text-gray-600">
+                      ⚡ {bidCount} bids
+                    </p>
+                  </div>
+
+                  <div className="mt-4 text-sm space-y-1">
+
+                    <p>
+                      Starting Bid:{" "}
+                      <span className="font-semibold">
+                        {formatCurrency(auction?.startingBid)}
+                      </span>
+                    </p>
+
+                    <p>
+                      Seller ARV:{" "}
+                      <span className="font-semibold">
+                        {formatCurrency(auction?.arv)}
+                      </span>
+                    </p>
+
+                  </div>
+
+                  <Link
+                    href={`/auctions/${auction?.slug}`}
+                    className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
+                  >
+                    View Live Auction
+                  </Link>
 
                 </div>
-
-                <Link
-                  href={`/auctions/${auction?.slug}`}
-                  className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
-                >
-                  View Live Auction
-                </Link>
-
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* PAST AUCTIONS */}
