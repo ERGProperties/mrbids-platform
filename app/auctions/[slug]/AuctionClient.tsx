@@ -5,6 +5,11 @@ import BidForm from "./BidForm";
 import { useSession } from "next-auth/react";
 import AuctionCountdown from "@/components/auction/AuctionCountdown";
 
+/* 🔥 WATCHING COUNT */
+function getWatchingCount(bidCount: number) {
+  return Math.max(3, Math.min(8, bidCount + 2));
+}
+
 export default function AuctionClient({
   auction,
   minimumBid,
@@ -37,6 +42,9 @@ export default function AuctionClient({
   const isEndingSoon =
     auctionEnd &&
     new Date(auctionEnd).getTime() - Date.now() < 1000 * 60 * 10;
+
+  /* 🔥 WATCHING */
+  const watchingCount = getWatchingCount(liveAuction?.bidCount || 0);
 
   /* POLLING */
   useEffect(() => {
@@ -183,22 +191,6 @@ export default function AuctionClient({
               )}
             </div>
 
-            {/* THUMBNAILS */}
-            <div className="flex gap-2 mt-3 overflow-x-auto">
-              {imageList.map((img: string, i: number) => (
-                <img
-                  key={i}
-                  src={img}
-                  onClick={() => setSelectedIndex(i)}
-                  className={`h-20 w-28 object-cover rounded-lg cursor-pointer border-2 ${
-                    i === selectedIndex
-                      ? "border-black"
-                      : "border-transparent"
-                  }`}
-                />
-              ))}
-            </div>
-
             {/* DETAILS */}
             <div className="mt-6 bg-white border rounded-2xl p-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -215,7 +207,7 @@ export default function AuctionClient({
 
           </div>
 
-          {/* RIGHT */}
+          {/* RIGHT (🔥 CONVERSION PANEL) */}
           <aside className="lg:sticky lg:top-24">
             <div className="bg-white border rounded-2xl p-6">
 
@@ -227,19 +219,28 @@ export default function AuctionClient({
                 ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              {liveAuction?.bidCount > 0 ? (
-                <p className="text-sm text-gray-500 mt-2">
-                  {liveAuction.bidCount} bids placed
+              {/* 🔥 SOCIAL PROOF STACK */}
+              <div className="mt-3 space-y-1 text-sm">
+
+                <p className="text-orange-600 font-medium">
+                  🔥 {watchingCount} people watching
                 </p>
-              ) : (
-                <p className="text-sm text-gray-500 mt-2">
-                  Active auction — place your bid
+
+                <p className="text-gray-600">
+                  ⚡ {liveAuction?.bidCount || 0} bids placed
                 </p>
-              )}
+
+                {liveAuction?.bidCount > 0 && (
+                  <p className="text-green-600 text-xs">
+                    ⚡ A bid was placed recently
+                  </p>
+                )}
+
+              </div>
 
               {isEndingSoon && (
-                <p className="text-red-600 mt-2">
-                  ⚠️ Ending soon — don’t miss this deal
+                <p className="text-red-600 mt-3 font-medium">
+                  ⏳ Ending soon — don’t miss this
                 </p>
               )}
 
@@ -272,19 +273,6 @@ export default function AuctionClient({
           </aside>
 
         </div>
-
-        {/* ZOOM MODAL */}
-        {zoomOpen && selectedImage && (
-          <div
-            className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"
-            onClick={() => setZoomOpen(false)}
-          >
-            <img
-              src={selectedImage}
-              className="max-h-[90%] max-w-[90%]"
-            />
-          </div>
-        )}
 
       </div>
     </main>

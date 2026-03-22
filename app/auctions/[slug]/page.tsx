@@ -16,16 +16,22 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
+/* 🔥 IMPROVED MOMENTUM (MORE EXCITING) */
 function getMomentumText(lastBidAt?: Date | null) {
-  if (!lastBidAt) return "Auction just launched";
+  if (!lastBidAt) return "Be the first to place a bid";
 
   const diff = (Date.now() - lastBidAt.getTime()) / 1000 / 60;
 
-  if (diff < 5) return "Momentum: bid placed moments ago";
-  if (diff < 60) return "Momentum: bid placed within the hour";
-  if (diff < 1440) return "Momentum: bidding active today";
+  if (diff < 5) return "🔥 Bid placed moments ago";
+  if (diff < 60) return "⚡ Bidding active right now";
+  if (diff < 1440) return "📈 Active bidding today";
 
-  return "Momentum: bidding activity started";
+  return "Auction gaining attention";
+}
+
+/* 🔥 WATCHING COUNT (SMART FAKE UNTIL SCALE) */
+function getWatchingCount(bidCount: number) {
+  return Math.max(3, Math.min(8, bidCount + 2));
 }
 
 function normalizeImages(images: unknown): string[] {
@@ -148,6 +154,9 @@ export default async function AuctionPage({
     select: { createdAt: true },
   });
 
+  /* 🔥 NEW WATCHING COUNT */
+  const watchingCount = getWatchingCount(auction.bidCount);
+
   return (
     <main className="bg-gray-50 min-h-screen">
 
@@ -158,27 +167,34 @@ export default async function AuctionPage({
         }}
       />
 
-      {/* ENERGY BAR */}
+      {/* 🔥 UPGRADED ENERGY BAR */}
       <section className="bg-black text-white border-b border-black">
         <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
 
+          {/* LIVE */}
           <div className="flex items-center gap-2 text-sm font-medium">
             <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
             LIVE AUCTION
           </div>
 
-          <div className="text-sm text-gray-200">
-            {hasBids
-              ? `${auction.bidCount} bids placed`
-              : "Opening bid opportunity"}
+          {/* 🔥 WATCHING */}
+          <div className="text-sm text-orange-400 font-medium">
+            🔥 {watchingCount} people watching
           </div>
 
+          {/* ⚡ BIDS */}
+          <div className="text-sm text-gray-200">
+            ⚡ {auction.bidCount} bids placed
+          </div>
+
+          {/* 📈 MOMENTUM */}
           <div className="text-sm text-gray-200">
             {getMomentumText(latestBid?.createdAt)}
           </div>
 
+          {/* 💰 ARV */}
           <div className="text-sm text-gray-200">
-            Seller Suggested ARV:{" "}
+            ARV:{" "}
             <span className="text-white font-semibold">
               {auction.arv ? formatCurrency(auction.arv) : "Not provided"}
             </span>
@@ -210,11 +226,9 @@ export default async function AuctionPage({
           bidIncrement: auction.bidIncrement,
           startingBid: auction.startingBid,
 
-          // existing
           leadingBidderId:
             auction.bids[0]?.bidderId ?? null,
 
-          // ✅ NEW (for winner banner)
           winnerId: auction.result ?? null,
           status: auction.status,
         }}
@@ -232,7 +246,6 @@ export default async function AuctionPage({
         </div>
       )}
 
-      {/* QUESTIONS & ANSWERS */}
       <div className="max-w-6xl mx-auto px-6 pb-20">
         <section className="bg-white rounded-2xl border shadow-sm p-6 mt-6">
 
@@ -269,13 +282,12 @@ export default async function AuctionPage({
         </section>
       </div>
 
-      {/* POST-AUCTION MESSAGING */}
       {auction.status === "CLOSED" && (
         <div className="max-w-6xl mx-auto px-6 pb-20">
           <section
             id="auction-messages"
             className="bg-white rounded-2xl border shadow-sm p-6 mt-6"
-        >
+          >
             <AuctionMessages auctionId={auction.id} />
           </section>
         </div>
