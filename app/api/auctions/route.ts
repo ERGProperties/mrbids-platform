@@ -27,15 +27,13 @@ export async function GET() {
     bidIncrement: a.bidIncrement,
     arv: a.arv,
 
-    // ⭐ SAFE NULL HANDLING
-    startAt: a.startAt
-      ? a.startAt.toISOString()
-      : null,
+    // ✅ ADD THESE (FIXES IMAGES)
+    images: a.images,
+    coverImage: a.coverImage,
 
-    endAt: a.endAt
-      ? a.endAt.toISOString()
-      : null,
-
+    // ✅ KEEP THESE
+    startAt: a.startAt ? a.startAt.toISOString() : null,
+    endAt: a.endAt ? a.endAt.toISOString() : null,
     createdAt: a.createdAt.toISOString(),
 
     highestBid:
@@ -43,6 +41,9 @@ export async function GET() {
       a.finalPrice ??
       a.startingBid ??
       0,
+
+    // ✅ ADD THIS (FIXES SOCIAL PROOF)
+    bidCount: a.bidCount ?? 0,
   }));
 
   return NextResponse.json(data);

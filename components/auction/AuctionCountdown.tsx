@@ -56,19 +56,26 @@ export default function AuctionCountdown({
     return () => clearInterval(interval);
   }, [end, mounted]);
 
-  if (!mounted) {
-    return <span>—</span>;
-  }
+  if (!mounted) return <span>—</span>;
 
   if (time.expired) {
-    return <span>Auction ended</span>;
+    return <span className="text-red-600">Auction ended</span>;
+  }
+
+  // 🔥 SMART DISPLAY
+  let display = "";
+
+  if (time.days > 0) {
+    display = `${time.days}d ${time.hours}h`;
+  } else if (time.hours > 0) {
+    display = `${time.hours}h ${time.minutes}m`;
+  } else {
+    display = `${Math.max(1, time.minutes)}m`;
   }
 
   return (
-    <div className="flex items-center gap-1 text-sm font-medium text-gray-900">
-      <span>{time.days}d</span>
-      <span>{time.hours}h</span>
-      <span>{time.minutes}m</span>
+    <div className="text-sm font-semibold text-gray-900">
+      ⏳ {display}
     </div>
   );
 }

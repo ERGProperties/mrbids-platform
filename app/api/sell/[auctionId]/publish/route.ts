@@ -30,7 +30,6 @@ export async function POST(
   request: Request,
   { params }: { params: { auctionId: string } }
 ) {
-
   const auction = await prisma.auction.findUnique({
     where: { id: params.auctionId },
   });
@@ -54,6 +53,7 @@ export async function POST(
     !auction.propertyType ||
     !auction.description ||
     !auction.durationDays ||
+    auction.durationDays <= 0 || // 🔥 FIX
     !Array.isArray(auction.images) ||
     auction.images.length === 0
   ) {
@@ -109,15 +109,22 @@ export async function POST(
   );
 
   // =========================
-  // Publish auction
+  // 🔥 FINAL FIX: SAFE DURATION
   // =========================
+  const durationDays =
+    auction.durationDays && auction.durationDays > 0
+      ? auction.durationDays
+      : 7;
+
   const startAt = new Date();
 
-  const endAt = new Date();
-  endAt.setDate(
-    endAt.getDate() + (auction.durationDays || 7)
+  const endAt = new Date(
+    Date.now() + durationDays * 24 * 60 * 60 * 1000
   );
 
+  // =========================
+  // Publish auction
+  // =========================
   const updated = await prisma.auction.update({
     where: { id: auction.id },
     data: {

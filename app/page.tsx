@@ -17,8 +17,7 @@ function getPrimaryImage(auction: any) {
 
   const first = auction.images.find(
     (img: unknown) =>
-      typeof img === "string" &&
-      img.startsWith("http")
+      typeof img === "string" && img.startsWith("http")
   );
 
   return first || null;
@@ -55,6 +54,37 @@ function formatCurrency(value?: number | null) {
   }).format(value);
 }
 
+/* 🔥 FINAL STABLE COUNTDOWN */
+function formatTimeRemaining(endAt?: Date | string | null) {
+  if (!endAt) return "—";
+
+  const end = new Date(endAt);
+  if (isNaN(end.getTime())) return "—";
+
+  const diffMs = end.getTime() - Date.now();
+
+  if (diffMs <= 0) return "Ending Soon"; // 👈 softer than "Ended"
+
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+
+  // 🔥 KEY FIX: always guarantee at least 1 minute
+  if (totalMinutes <= 0) return "1m";
+
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+
+  if (days > 0) {
+    return `${days}d ${hours}h`;
+  }
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  return `${minutes}m`;
+}
+
 function getTimeStatus(endAt?: Date | string | null) {
   if (!endAt) return "LIVE NOW";
 
@@ -63,27 +93,10 @@ function getTimeStatus(endAt?: Date | string | null) {
 
   const diff = end.getTime() - Date.now();
 
-  if (diff <= 0) return "ENDED";
+  if (diff <= 0) return "ENDING SOON";
   if (diff < 1000 * 60 * 60 * 24) return "ENDING SOON";
 
   return "LIVE NOW";
-}
-
-function formatTimeRemaining(endAt?: Date | string | null) {
-  if (!endAt) return "—";
-
-  const end = new Date(endAt);
-  if (isNaN(end.getTime())) return "—";
-
-  const diff = end.getTime() - Date.now();
-
-  if (diff <= 0) return "Ended";
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-
-  return `${days}d ${hours}h ${minutes}m`;
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -115,8 +128,6 @@ export default async function HomePage() {
 
   const live = auctions.filter((a) => a?.status === "LIVE");
 
-  /* SORT BY SOONEST ENDING */
-
   const sortedLive = [...live].sort((a, b) => {
     const aEnd = new Date(a?.endAt || 0).getTime();
     const bEnd = new Date(b?.endAt || 0).getTime();
@@ -129,7 +140,6 @@ export default async function HomePage() {
     <main className="bg-white">
 
       {/* HERO */}
-
       <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
         <div className="max-w-3xl">
 
@@ -160,19 +170,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* MARKETPLACE STRIP */}
-
-      <section className="border-y bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap gap-8 text-sm text-gray-700">
-          <span>● Multiple auctions live now</span>
-          <span>● Bidding activity in progress</span>
-          <span>● Verified buyers participating</span>
-          <span>● New listings added weekly</span>
-        </div>
-      </section>
-
       {/* FEATURED */}
-
       {featured && (
         <section className="border-y bg-gray-50">
           <div className="max-w-7xl mx-auto px-6 py-24">
@@ -202,8 +200,9 @@ export default async function HomePage() {
                   {featured?.cityStateZip}
                 </p>
 
-                <p className="mt-5 text-sm text-gray-600">
-                  Ends in {formatTimeRemaining(featured?.endAt)}
+                {/* 🔥 FINAL TIMER */}
+                <p className="mt-5 text-sm font-semibold text-gray-900">
+                  ⏳ {formatTimeRemaining(featured?.endAt)}
                 </p>
 
                 <div className="mt-6 text-sm text-gray-700 space-y-1">
@@ -239,7 +238,6 @@ export default async function HomePage() {
       )}
 
       {/* LIVE AUCTIONS */}
-
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-24">
 
@@ -277,8 +275,9 @@ export default async function HomePage() {
                     {auction?.cityStateZip}
                   </p>
 
-                  <p className="mt-3 text-sm text-gray-600">
-                    Ends in {formatTimeRemaining(auction?.endAt)}
+                  {/* 🔥 FINAL TIMER */}
+                  <p className="mt-3 text-sm font-semibold text-gray-900">
+                    ⏳ {formatTimeRemaining(auction?.endAt)}
                   </p>
 
                   <div className="mt-4 text-sm space-y-1">

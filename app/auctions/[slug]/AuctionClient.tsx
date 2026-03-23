@@ -36,8 +36,8 @@ export default function AuctionClient({
   const selectedImage =
     imageList.length > 0 ? imageList[selectedIndex] : null;
 
-  const auctionEnd =
-    liveAuction?.endAt || liveAuction?.endsAt;
+  // ✅ FIX: ONLY USE endAt (no more endsAt)
+  const auctionEnd = liveAuction?.endAt;
 
   const isEndingSoon =
     auctionEnd &&
@@ -77,8 +77,9 @@ export default function AuctionClient({
               data.highestBid ?? prev.highestBid,
             bidCount:
               data.bidCount ?? prev.bidCount,
-            endAt:
-              data.endsAt ?? prev.endAt,
+
+            // ✅ FIX: correct field
+            endAt: data.endAt ?? prev.endAt,
           };
         });
       } catch (err) {
@@ -207,7 +208,7 @@ export default function AuctionClient({
 
           </div>
 
-          {/* RIGHT (🔥 CONVERSION PANEL) */}
+          {/* RIGHT */}
           <aside className="lg:sticky lg:top-24">
             <div className="bg-white border rounded-2xl p-6">
 
@@ -219,7 +220,7 @@ export default function AuctionClient({
                 ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              {/* 🔥 SOCIAL PROOF STACK */}
+              {/* SOCIAL PROOF */}
               <div className="mt-3 space-y-1 text-sm">
 
                 <p className="text-orange-600 font-medium">

@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { getAllAuctions } from "@/lib/repositories/auctionRepository";
+import { prisma } from "@/lib/db";
 import { autoCloseExpiredAuctions } from "@/lib/auctionLifecycle";
 import { getPrimaryImage } from "@/lib/getPrimaryImage";
 
@@ -17,18 +17,22 @@ function formatCurrency(value?: number | null) {
   }).format(value);
 }
 
-/* 🔥 UPDATED: NOW INCLUDES MINUTES */
+/* 🔥 FINAL STABLE COUNTDOWN */
 function formatTimeRemaining(endAt?: Date | string | null) {
   if (!endAt) return "—";
 
   const end = new Date(endAt);
   if (isNaN(end.getTime())) return "—";
 
-  const diff = end.getTime() - Date.now();
+  const diffMs = end.getTime() - Date.now();
 
-  if (diff <= 0) return "Ended";
+  // 🔥 KEY: don't show "Ended" aggressively
+  if (diffMs <= 0) return "Ending Soon";
 
-  const totalMinutes = Math.floor(diff / (1000 * 60));
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+
+  // 🔥 GUARANTEE at least 1 minute display
+  if (totalMinutes <= 0) return "1m";
 
   const days = Math.floor(totalMinutes / (60 * 24));
   const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
@@ -50,12 +54,11 @@ function getWatchingCount(bidCount: number) {
 function AuctionImage({ src }: { src: string | null }) {
   return (
     <div className="h-56 w-full bg-gray-100 overflow-hidden">
-      {typeof src === "string" && src.length > 0 ? (
+      {src ? (
         <img
           src={src}
           alt=""
           className="h-full w-full object-cover"
-          loading="lazy"
         />
       ) : (
         <div className="h-full w-full flex items-center justify-center text-sm text-gray-400">
@@ -74,8 +77,9 @@ export default async function AuctionsPage() {
   let auctions: any[] = [];
 
   try {
-    const result = await getAllAuctions();
-    auctions = Array.isArray(result) ? result : [];
+    auctions = await prisma.auction.findMany({
+      orderBy: { endAt: "asc" },
+    });
   } catch (err) {
     console.error("Failed loading auctions:", err);
   }
@@ -103,7 +107,6 @@ export default async function AuctionsPage() {
       <div className="max-w-6xl mx-auto px-6 py-32">
 
         {/* ENDING SOON */}
-
         {endingSoon.length > 0 && (
           <>
             <h1 className="text-3xl font-semibold mb-10">
@@ -123,7 +126,6 @@ export default async function AuctionsPage() {
                     <AuctionImage src={getPrimaryImage(auction)} />
 
                     <div className="p-6">
-
                       <h2 className="text-lg font-semibold">
                         {auction?.title ?? "Untitled Auction"}
                       </h2>
@@ -134,11 +136,10 @@ export default async function AuctionsPage() {
                         {auction?.cityStateZip ?? ""}
                       </p>
 
-                      <p className="mt-3 text-sm text-gray-600 font-medium">
-                        ⏳ Ends in {formatTimeRemaining(auction?.endAt)}
+                      <p className="mt-3 text-sm font-semibold text-gray-900">
+                        ⏳ {formatTimeRemaining(auction?.endAt)}
                       </p>
 
-                      {/* SOCIAL PROOF */}
                       <div className="mt-3 text-xs space-y-1">
                         <p className="text-orange-600 font-medium">
                           🔥 {watching} watching
@@ -149,7 +150,6 @@ export default async function AuctionsPage() {
                       </div>
 
                       <div className="mt-4 text-sm space-y-1">
-
                         <p>
                           Starting Bid:{" "}
                           <span className="font-semibold">
@@ -163,7 +163,6 @@ export default async function AuctionsPage() {
                             {formatCurrency(auction?.arv)}
                           </span>
                         </p>
-
                       </div>
 
                       <Link
@@ -172,7 +171,6 @@ export default async function AuctionsPage() {
                       >
                         View Live Auction
                       </Link>
-
                     </div>
                   </div>
                 );
@@ -182,7 +180,6 @@ export default async function AuctionsPage() {
         )}
 
         {/* LIVE AUCTIONS */}
-
         <h2 className="text-3xl font-semibold mb-10">
           Live Auctions
         </h2>
@@ -200,7 +197,6 @@ export default async function AuctionsPage() {
                 <AuctionImage src={getPrimaryImage(auction)} />
 
                 <div className="p-6">
-
                   <h2 className="text-lg font-semibold">
                     {auction?.title ?? "Untitled Auction"}
                   </h2>
@@ -211,11 +207,10 @@ export default async function AuctionsPage() {
                     {auction?.cityStateZip ?? ""}
                   </p>
 
-                  <p className="mt-3 text-sm text-gray-600 font-medium">
-                    ⏳ Ends in {formatTimeRemaining(auction?.endAt)}
+                  <p className="mt-3 text-sm font-semibold text-gray-900">
+                    ⏳ {formatTimeRemaining(auction?.endAt)}
                   </p>
 
-                  {/* SOCIAL PROOF */}
                   <div className="mt-3 text-xs space-y-1">
                     <p className="text-orange-600 font-medium">
                       🔥 {watching} watching
@@ -226,7 +221,6 @@ export default async function AuctionsPage() {
                   </div>
 
                   <div className="mt-4 text-sm space-y-1">
-
                     <p>
                       Starting Bid:{" "}
                       <span className="font-semibold">
@@ -240,7 +234,6 @@ export default async function AuctionsPage() {
                         {formatCurrency(auction?.arv)}
                       </span>
                     </p>
-
                   </div>
 
                   <Link
@@ -249,7 +242,6 @@ export default async function AuctionsPage() {
                   >
                     View Live Auction
                   </Link>
-
                 </div>
               </div>
             );
@@ -257,7 +249,6 @@ export default async function AuctionsPage() {
         </div>
 
         {/* PAST AUCTIONS */}
-
         <h2 className="text-3xl font-semibold mb-10">
           Past Auctions
         </h2>
@@ -271,7 +262,6 @@ export default async function AuctionsPage() {
               <AuctionImage src={getPrimaryImage(auction)} />
 
               <div className="p-6">
-
                 <h2 className="text-lg font-semibold">
                   {auction?.title ?? "Untitled Auction"}
                 </h2>
@@ -292,7 +282,6 @@ export default async function AuctionsPage() {
                 >
                   View Auction Results
                 </Link>
-
               </div>
             </div>
           ))}
