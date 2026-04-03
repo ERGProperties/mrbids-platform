@@ -26,12 +26,10 @@ function formatTimeRemaining(endAt?: Date | string | null) {
 
   const diffMs = end.getTime() - Date.now();
 
-  // 🔥 KEY: don't show "Ended" aggressively
   if (diffMs <= 0) return "Ending Soon";
 
   const totalMinutes = Math.floor(diffMs / (1000 * 60));
 
-  // 🔥 GUARANTEE at least 1 minute display
   if (totalMinutes <= 0) return "1m";
 
   const days = Math.floor(totalMinutes / (60 * 24));
@@ -102,6 +100,13 @@ export default async function AuctionsPage() {
     (auction) => !endingSoon.some((a) => a.id === auction.id)
   );
 
+  /* 🔥 FIX: SORT PAST AUCTIONS (NEWEST FIRST) */
+  const sortedPast = [...past].sort((a, b) => {
+    const aEnd = new Date(a?.endAt || 0).getTime();
+    const bEnd = new Date(b?.endAt || 0).getTime();
+    return bEnd - aEnd; // 🔥 KEY CHANGE
+  });
+
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-32">
@@ -119,10 +124,7 @@ export default async function AuctionsPage() {
                 const watching = getWatchingCount(bidCount);
 
                 return (
-                  <div
-                    key={auction?.id}
-                    className="bg-white border rounded-2xl overflow-hidden"
-                  >
+                  <div key={auction?.id} className="bg-white border rounded-2xl overflow-hidden">
                     <AuctionImage src={getPrimaryImage(auction)} />
 
                     <div className="p-6">
@@ -165,10 +167,7 @@ export default async function AuctionsPage() {
                         </p>
                       </div>
 
-                      <Link
-                        href={`/auctions/${auction?.slug}`}
-                        className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
-                      >
+                      <Link href={`/auctions/${auction?.slug}`} className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm">
                         View Live Auction
                       </Link>
                     </div>
@@ -190,10 +189,7 @@ export default async function AuctionsPage() {
             const watching = getWatchingCount(bidCount);
 
             return (
-              <div
-                key={auction?.id}
-                className="bg-white border rounded-2xl overflow-hidden"
-              >
+              <div key={auction?.id} className="bg-white border rounded-2xl overflow-hidden">
                 <AuctionImage src={getPrimaryImage(auction)} />
 
                 <div className="p-6">
@@ -236,10 +232,7 @@ export default async function AuctionsPage() {
                     </p>
                   </div>
 
-                  <Link
-                    href={`/auctions/${auction?.slug}`}
-                    className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
-                  >
+                  <Link href={`/auctions/${auction?.slug}`} className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm">
                     View Live Auction
                   </Link>
                 </div>
@@ -254,11 +247,8 @@ export default async function AuctionsPage() {
         </h2>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {past.map((auction) => (
-            <div
-              key={auction?.id}
-              className="bg-white border rounded-2xl overflow-hidden"
-            >
+          {sortedPast.map((auction) => (
+            <div key={auction?.id} className="bg-white border rounded-2xl overflow-hidden">
               <AuctionImage src={getPrimaryImage(auction)} />
 
               <div className="p-6">
@@ -276,10 +266,7 @@ export default async function AuctionsPage() {
                   Ended
                 </p>
 
-                <Link
-                  href={`/auctions/${auction?.slug}/result`}
-                  className="inline-block mt-6 px-6 py-2 bg-gray-900 text-white rounded-full text-sm"
-                >
+                <Link href={`/auctions/${auction?.slug}/result`} className="inline-block mt-6 px-6 py-2 bg-gray-900 text-white rounded-full text-sm">
                   View Auction Results
                 </Link>
               </div>
