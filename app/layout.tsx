@@ -75,14 +75,6 @@ export default function RootLayout({
                 >
                   Sell a Property
                 </Link>
-
-                {/* 🔥 NEW: MESSAGES */}
-                <Link
-                  href="/account/messages"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900 transition"
-                >
-                  Messages
-                </Link>
               </nav>
 
             </div>
