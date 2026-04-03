@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import BidForm from "./BidForm";
 import { useSession } from "next-auth/react";
 import AuctionCountdown from "@/components/auction/AuctionCountdown";
-import Link from "next/link"; // ✅ ADDED
+import Link from "next/link";
 
 function getWatchingCount(bidCount: number) {
   return Math.max(3, Math.min(8, bidCount + 2));
@@ -138,7 +138,6 @@ export default function AuctionClient({
             {liveAuction?.addressLine} {liveAuction?.cityStateZip}
           </p>
 
-          {/* ✅ NEW: SELLER LINK */}
           {liveAuction?.seller && (
             <p className="text-sm text-gray-500 mt-2">
               Listed by{" "}
@@ -240,7 +239,7 @@ export default function AuctionClient({
                     }
                     className="w-full bg-black text-white py-3 rounded-xl"
                   >
-                    Sign In to Bid
+                    Create Profile / Sign In to Bid
                   </button>
                 )}
               </div>
