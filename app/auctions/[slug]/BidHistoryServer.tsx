@@ -12,7 +12,15 @@ export default async function BidHistoryServer({
     where: { auctionId },
     orderBy: { createdAt: "desc" },
     include: {
-      bidder: true, // ✅ ADD THIS
+      bidder: {
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true,
+          image: true,
+          isVerifiedBidder: true,
+        },
+      },
     },
   });
 
@@ -25,26 +33,49 @@ export default async function BidHistoryServer({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {bids.map((bid) => (
         <div
           key={bid.id}
-          className="flex justify-between items-center border-b pb-2"
+          className="flex justify-between items-center border-b pb-3"
         >
-          {/* LEFT: BIDDER + AMOUNT */}
-          <div className="flex items-center gap-2 text-sm">
-            <Link
-              href={`/user/${bid.bidderId}`}
-              className="font-medium underline hover:text-black"
-            >
-              {bid.bidder?.name || "Anonymous"}
-            </Link>
+          {/* LEFT: AVATAR + NAME + BADGE + AMOUNT */}
+          <div className="flex items-center gap-3">
 
-            <span className="text-gray-400">•</span>
+            <img
+              src={
+                bid.bidder?.avatarUrl ||
+                bid.bidder?.image ||
+                "/default-avatar.png"
+              }
+              className="w-8 h-8 rounded-full object-cover border"
+            />
 
-            <span>
-              ${bid.amount.toLocaleString()}
-            </span>
+            <div className="text-sm">
+
+              <div className="flex items-center gap-2">
+
+                <Link
+                  href={`/user/${bid.bidder?.id}`}
+                  className="font-medium hover:underline"
+                >
+                  {bid.bidder?.name || "Anonymous"}
+                </Link>
+
+                {bid.bidder?.isVerifiedBidder && (
+                  <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                    Verified
+                  </span>
+                )}
+
+              </div>
+
+              <div className="text-gray-600">
+                ${bid.amount.toLocaleString()}
+              </div>
+
+            </div>
+
           </div>
 
           {/* RIGHT: TIME */}
@@ -55,9 +86,9 @@ export default async function BidHistoryServer({
               hour: "numeric",
               minute: "2-digit",
               timeZone: "America/Chicago",
-              timeZoneName: "short",
             })}
           </span>
+
         </div>
       ))}
     </div>
