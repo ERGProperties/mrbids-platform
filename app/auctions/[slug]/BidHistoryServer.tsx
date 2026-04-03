@@ -32,12 +32,19 @@ export default async function BidHistoryServer({
     );
   }
 
+  // 🔥 Identify top bid (latest highest)
+  const topBidId = bids[0]?.id;
+
   return (
     <div className="space-y-3">
       {bids.map((bid) => (
         <div
           key={bid.id}
-          className="flex justify-between items-center border-b pb-3"
+          className={`flex justify-between items-center border-b pb-3 rounded-lg px-2 ${
+            bid.id === topBidId
+              ? "bg-green-50 border-green-200"
+              : ""
+          }`}
         >
           {/* LEFT: AVATAR + NAME + BADGE + AMOUNT */}
           <div className="flex items-center gap-3">
@@ -62,6 +69,14 @@ export default async function BidHistoryServer({
                   {bid.bidder?.name || "Anonymous"}
                 </Link>
 
+                {/* 🏷️ Winning badge */}
+                {bid.id === topBidId && (
+                  <span className="text-[10px] bg-green-600 text-white px-2 py-0.5 rounded-full">
+                    Winning
+                  </span>
+                )}
+
+                {/* ✅ Verified badge */}
                 {bid.bidder?.isVerifiedBidder && (
                   <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
                     Verified
