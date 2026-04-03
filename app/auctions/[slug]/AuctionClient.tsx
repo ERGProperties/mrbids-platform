@@ -22,7 +22,7 @@ export default function AuctionClient({
   const [liveAuction, setLiveAuction] = useState<any>(auction);
   const [flashBid, setFlashBid] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [lastBidderName, setLastBidderName] = useState("Someone"); // 🔥 NEW
+  const [lastBidderName, setLastBidderName] = useState("Someone");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [zoomOpen, setZoomOpen] = useState(false);
 
@@ -207,7 +207,7 @@ export default function AuctionClient({
           <aside className="lg:sticky lg:top-24">
             <div className="bg-white border rounded-2xl p-6">
 
-              {/* 🔥 NAMED LIVE ALERT */}
+              {/* 🔥 ALERT */}
               {showAlert && (
                 <div className="mb-3 text-sm font-medium text-orange-600">
                   🔥 {lastBidderName} just placed a bid
@@ -259,6 +259,7 @@ export default function AuctionClient({
                 )}
               </div>
 
+              {/* BID SECTION */}
               <div className="mt-6">
                 {session ? (
                   <BidForm
@@ -274,6 +275,37 @@ export default function AuctionClient({
                     className="w-full bg-black text-white py-3 rounded-xl"
                   >
                     Create Profile / Sign In to Bid
+                  </button>
+                )}
+              </div>
+
+              {/* 🔥 CONTACT CTA */}
+              <div className="mt-4">
+                {session ? (
+                  <button
+                    onClick={() => {
+                      document
+                        .getElementById("auction-messages")
+                        ?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="w-full border border-black text-black py-3 rounded-xl font-medium hover:bg-gray-100 transition"
+                  >
+                    {liveAuction.status === "CLOSED"
+                      ? session.user.id === liveAuction.winnerId
+                        ? "Contact Seller"
+                        : session.user.id === liveAuction.sellerId
+                        ? "Contact Buyer"
+                        : "View Conversation"
+                      : "Contact Seller"}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() =>
+                      (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction.slug}`)
+                    }
+                    className="w-full border border-black text-black py-3 rounded-xl font-medium hover:bg-gray-100 transition"
+                  >
+                    Create Profile / Sign In to Contact
                   </button>
                 )}
               </div>
