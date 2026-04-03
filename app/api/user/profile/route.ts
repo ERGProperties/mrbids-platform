@@ -9,13 +9,14 @@ export async function POST(req: Request) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const { name, bio } = await req.json();
+  const { name, bio, avatarUrl } = await req.json();
 
   await prisma.user.update({
     where: { email: session.user.email },
     data: {
       name,
       bio,
+      avatarUrl,
     },
   });
 

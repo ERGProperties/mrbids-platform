@@ -26,20 +26,23 @@ export default async function UserProfile({ params }: { params: { id: string } }
     <div className="max-w-5xl mx-auto p-6">
 
       {/* HEADER */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-5 border-b pb-6">
+
         <img
           src={user.avatarUrl || user.image || "/default-avatar.png"}
-          className="w-16 h-16 rounded-full object-cover"
+          className="w-20 h-20 rounded-full object-cover border"
         />
 
         <div>
           <h1 className="text-2xl font-bold">
             {user.name || "Anonymous User"}
           </h1>
-          <p className="text-gray-500">
+
+          <p className="text-gray-500 mt-1">
             {user.bio || "No bio yet"}
           </p>
         </div>
+
       </div>
 
       {/* STATS */}
@@ -56,19 +59,26 @@ export default async function UserProfile({ params }: { params: { id: string } }
         {user.auctions.length === 0 ? (
           <p className="text-gray-500">No listings yet</p>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {user.auctions.map((auction) => (
               <Link
                 key={auction.id}
-                href={`/auction/${auction.id}`}
-                className="block p-4 border rounded-xl hover:bg-gray-50"
+                href={`/auctions/${auction.slug}`} // ✅ FIXED ROUTE
+                className="block p-4 border rounded-xl hover:bg-gray-50 transition"
               >
-                {auction.title || "Untitled Property"}
+                <div className="font-medium">
+                  {auction.title || "Untitled Property"}
+                </div>
+
+                <div className="text-sm text-gray-500 mt-1">
+                  {auction.cityStateZip || ""}
+                </div>
               </Link>
             ))}
           </div>
         )}
       </section>
+
     </div>
   );
 }

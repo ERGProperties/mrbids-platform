@@ -5,6 +5,7 @@ import { useState } from "react";
 export default function ProfileForm({ user }: { user: any }) {
   const [name, setName] = useState(user.name || "");
   const [bio, setBio] = useState(user.bio || "");
+  const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || "");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -16,7 +17,7 @@ export default function ProfileForm({ user }: { user: any }) {
     try {
       const res = await fetch("/api/user/profile", {
         method: "POST",
-        body: JSON.stringify({ name, bio }),
+        body: JSON.stringify({ name, bio, avatarUrl }),
       });
 
       if (res.ok) {
@@ -31,6 +32,26 @@ export default function ProfileForm({ user }: { user: any }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+
+      {/* AVATAR */}
+      <div>
+        <label className="block text-sm font-medium mb-1">
+          Profile Photo URL
+        </label>
+        <input
+          value={avatarUrl}
+          onChange={(e) => setAvatarUrl(e.target.value)}
+          className="w-full border rounded-xl p-3"
+          placeholder="Paste image URL (Cloudinary, etc)"
+        />
+
+        {avatarUrl && (
+          <img
+            src={avatarUrl}
+            className="w-16 h-16 rounded-full mt-3 object-cover"
+          />
+        )}
+      </div>
 
       {/* NAME */}
       <div>
