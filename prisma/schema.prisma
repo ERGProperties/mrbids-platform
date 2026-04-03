@@ -56,6 +56,10 @@ model Auction {
   status        AuctionStatus @default(DRAFT)
   result        String?
 
+  // 🔥 NEW WINNER FIELD
+  winnerId      String?
+  winner        User? @relation("AuctionWinner", fields: [winnerId], references: [id])
+
   bidCount      Int @default(0)
   durationDays  Int?
 
@@ -110,8 +114,6 @@ model Question {
   createdAt DateTime @default(now())
   answeredAt DateTime?
 
-  /* RELATIONS */
-
   auctionId String
   auction   Auction  @relation(fields: [auctionId], references: [id])
 
@@ -152,7 +154,7 @@ model User {
 
   role      Role     @default(USER)
 
-  /* 🔥 NEW PROFILE FIELDS */
+  /* PROFILE */
   bio       String?
   avatarUrl String?
 
@@ -164,6 +166,10 @@ model User {
 
   bids      Bid[]
   auctions  Auction[] @relation("SellerAuctions")
+
+  // 🔥 NEW: WON AUCTIONS
+  wonAuctions Auction[] @relation("AuctionWinner")
+
   questions Question[]
 
   sentMessages     Message[] @relation("SentMessages")
