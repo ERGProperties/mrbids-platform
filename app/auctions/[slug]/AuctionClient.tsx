@@ -106,35 +106,6 @@ export default function AuctionClient({
     };
   }, [auction?.slug]);
 
-  function goPrev() {
-    setSelectedIndex((prev) =>
-      prev === 0 ? imageList.length - 1 : prev - 1
-    );
-  }
-
-  function goNext() {
-    setSelectedIndex((prev) =>
-      prev === imageList.length - 1 ? 0 : prev + 1
-    );
-  }
-
-  function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
-    touchStartX.current = e.touches[0].clientX;
-  }
-
-  function onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
-    if (touchStartX.current == null) return;
-
-    const delta =
-      e.changedTouches[0].clientX - touchStartX.current;
-
-    if (Math.abs(delta) > 50) {
-      delta > 0 ? goPrev() : goNext();
-    }
-
-    touchStartX.current = null;
-  }
-
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
@@ -197,7 +168,6 @@ export default function AuctionClient({
           <aside className="lg:sticky lg:top-24">
             <div className="bg-white border rounded-2xl p-6">
 
-              {/* ALERT */}
               {showAlert && (
                 <div className="mb-3 text-sm font-medium text-orange-600">
                   🔥 {lastBidderName} just placed a bid
@@ -208,40 +178,27 @@ export default function AuctionClient({
                 Current Winning Bid
               </p>
 
-              <p className={`text-3xl mt-2 ${flashBid ? "text-green-600" : ""}`}>
+              <p className="text-3xl mt-2">
                 ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              {/* FIXED OUTBID */}
               {session && liveAuction?.bidCount > 0 && (
                 <div className="mt-3 text-sm font-medium">
                   {isWinning ? (
                     <div className="text-green-600">
-                      🟢 You are currently winning this auction
+                      🟢 You are currently winning
                     </div>
                   ) : (
                     <div className="text-red-600">
-                      🔴 You’ve been outbid — place a higher bid
+                      🔴 You’ve been outbid
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="mt-3 space-y-1 text-sm">
-                <p className="text-orange-600 font-medium">
-                  🔥 {watchingCount} people watching
-                </p>
-
-                <p className="text-gray-600">
-                  ⚡ {liveAuction?.bidCount || 0} bids placed
-                </p>
+              <div className="mt-3 text-sm">
+                🔥 {watchingCount} watching • ⚡ {liveAuction?.bidCount || 0} bids
               </div>
-
-              {isEndingSoon && (
-                <p className="text-red-600 mt-3 font-medium">
-                  ⏳ Ending soon — don’t miss this
-                </p>
-              )}
 
               <div className="mt-4">
                 {auctionEnd && (
@@ -252,35 +209,59 @@ export default function AuctionClient({
               {/* 🔥 POST-AUCTION STATUS */}
               {liveAuction.status === "CLOSED" && session && (
                 <div className="mt-4 p-4 rounded-xl border bg-gray-50">
-
                   {session.user.id === liveAuction.winnerId ? (
-                    <div className="text-green-700">
-                      <div className="font-semibold">
-                        🎉 You won this auction
-                      </div>
-                      <div className="text-sm mt-1">
-                        Message the seller below to move forward.
-                      </div>
+                    <div className="text-green-700 font-semibold">
+                      🎉 You won this auction
                     </div>
                   ) : session.user.id === liveAuction.sellerId ? (
-                    <div className="text-blue-700">
-                      <div className="font-semibold">
-                        🏁 Your auction has ended
-                      </div>
-                      <div className="text-sm mt-1">
-                        Contact the winning bidder to proceed.
-                      </div>
+                    <div className="text-blue-700 font-semibold">
+                      🏁 Your auction has ended
                     </div>
                   ) : (
                     <div className="text-gray-600 text-sm">
-                      This auction has ended.
+                      Auction ended
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 🔥 IDENTITY CARD */}
+              {liveAuction.status === "CLOSED" && (
+                <div className="mt-4 p-4 border rounded-xl bg-white">
+
+                  {session?.user?.id === liveAuction.winnerId && liveAuction.seller && (
+                    <div>
+                      <p className="text-sm text-gray-500 mb-2">Seller</p>
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={liveAuction.seller.avatarUrl || "/default-avatar.png"}
+                          className="w-10 h-10 rounded-full border"
+                        />
+                        <Link href={`/user/${liveAuction.seller.id}`}>
+                          {liveAuction.seller.name || "Anonymous"}
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
+                  {session?.user?.id === liveAuction.sellerId && liveAuction.winner && (
+                    <div>
+                      <p className="text-sm text-gray-500 mb-2">Winning Bidder</p>
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={liveAuction.winner.avatarUrl || "/default-avatar.png"}
+                          className="w-10 h-10 rounded-full border"
+                        />
+                        <Link href={`/user/${liveAuction.winner.id}`}>
+                          {liveAuction.winner.name || "Anonymous"}
+                        </Link>
+                      </div>
                     </div>
                   )}
 
                 </div>
               )}
 
-              {/* BID SECTION */}
               <div className="mt-6">
                 {session ? (
                   <BidForm
@@ -295,7 +276,7 @@ export default function AuctionClient({
                     }
                     className="w-full bg-black text-white py-3 rounded-xl"
                   >
-                    Create Profile / Sign In to Bid
+                    Sign In to Bid
                   </button>
                 )}
               </div>
@@ -314,7 +295,7 @@ function InfoCard({ label, value }: { label: string; value: any }) {
   return (
     <div className="bg-gray-50 p-4 rounded-xl border">
       <p className="text-xs text-gray-500">{label}</p>
-      <p className="font-semibold mt-1">{value || "—"}</p>
+      <p className="font-semibold">{value || "—"}</p>
     </div>
   );
 }

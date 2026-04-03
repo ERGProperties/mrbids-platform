@@ -116,7 +116,8 @@ export default async function AuctionPage({
   const auction = await prisma.auction.findUnique({
     where: { slug: params.slug },
     include: {
-      seller: true, // ✅ ADDED
+      seller: true,
+      winner: true, // 🔥 NEW
       bids: {
         orderBy: { amount: "desc" },
         take: 1,
@@ -219,10 +220,13 @@ export default async function AuctionPage({
           leadingBidderId:
             auction.bids[0]?.bidderId ?? null,
 
-          winnerId: auction.result ?? null,
+          winnerId: auction.winnerId, // 🔥 FIXED
+          sellerId: auction.sellerId, // 🔥 NEW
+
           status: auction.status,
 
-          seller: auction.seller, // ✅ ADDED
+          seller: auction.seller,
+          winner: auction.winner, // 🔥 NEW
         }}
         minimumBid={minimumBid}
       />
