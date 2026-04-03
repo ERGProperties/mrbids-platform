@@ -21,6 +21,7 @@ export default function AuctionClient({
 
   const [liveAuction, setLiveAuction] = useState<any>(auction);
   const [flashBid, setFlashBid] = useState(false);
+  const [showAlert, setShowAlert] = useState(false); // 🔥 NEW
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [zoomOpen, setZoomOpen] = useState(false);
 
@@ -44,7 +45,6 @@ export default function AuctionClient({
 
   const watchingCount = getWatchingCount(liveAuction?.bidCount || 0);
 
-  // 🔥 NEW: Determine if current user is winning
   const isWinning =
     session?.user?.id === liveAuction?.leadingBidderId;
 
@@ -69,7 +69,12 @@ export default function AuctionClient({
             data.highestBid !== prev.highestBid
           ) {
             setFlashBid(true);
-            setTimeout(() => setFlashBid(false), 600);
+            setShowAlert(true);
+
+            setTimeout(() => {
+              setFlashBid(false);
+              setShowAlert(false);
+            }, 1500);
           }
 
           return {
@@ -197,6 +202,13 @@ export default function AuctionClient({
           <aside className="lg:sticky lg:top-24">
             <div className="bg-white border rounded-2xl p-6">
 
+              {/* 🔥 LIVE ALERT */}
+              {showAlert && (
+                <div className="mb-3 text-sm font-medium text-orange-600">
+                  🔥 New bid just placed
+                </div>
+              )}
+
               <p className="text-sm text-gray-500">
                 Current Winning Bid
               </p>
@@ -205,7 +217,7 @@ export default function AuctionClient({
                 ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              {/* 🔥 NEW: Winning / Outbid Message */}
+              {/* WIN / OUTBID */}
               {session && (
                 <div className="mt-3 text-sm font-medium">
                   {isWinning ? (
