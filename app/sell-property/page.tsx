@@ -1,6 +1,19 @@
+"use client";
+
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function SellLandingPage() {
+  const { data: session } = useSession();
+
+  function handleStart() {
+    if (!session) {
+      window.location.href = "/signin?callbackUrl=/sell";
+    } else {
+      window.location.href = "/sell";
+    }
+  }
+
   return (
     <main className="bg-white">
 
@@ -21,12 +34,12 @@ export default function SellLandingPage() {
             No listing fees. Sellers control the reserve price.
           </p>
 
-          <Link
-            href="/sell"
+          <button
+            onClick={handleStart}
             className="inline-block bg-green-500 hover:bg-green-600 text-black font-semibold px-8 py-4 rounded-lg text-lg"
           >
             Start Your Auction
-          </Link>
+          </button>
 
         </div>
       </section>
@@ -163,12 +176,12 @@ export default function SellLandingPage() {
             Start your auction today and let investors compete for your property.
           </p>
 
-          <Link
-            href="/sell"
+          <button
+            onClick={handleStart}
             className="inline-block bg-green-500 hover:bg-green-600 text-black font-semibold px-8 py-4 rounded-lg text-lg"
           >
             List Your Property
-          </Link>
+          </button>
 
         </div>
       </section>

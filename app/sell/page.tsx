@@ -20,6 +20,11 @@ export default async function SellPage() {
     redirect("/signin?callbackUrl=/sell");
   }
 
+  // 🚨 NEW: Require profile completion
+  if (!user.name || !user.bio) {
+    redirect("/account/profile");
+  }
+
   // Find existing draft for THIS seller
   const existingDraft = await prisma.auction.findFirst({
     where: {
