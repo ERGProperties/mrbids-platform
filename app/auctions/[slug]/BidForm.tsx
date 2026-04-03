@@ -35,7 +35,7 @@ export default function BidForm({
         body: JSON.stringify({ amount }),
       });
 
-      // ⭐ If user is not authenticated, redirect to signin
+      // 🔒 Not authenticated → go to signin
       if (res.status === 401) {
         window.location.href = `/signin?callbackUrl=/auctions/${slug}`;
         return;
@@ -43,20 +43,26 @@ export default function BidForm({
 
       const data = await res.json();
 
+      // 🚨 NEW: Profile incomplete → force profile completion
+      if (data.error === "PROFILE_INCOMPLETE") {
+        window.location.href = `/account/profile`;
+        return;
+      }
+
       if (!res.ok) {
         console.error("BID API ERROR:", data);
         setMessage(data.error || "Failed to place bid.");
         return;
       }
 
-      // ⭐ Trigger extension banner if soft close happened
+      // ⭐ Soft close extension trigger
       if (data.extended && onExtended) {
         onExtended();
       }
 
       setMessage("Bid placed successfully!");
 
-      // ⭐ Refresh auction page to update bids + countdown
+      // Refresh auction UI
       router.refresh();
     } catch (err: any) {
       console.error("BID ERROR:", err);
