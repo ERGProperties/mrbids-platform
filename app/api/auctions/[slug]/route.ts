@@ -15,6 +15,14 @@ export async function GET(
         bids: {
           orderBy: { amount: "desc" },
           take: 1,
+          include: {
+            bidder: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
         },
       },
     });
@@ -29,13 +37,25 @@ export async function GET(
       auction.startingBid ??
       0;
 
+    const leadingBidderId =
+      auction.bids[0]?.bidder?.id ?? null;
+
+    const lastBidderName =
+      auction.bids[0]?.bidder?.name || "Someone";
+
     return Response.json({
       highestBid,
-      // ✅ FIX: use endAt (consistent everywhere)
+
+      // ✅ Keep consistent
       endAt: auction.endAt
         ? auction.endAt.toISOString()
         : null,
+
       bidCount: auction.bidCount ?? 0,
+
+      // 🔥 NEW
+      leadingBidderId,
+      lastBidderName,
     });
   } catch (err) {
     console.error("AUCTION FETCH ERROR:", err);

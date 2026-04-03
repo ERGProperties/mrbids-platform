@@ -21,7 +21,8 @@ export default function AuctionClient({
 
   const [liveAuction, setLiveAuction] = useState<any>(auction);
   const [flashBid, setFlashBid] = useState(false);
-  const [showAlert, setShowAlert] = useState(false); // 🔥 NEW
+  const [showAlert, setShowAlert] = useState(false);
+  const [lastBidderName, setLastBidderName] = useState("Someone"); // 🔥 NEW
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [zoomOpen, setZoomOpen] = useState(false);
 
@@ -70,6 +71,10 @@ export default function AuctionClient({
           ) {
             setFlashBid(true);
             setShowAlert(true);
+
+            if (data.lastBidderName) {
+              setLastBidderName(data.lastBidderName);
+            }
 
             setTimeout(() => {
               setFlashBid(false);
@@ -202,10 +207,10 @@ export default function AuctionClient({
           <aside className="lg:sticky lg:top-24">
             <div className="bg-white border rounded-2xl p-6">
 
-              {/* 🔥 LIVE ALERT */}
+              {/* 🔥 NAMED LIVE ALERT */}
               {showAlert && (
                 <div className="mb-3 text-sm font-medium text-orange-600">
-                  🔥 New bid just placed
+                  🔥 {lastBidderName} just placed a bid
                 </div>
               )}
 
