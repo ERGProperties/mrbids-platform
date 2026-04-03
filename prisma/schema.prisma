@@ -151,6 +151,11 @@ model User {
   image         String?
 
   role      Role     @default(USER)
+
+  /* 🔥 NEW PROFILE FIELDS */
+  bio       String?
+  avatarUrl String?
+
   createdAt DateTime @default(now())
 
   isVerifiedBidder Boolean @default(false)

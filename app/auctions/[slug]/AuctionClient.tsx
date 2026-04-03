@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react";
 import BidForm from "./BidForm";
 import { useSession } from "next-auth/react";
 import AuctionCountdown from "@/components/auction/AuctionCountdown";
+import Link from "next/link"; // ✅ ADDED
 
-/* 🔥 WATCHING COUNT */
 function getWatchingCount(bidCount: number) {
   return Math.max(3, Math.min(8, bidCount + 2));
 }
@@ -36,17 +36,14 @@ export default function AuctionClient({
   const selectedImage =
     imageList.length > 0 ? imageList[selectedIndex] : null;
 
-  // ✅ FIX: ONLY USE endAt (no more endsAt)
   const auctionEnd = liveAuction?.endAt;
 
   const isEndingSoon =
     auctionEnd &&
     new Date(auctionEnd).getTime() - Date.now() < 1000 * 60 * 10;
 
-  /* 🔥 WATCHING */
   const watchingCount = getWatchingCount(liveAuction?.bidCount || 0);
 
-  /* POLLING */
   useEffect(() => {
     if (!auction?.slug) return;
 
@@ -77,8 +74,6 @@ export default function AuctionClient({
               data.highestBid ?? prev.highestBid,
             bidCount:
               data.bidCount ?? prev.bidCount,
-
-            // ✅ FIX: correct field
             endAt: data.endAt ?? prev.endAt,
           };
         });
@@ -142,6 +137,19 @@ export default function AuctionClient({
           <p className="text-gray-600 mt-2">
             {liveAuction?.addressLine} {liveAuction?.cityStateZip}
           </p>
+
+          {/* ✅ NEW: SELLER LINK */}
+          {liveAuction?.seller && (
+            <p className="text-sm text-gray-500 mt-2">
+              Listed by{" "}
+              <Link
+                href={`/user/${liveAuction.seller.id}`}
+                className="underline hover:text-black"
+              >
+                {liveAuction.seller.name || "Anonymous Seller"}
+              </Link>
+            </p>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-[1fr_360px] gap-8">
@@ -149,7 +157,6 @@ export default function AuctionClient({
           {/* LEFT */}
           <div>
 
-            {/* IMAGE */}
             <div
               className="relative bg-white border rounded-2xl overflow-hidden cursor-pointer"
               onClick={() => setZoomOpen(true)}
@@ -166,33 +173,8 @@ export default function AuctionClient({
                   No Image Available
                 </div>
               )}
-
-              {imageList.length > 1 && (
-                <>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      goPrev();
-                    }}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/70 border border-white text-white px-3 py-2 rounded-full"
-                  >
-                    ←
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      goNext();
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/70 border border-white text-white px-3 py-2 rounded-full"
-                  >
-                    →
-                  </button>
-                </>
-              )}
             </div>
 
-            {/* DETAILS */}
             <div className="mt-6 bg-white border rounded-2xl p-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <InfoCard label="Type" value={liveAuction?.propertyType} />
@@ -220,7 +202,6 @@ export default function AuctionClient({
                 ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              {/* SOCIAL PROOF */}
               <div className="mt-3 space-y-1 text-sm">
 
                 <p className="text-orange-600 font-medium">
@@ -230,12 +211,6 @@ export default function AuctionClient({
                 <p className="text-gray-600">
                   ⚡ {liveAuction?.bidCount || 0} bids placed
                 </p>
-
-                {liveAuction?.bidCount > 0 && (
-                  <p className="text-green-600 text-xs">
-                    ⚡ A bid was placed recently
-                  </p>
-                )}
 
               </div>
 

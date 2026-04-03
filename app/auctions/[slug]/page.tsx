@@ -16,7 +16,6 @@ function formatCurrency(value: number) {
   }).format(value);
 }
 
-/* 🔥 IMPROVED MOMENTUM (MORE EXCITING) */
 function getMomentumText(lastBidAt?: Date | null) {
   if (!lastBidAt) return "Be the first to place a bid";
 
@@ -29,7 +28,6 @@ function getMomentumText(lastBidAt?: Date | null) {
   return "Auction gaining attention";
 }
 
-/* 🔥 WATCHING COUNT (SMART FAKE UNTIL SCALE) */
 function getWatchingCount(bidCount: number) {
   return Math.max(3, Math.min(8, bidCount + 2));
 }
@@ -118,6 +116,7 @@ export default async function AuctionPage({
   const auction = await prisma.auction.findUnique({
     where: { slug: params.slug },
     include: {
+      seller: true, // ✅ ADDED
       bids: {
         orderBy: { amount: "desc" },
         take: 1,
@@ -128,8 +127,6 @@ export default async function AuctionPage({
   if (!auction) notFound();
 
   const questions = await getQuestionsForAuction(auction.id);
-
-  const hasBids = auction.bidCount > 0;
 
   const highestBid =
     auction.bids[0]?.amount ??
@@ -154,7 +151,6 @@ export default async function AuctionPage({
     select: { createdAt: true },
   });
 
-  /* 🔥 NEW WATCHING COUNT */
   const watchingCount = getWatchingCount(auction.bidCount);
 
   return (
@@ -167,32 +163,26 @@ export default async function AuctionPage({
         }}
       />
 
-      {/* 🔥 UPGRADED ENERGY BAR */}
       <section className="bg-black text-white border-b border-black">
         <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
 
-          {/* LIVE */}
           <div className="flex items-center gap-2 text-sm font-medium">
             <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
             LIVE AUCTION
           </div>
 
-          {/* 🔥 WATCHING */}
           <div className="text-sm text-orange-400 font-medium">
             🔥 {watchingCount} people watching
           </div>
 
-          {/* ⚡ BIDS */}
           <div className="text-sm text-gray-200">
             ⚡ {auction.bidCount} bids placed
           </div>
 
-          {/* 📈 MOMENTUM */}
           <div className="text-sm text-gray-200">
             {getMomentumText(latestBid?.createdAt)}
           </div>
 
-          {/* 💰 ARV */}
           <div className="text-sm text-gray-200">
             ARV:{" "}
             <span className="text-white font-semibold">
@@ -231,6 +221,8 @@ export default async function AuctionPage({
 
           winnerId: auction.result ?? null,
           status: auction.status,
+
+          seller: auction.seller, // ✅ ADDED
         }}
         minimumBid={minimumBid}
       />
