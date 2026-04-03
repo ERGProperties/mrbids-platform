@@ -34,8 +34,14 @@ export default async function UserProfile({ params }: { params: { id: string } }
         />
 
         <div>
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
             {user.name || "Anonymous User"}
+
+            {user.isVerifiedBidder && (
+              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                Verified Buyer
+              </span>
+            )}
           </h1>
 
           <p className="text-gray-500 mt-1">
@@ -63,7 +69,7 @@ export default async function UserProfile({ params }: { params: { id: string } }
             {user.auctions.map((auction) => (
               <Link
                 key={auction.id}
-                href={`/auctions/${auction.slug}`} // ✅ FIXED ROUTE
+                href={`/auctions/${auction.slug}`}
                 className="block p-4 border rounded-xl hover:bg-gray-50 transition"
               >
                 <div className="font-medium">
