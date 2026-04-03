@@ -24,7 +24,6 @@ export default function AuctionClient({
   const [showAlert, setShowAlert] = useState(false);
   const [lastBidderName, setLastBidderName] = useState("Someone");
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [zoomOpen, setZoomOpen] = useState(false);
 
   const touchStartX = useRef<number | null>(null);
 
@@ -167,12 +166,7 @@ export default function AuctionClient({
 
           {/* LEFT */}
           <div>
-            <div
-              className="relative bg-white border rounded-2xl overflow-hidden cursor-pointer"
-              onClick={() => setZoomOpen(true)}
-              onTouchStart={onTouchStart}
-              onTouchEnd={onTouchEnd}
-            >
+            <div className="bg-white border rounded-2xl overflow-hidden">
               {selectedImage ? (
                 <img
                   src={selectedImage}
@@ -193,7 +187,7 @@ export default function AuctionClient({
                 <InfoCard label="Sqft" value={liveAuction?.sqft} />
               </div>
 
-              <div className="prose text-gray-700 whitespace-pre-line">
+              <div className="text-gray-700 whitespace-pre-line">
                 {liveAuction?.description}
               </div>
             </div>
@@ -203,7 +197,7 @@ export default function AuctionClient({
           <aside className="lg:sticky lg:top-24">
             <div className="bg-white border rounded-2xl p-6">
 
-              {/* LIVE ALERT */}
+              {/* ALERT */}
               {showAlert && (
                 <div className="mb-3 text-sm font-medium text-orange-600">
                   🔥 {lastBidderName} just placed a bid
@@ -218,7 +212,7 @@ export default function AuctionClient({
                 ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              {/* ✅ FIXED: ONLY SHOW IF BIDS EXIST */}
+              {/* FIXED OUTBID */}
               {session && liveAuction?.bidCount > 0 && (
                 <div className="mt-3 text-sm font-medium">
                   {isWinning ? (
@@ -255,6 +249,38 @@ export default function AuctionClient({
                 )}
               </div>
 
+              {/* 🔥 POST-AUCTION STATUS */}
+              {liveAuction.status === "CLOSED" && session && (
+                <div className="mt-4 p-4 rounded-xl border bg-gray-50">
+
+                  {session.user.id === liveAuction.winnerId ? (
+                    <div className="text-green-700">
+                      <div className="font-semibold">
+                        🎉 You won this auction
+                      </div>
+                      <div className="text-sm mt-1">
+                        Message the seller below to move forward.
+                      </div>
+                    </div>
+                  ) : session.user.id === liveAuction.sellerId ? (
+                    <div className="text-blue-700">
+                      <div className="font-semibold">
+                        🏁 Your auction has ended
+                      </div>
+                      <div className="text-sm mt-1">
+                        Contact the winning bidder to proceed.
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-gray-600 text-sm">
+                      This auction has ended.
+                    </div>
+                  )}
+
+                </div>
+              )}
+
+              {/* BID SECTION */}
               <div className="mt-6">
                 {session ? (
                   <BidForm
