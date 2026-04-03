@@ -43,8 +43,15 @@ export async function POST(
       );
     }
 
+    // 🚨 NEW: Require profile completion before bidding
+    if (!user.name || !user.bio) {
+      return NextResponse.json(
+        { error: "PROFILE_INCOMPLETE" },
+        { status: 403 }
+      );
+    }
+
     const result = await prisma.$transaction(async (tx) => {
-      // ⭐ Find auction inside transaction
       const auction = await tx.auction.findUnique({
         where: { slug: params.slug },
       });
@@ -53,12 +60,10 @@ export async function POST(
         throw new Error("Auction not found");
       }
 
-      // ⭐ Prevent bids after auction ends
       if (auction.endAt <= new Date()) {
         throw new Error("Auction has ended");
       }
 
-      // ⭐ Always fetch highest bid fresh
       const previousHighestBid = await tx.bid.findFirst({
         where: { auctionId: auction.id },
         orderBy: { amount: "desc" },
@@ -75,7 +80,6 @@ export async function POST(
         throw new Error("Bid must be higher than current bid");
       }
 
-      // ⭐ Create bid
       const newBid = await tx.bid.create({
         data: {
           amount,
@@ -114,7 +118,6 @@ export async function POST(
         auctionExtended = true;
       }
 
-      // ⭐ Update bid count
       await tx.auction.update({
         where: { id: auction.id },
         data: {
@@ -162,6 +165,7 @@ export async function POST(
       success: true,
       extended: result.auctionExtended,
     });
+
   } catch (err: any) {
     console.error("BID API ERROR:", err);
 
