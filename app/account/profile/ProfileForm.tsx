@@ -7,7 +7,26 @@ export default function ProfileForm({ user }: { user: any }) {
   const [bio, setBio] = useState(user.bio || "");
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || "");
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // 🔥 Upload to Cloudinary
+  async function handleImageUpload(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "mrbids_upload"); // 👈 your preset
+
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/dx1okt4vf/image/upload", // 👈 replace this
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+    return data.secure_url;
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -17,6 +36,9 @@ export default function ProfileForm({ user }: { user: any }) {
     try {
       const res = await fetch("/api/user/profile", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ name, bio, avatarUrl }),
       });
 
@@ -33,23 +55,45 @@ export default function ProfileForm({ user }: { user: any }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
 
-      {/* AVATAR */}
+      {/* 🔥 AVATAR UPLOAD */}
       <div>
-        <label className="block text-sm font-medium mb-1">
-          Profile Photo URL
+        <label className="block text-sm font-medium mb-2">
+          Profile Photo
         </label>
+
         <input
-          value={avatarUrl}
-          onChange={(e) => setAvatarUrl(e.target.value)}
+          type="file"
+          accept="image/*"
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            setUploading(true);
+
+            try {
+              const url = await handleImageUpload(file);
+              setAvatarUrl(url);
+            } catch (err) {
+              console.error("Upload failed:", err);
+            }
+
+            setUploading(false);
+          }}
           className="w-full border rounded-xl p-3"
-          placeholder="Paste image URL (Cloudinary, etc)"
         />
 
+        {/* Preview */}
         {avatarUrl && (
           <img
             src={avatarUrl}
-            className="w-16 h-16 rounded-full mt-3 object-cover"
+            className="w-20 h-20 rounded-full mt-4 object-cover border"
           />
+        )}
+
+        {uploading && (
+          <p className="text-sm text-gray-500 mt-2">
+            Uploading image...
+          </p>
         )}
       </div>
 
@@ -82,8 +126,8 @@ export default function ProfileForm({ user }: { user: any }) {
       {/* BUTTON */}
       <button
         type="submit"
-        disabled={loading}
-        className="w-full bg-black text-white py-3 rounded-xl"
+        disabled={loading || uploading}
+        className="w-full bg-black text-white py-3 rounded-xl disabled:opacity-60"
       >
         {loading ? "Saving..." : "Save Profile"}
       </button>
@@ -94,7 +138,6 @@ export default function ProfileForm({ user }: { user: any }) {
           Profile updated successfully
         </p>
       )}
-
     </form>
   );
 }
