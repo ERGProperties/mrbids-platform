@@ -19,11 +19,36 @@ export default async function ProfilePage() {
     redirect("/");
   }
 
+  // 🔥 NEW: Profile completion calculation
+  const completion =
+    (user.name ? 50 : 0) +
+    (user.bio ? 50 : 0);
+
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">
         Edit Profile
       </h1>
+
+      {/* 🔥 NEW: Profile Strength */}
+      <div className="mb-6">
+        <p className="text-sm font-medium mb-2">
+          Profile Strength: {completion}%
+        </p>
+
+        <div className="w-full bg-gray-200 rounded-full h-3">
+          <div
+            className="bg-green-500 h-3 rounded-full transition-all"
+            style={{ width: `${completion}%` }}
+          />
+        </div>
+
+        {completion < 100 && (
+          <p className="text-xs text-gray-500 mt-2">
+            Complete your profile to build trust and increase your chances of winning auctions.
+          </p>
+        )}
+      </div>
 
       <ProfileForm user={user} />
     </div>
