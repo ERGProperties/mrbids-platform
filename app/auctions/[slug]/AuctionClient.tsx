@@ -206,7 +206,7 @@ export default function AuctionClient({
                 )}
               </div>
 
-              {/* 🔥 POST-AUCTION STATUS */}
+              {/* POST STATUS */}
               {liveAuction.status === "CLOSED" && session && (
                 <div className="mt-4 p-4 rounded-xl border bg-gray-50">
                   {session.user.id === liveAuction.winnerId ? (
@@ -225,14 +225,14 @@ export default function AuctionClient({
                 </div>
               )}
 
-              {/* 🔥 IDENTITY CARD */}
+              {/* 🔥 IDENTITY + CTA */}
               {liveAuction.status === "CLOSED" && (
-                <div className="mt-4 p-4 border rounded-xl bg-white">
+                <div className="mt-4 p-4 border rounded-xl bg-white space-y-4">
 
                   {session?.user?.id === liveAuction.winnerId && liveAuction.seller && (
                     <div>
                       <p className="text-sm text-gray-500 mb-2">Seller</p>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 mb-3">
                         <img
                           src={liveAuction.seller.avatarUrl || "/default-avatar.png"}
                           className="w-10 h-10 rounded-full border"
@@ -241,13 +241,24 @@ export default function AuctionClient({
                           {liveAuction.seller.name || "Anonymous"}
                         </Link>
                       </div>
+
+                      <button
+                        onClick={() =>
+                          document
+                            .getElementById("auction-messages")
+                            ?.scrollIntoView({ behavior: "smooth" })
+                        }
+                        className="w-full bg-black text-white py-2 rounded-lg text-sm"
+                      >
+                        Message Seller
+                      </button>
                     </div>
                   )}
 
                   {session?.user?.id === liveAuction.sellerId && liveAuction.winner && (
                     <div>
                       <p className="text-sm text-gray-500 mb-2">Winning Bidder</p>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 mb-3">
                         <img
                           src={liveAuction.winner.avatarUrl || "/default-avatar.png"}
                           className="w-10 h-10 rounded-full border"
@@ -256,6 +267,17 @@ export default function AuctionClient({
                           {liveAuction.winner.name || "Anonymous"}
                         </Link>
                       </div>
+
+                      <button
+                        onClick={() =>
+                          document
+                            .getElementById("auction-messages")
+                            ?.scrollIntoView({ behavior: "smooth" })
+                        }
+                        className="w-full bg-black text-white py-2 rounded-lg text-sm"
+                      >
+                        Message Buyer
+                      </button>
                     </div>
                   )}
 
