@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/db";
-import { sendEmail } from "@/lib/email/sendEmail"; // 🔥 you will create this
+import { sendEmail } from "@/lib/email/sendEmail";
 
 export async function finalizeAuction(auctionId: string) {
   const auction = await prisma.auction.findUnique({
@@ -9,7 +9,7 @@ export async function finalizeAuction(auctionId: string) {
         orderBy: { amount: "desc" },
         take: 1,
       },
-      seller: true, // 🔥 NEW
+      seller: true,
     },
   });
 
@@ -18,6 +18,7 @@ export async function finalizeAuction(auctionId: string) {
   const highestBid = auction.bids[0];
 
   if (!highestBid) {
+    // ❌ No bids → close auction
     await prisma.auction.update({
       where: { id: auctionId },
       data: {
@@ -49,10 +50,11 @@ export async function finalizeAuction(auctionId: string) {
   if (buyer && auction.seller) {
     try {
       // 📧 Email seller
-      await sendEmail({
-        to: auction.seller.email!,
-        subject: "Your auction has ended 🎉",
-        text: `
+      if (auction.seller.email) {
+        await sendEmail({
+          to: auction.seller.email,
+          subject: "Your auction has ended 🎉",
+          text: `
 Your auction has ended.
 
 Winning Bid: $${highestBid.amount}
@@ -60,14 +62,16 @@ Winning Bid: $${highestBid.amount}
 Buyer:
 ${buyer.name || "Anonymous"}
 ${buyer.email}
-        `,
-      });
+          `,
+        });
+      }
 
       // 📧 Email buyer
-      await sendEmail({
-        to: buyer.email!,
-        subject: "You won the auction 🎉",
-        text: `
+      if (buyer.email) {
+        await sendEmail({
+          to: buyer.email,
+          subject: "You won the auction 🎉",
+          text: `
 Congratulations! You won the auction.
 
 Winning Bid: $${highestBid.amount}
@@ -75,11 +79,28 @@ Winning Bid: $${highestBid.amount}
 Seller:
 ${auction.seller.name || "Anonymous"}
 ${auction.seller.email}
-        `,
-      });
+          `,
+        });
+      }
 
     } catch (err) {
       console.error("Email error:", err);
+    }
+  }
+
+  // 💬 CREATE INITIAL MESSAGE THREAD (NEW 🔥)
+  if (buyer && auction.seller) {
+    try {
+      await prisma.message.create({
+        data: {
+          auctionId: auction.id,
+          senderId: buyer.id,
+          receiverId: auction.seller.id,
+          body: `Hi, I won this auction for $${highestBid.amount}. Looking forward to next steps.`,
+        },
+      });
+    } catch (err) {
+      console.error("Message creation error:", err);
     }
   }
 }
