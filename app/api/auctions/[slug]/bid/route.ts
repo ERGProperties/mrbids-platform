@@ -43,7 +43,7 @@ export async function POST(
       );
     }
 
-    // 🚨 NEW: Require profile completion before bidding
+    // 🚨 Require profile completion before bidding
     if (!user.name || !user.bio) {
       return NextResponse.json(
         { error: "PROFILE_INCOMPLETE" },
@@ -80,6 +80,7 @@ export async function POST(
         throw new Error("Bid must be higher than current bid");
       }
 
+      // ⭐ Create bid
       const newBid = await tx.bid.create({
         data: {
           amount,
@@ -87,6 +88,16 @@ export async function POST(
           bidderId: user.id,
         },
       });
+
+      // 🔥 NEW: Auto-verify user after first bid
+      if (!user.isVerifiedBidder) {
+        await tx.user.update({
+          where: { id: user.id },
+          data: {
+            isVerifiedBidder: true,
+          },
+        });
+      }
 
       // ⭐ SOFT CLOSE LOGIC
       const now = new Date();
@@ -118,6 +129,7 @@ export async function POST(
         auctionExtended = true;
       }
 
+      // ⭐ Update bid count
       await tx.auction.update({
         where: { id: auction.id },
         data: {
