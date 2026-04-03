@@ -136,10 +136,6 @@ export default function AuctionClient({
     touchStartX.current = null;
   }
 
-  const isWinner =
-    liveAuction?.status === "CLOSED" &&
-    session?.user?.id === liveAuction?.winnerId;
-
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-16">
@@ -207,7 +203,7 @@ export default function AuctionClient({
           <aside className="lg:sticky lg:top-24">
             <div className="bg-white border rounded-2xl p-6">
 
-              {/* 🔥 ALERT */}
+              {/* LIVE ALERT */}
               {showAlert && (
                 <div className="mb-3 text-sm font-medium text-orange-600">
                   🔥 {lastBidderName} just placed a bid
@@ -222,8 +218,8 @@ export default function AuctionClient({
                 ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              {/* WIN / OUTBID */}
-              {session && (
+              {/* ✅ FIXED: ONLY SHOW IF BIDS EXIST */}
+              {session && liveAuction?.bidCount > 0 && (
                 <div className="mt-3 text-sm font-medium">
                   {isWinning ? (
                     <div className="text-green-600">
@@ -259,7 +255,6 @@ export default function AuctionClient({
                 )}
               </div>
 
-              {/* BID SECTION */}
               <div className="mt-6">
                 {session ? (
                   <BidForm
@@ -275,37 +270,6 @@ export default function AuctionClient({
                     className="w-full bg-black text-white py-3 rounded-xl"
                   >
                     Create Profile / Sign In to Bid
-                  </button>
-                )}
-              </div>
-
-              {/* 🔥 CONTACT CTA */}
-              <div className="mt-4">
-                {session ? (
-                  <button
-                    onClick={() => {
-                      document
-                        .getElementById("auction-messages")
-                        ?.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    className="w-full border border-black text-black py-3 rounded-xl font-medium hover:bg-gray-100 transition"
-                  >
-                    {liveAuction.status === "CLOSED"
-                      ? session.user.id === liveAuction.winnerId
-                        ? "Contact Seller"
-                        : session.user.id === liveAuction.sellerId
-                        ? "Contact Buyer"
-                        : "View Conversation"
-                      : "Contact Seller"}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() =>
-                      (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction.slug}`)
-                    }
-                    className="w-full border border-black text-black py-3 rounded-xl font-medium hover:bg-gray-100 transition"
-                  >
-                    Create Profile / Sign In to Contact
                   </button>
                 )}
               </div>
