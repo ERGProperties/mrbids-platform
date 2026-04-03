@@ -44,6 +44,10 @@ export default function AuctionClient({
 
   const watchingCount = getWatchingCount(liveAuction?.bidCount || 0);
 
+  // 🔥 NEW: Determine if current user is winning
+  const isWinning =
+    session?.user?.id === liveAuction?.leadingBidderId;
+
   useEffect(() => {
     if (!auction?.slug) return;
 
@@ -75,6 +79,8 @@ export default function AuctionClient({
             bidCount:
               data.bidCount ?? prev.bidCount,
             endAt: data.endAt ?? prev.endAt,
+            leadingBidderId:
+              data.leadingBidderId ?? prev.leadingBidderId,
           };
         });
       } catch (err) {
@@ -155,7 +161,6 @@ export default function AuctionClient({
 
           {/* LEFT */}
           <div>
-
             <div
               className="relative bg-white border rounded-2xl overflow-hidden cursor-pointer"
               onClick={() => setZoomOpen(true)}
@@ -186,7 +191,6 @@ export default function AuctionClient({
                 {liveAuction?.description}
               </div>
             </div>
-
           </div>
 
           {/* RIGHT */}
@@ -201,8 +205,22 @@ export default function AuctionClient({
                 ${liveAuction?.highestBid?.toLocaleString?.() || 0}
               </p>
 
-              <div className="mt-3 space-y-1 text-sm">
+              {/* 🔥 NEW: Winning / Outbid Message */}
+              {session && (
+                <div className="mt-3 text-sm font-medium">
+                  {isWinning ? (
+                    <div className="text-green-600">
+                      🟢 You are currently winning this auction
+                    </div>
+                  ) : (
+                    <div className="text-red-600">
+                      🔴 You’ve been outbid — place a higher bid
+                    </div>
+                  )}
+                </div>
+              )}
 
+              <div className="mt-3 space-y-1 text-sm">
                 <p className="text-orange-600 font-medium">
                   🔥 {watchingCount} people watching
                 </p>
@@ -210,7 +228,6 @@ export default function AuctionClient({
                 <p className="text-gray-600">
                   ⚡ {liveAuction?.bidCount || 0} bids placed
                 </p>
-
               </div>
 
               {isEndingSoon && (
