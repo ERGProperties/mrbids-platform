@@ -17,41 +17,99 @@ export const authOptions: NextAuthOptions = {
         console.log("🔥 SEND VERIFICATION CALLED", identifier);
 
         try {
+          const subject = "Sign in to MrBids";
+
+          const html = `
+            <div style="margin:0; padding:0; background:#f5f5f5; font-family:Arial, sans-serif;">
+
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding:40px 0;">
+
+                    <!-- CONTAINER -->
+                    <table width="600" style="background:#ffffff; border-radius:12px; overflow:hidden;">
+
+                      <!-- HEADER -->
+                      <tr>
+                        <td style="padding:20px; text-align:center; border-bottom:1px solid #eee;">
+                          <img 
+                            src="https://mrbids.com/logo.png" 
+                            alt="MrBids"
+                            style="height:40px;"
+                          />
+                        </td>
+                      </tr>
+
+                      <!-- BODY -->
+                      <tr>
+                        <td style="padding:30px;">
+
+                          <h2 style="margin-top:0; font-size:22px;">
+                            Sign in to MrBids
+                          </h2>
+
+                          <p style="font-size:16px; color:#333;">
+                            Click the button below to securely access your account.
+                          </p>
+
+                          <div style="text-align:center; margin:30px 0;">
+                            <a 
+                              href="${url}" 
+                              style="
+                                display:inline-block;
+                                padding:14px 26px;
+                                background:#000;
+                                color:#ffffff;
+                                text-decoration:none;
+                                border-radius:8px;
+                                font-weight:bold;
+                                font-size:15px;
+                              "
+                            >
+                              Sign In
+                            </a>
+                          </div>
+
+                          <p style="font-size:14px; color:#666;">
+                            This secure link will expire shortly.
+                          </p>
+
+                          <p style="font-size:14px; color:#666;">
+                            If you didn’t request this email, you can safely ignore it.
+                          </p>
+
+                        </td>
+                      </tr>
+
+                      <!-- FOOTER -->
+                      <tr>
+                        <td style="padding:20px; text-align:center; font-size:12px; color:#888; border-top:1px solid #eee;">
+                          © ${new Date().getFullYear()} MrBids<br/>
+                          Real-time real estate auctions
+                        </td>
+                      </tr>
+
+                    </table>
+
+                  </td>
+                </tr>
+              </table>
+
+            </div>
+          `;
+
+          const text = `Sign in to MrBids\n${url}`;
+
           const result = await resend.emails.send({
             from: process.env.EMAIL_FROM!,
             to: identifier,
-            subject: "Sign in to MrBids",
-            html: `
-              <div style="font-family: Arial, sans-serif; line-height:1.5;">
-                <h2>Sign in to MrBids</h2>
-                <p>Click below to securely sign in:</p>
-
-                <p>
-                  <a href="${url}" style="
-                    display:inline-block;
-                    padding:10px 16px;
-                    background:#000;
-                    color:#fff;
-                    text-decoration:none;
-                    border-radius:6px;
-                    font-weight:600;
-                  ">
-                    Sign in
-                  </a>
-                </p>
-
-                <p style="font-size:12px;color:#666;">
-                  This secure magic link will expire automatically.
-                </p>
-
-                <p style="font-size:12px;color:#666;">
-                  If you did not request this email, you can safely ignore it.
-                </p>
-              </div>
-            `,
+            subject,
+            html,
+            text,
           });
 
           console.log("✅ RESEND RESULT:", result);
+
         } catch (err) {
           console.error("❌ RESEND ERROR:", err);
           throw err;
@@ -71,27 +129,21 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ session, user }) {
       if (session.user) {
-        // Ensure API routes can access user ID and email
         session.user.id = user.id;
         session.user.email = user.email ?? undefined;
       }
-
       return session;
     },
 
     async redirect({ url, baseUrl }) {
-
-      // Allow relative URLs like /sell or /auctions/slug
       if (url.startsWith("/")) {
         return `${baseUrl}${url}`;
       }
 
-      // Allow full URLs from our own domain
       if (new URL(url).origin === baseUrl) {
         return url;
       }
 
-      // Fallback
       return `${baseUrl}/auctions`;
     },
   },
