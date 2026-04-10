@@ -117,7 +117,7 @@ export default async function AuctionPage({
     where: { slug: params.slug },
     include: {
       seller: true,
-      winner: true, // 🔥 NEW
+      winner: true,
       bids: {
         orderBy: { amount: "desc" },
         take: 1,
@@ -164,6 +164,7 @@ export default async function AuctionPage({
         }}
       />
 
+      {/* TOP BAR */}
       <section className="bg-black text-white border-b border-black">
         <div className="max-w-6xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-4">
 
@@ -194,6 +195,7 @@ export default async function AuctionPage({
         </div>
       </section>
 
+      {/* MAIN AUCTION */}
       <AuctionClient
         auction={{
           id: auction.id,
@@ -206,6 +208,7 @@ export default async function AuctionPage({
           beds: auction.beds,
           baths: auction.baths,
           sqft: auction.sqft,
+          yearBuilt: auction.yearBuilt, // ✅ FIXED HERE
           arv: auction.arv,
           images,
           image,
@@ -216,21 +219,18 @@ export default async function AuctionPage({
             : null,
           bidIncrement: auction.bidIncrement,
           startingBid: auction.startingBid,
-
           leadingBidderId:
             auction.bids[0]?.bidderId ?? null,
-
-          winnerId: auction.winnerId, // 🔥 FIXED
-          sellerId: auction.sellerId, // 🔥 NEW
-
+          winnerId: auction.winnerId,
+          sellerId: auction.sellerId,
           status: auction.status,
-
           seller: auction.seller,
-          winner: auction.winner, // 🔥 NEW
+          winner: auction.winner,
         }}
         minimumBid={minimumBid}
       />
 
+      {/* BID HISTORY */}
       {auction.bidCount > 0 && (
         <div className="max-w-6xl mx-auto px-6 pb-10">
           <section className="bg-white rounded-2xl border shadow-sm p-6">
@@ -242,6 +242,7 @@ export default async function AuctionPage({
         </div>
       )}
 
+      {/* Q&A */}
       <div className="max-w-6xl mx-auto px-6 pb-20">
         <section className="bg-white rounded-2xl border shadow-sm p-6 mt-6">
 
@@ -257,7 +258,6 @@ export default async function AuctionPage({
 
           {questions.map((q) => (
             <div key={q.id} className="border-b py-3">
-
               <p className="font-medium">
                 Q: {q.question}
               </p>
@@ -269,7 +269,6 @@ export default async function AuctionPage({
               ) : (
                 <AnswerQuestion questionId={q.id} />
               )}
-
             </div>
           ))}
 
@@ -278,6 +277,7 @@ export default async function AuctionPage({
         </section>
       </div>
 
+      {/* MESSAGES */}
       {auction.status === "CLOSED" && (
         <div className="max-w-6xl mx-auto px-6 pb-20">
           <section

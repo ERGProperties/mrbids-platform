@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import BidForm from "./BidForm";
 import { useSession } from "next-auth/react";
 import AuctionCountdown from "@/components/auction/AuctionCountdown";
@@ -20,12 +20,9 @@ export default function AuctionClient({
   const { data: session } = useSession();
 
   const [liveAuction, setLiveAuction] = useState<any>(auction);
-  const [flashBid, setFlashBid] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [lastBidderName, setLastBidderName] = useState("Someone");
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const touchStartX = useRef<number | null>(null);
 
   const imageList =
     Array.isArray(liveAuction?.images) && liveAuction.images.length
@@ -39,14 +36,19 @@ export default function AuctionClient({
 
   const auctionEnd = liveAuction?.endAt;
 
-  const isEndingSoon =
-    auctionEnd &&
-    new Date(auctionEnd).getTime() - Date.now() < 1000 * 60 * 10;
-
   const watchingCount = getWatchingCount(liveAuction?.bidCount || 0);
 
-  const isWinning =
-    session?.user?.id === liveAuction?.leadingBidderId;
+  const prevImage = () => {
+    setSelectedIndex((prev) =>
+      prev === 0 ? imageList.length - 1 : prev - 1
+    );
+  };
+
+  const nextImage = () => {
+    setSelectedIndex((prev) =>
+      prev === imageList.length - 1 ? 0 : prev + 1
+    );
+  };
 
   useEffect(() => {
     if (!auction?.slug) return;
@@ -64,32 +66,26 @@ export default function AuctionClient({
         setLiveAuction((prev: any) => {
           if (!prev) return prev;
 
-          if (
-            data.highestBid &&
-            data.highestBid !== prev.highestBid
-          ) {
-            setFlashBid(true);
+          const hasChanged =
+            data.highestBid !== prev.highestBid ||
+            data.bidCount !== prev.bidCount ||
+            data.endAt !== prev.endAt;
+
+          if (!hasChanged) return prev;
+
+          if (data.highestBid && data.highestBid !== prev.highestBid) {
             setShowAlert(true);
 
             if (data.lastBidderName) {
               setLastBidderName(data.lastBidderName);
             }
 
-            setTimeout(() => {
-              setFlashBid(false);
-              setShowAlert(false);
-            }, 1500);
+            setTimeout(() => setShowAlert(false), 1500);
           }
 
           return {
             ...prev,
-            highestBid:
-              data.highestBid ?? prev.highestBid,
-            bidCount:
-              data.bidCount ?? prev.bidCount,
-            endAt: data.endAt ?? prev.endAt,
-            leadingBidderId:
-              data.leadingBidderId ?? prev.leadingBidderId,
+            ...data, // ✅ KEEP ALL FIELDS (INCLUDING yearBuilt)
           };
         });
       } catch (err) {
@@ -107,7 +103,7 @@ export default function AuctionClient({
   }, [auction?.slug]);
 
   return (
-    <main className="bg-gray-50 min-h-screen">
+    <main className="bg-gray-50 min-h-screen overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-6 py-16">
 
         {/* HEADER */}
@@ -133,11 +129,13 @@ export default function AuctionClient({
           )}
         </div>
 
-        <div className="grid lg:grid-cols-[1fr_360px] gap-8">
+        {/* 🔥 CRITICAL FIX: items-start + full height */}
+        <div className="grid lg:grid-cols-[1fr_360px] gap-8 items-start">
 
           {/* LEFT */}
-          <div>
-            <div className="bg-white border rounded-2xl overflow-hidden">
+          <div className="min-w-0">
+
+            <div className="relative bg-white border rounded-2xl overflow-hidden">
               {selectedImage ? (
                 <img
                   src={selectedImage}
@@ -148,14 +146,52 @@ export default function AuctionClient({
                   No Image Available
                 </div>
               )}
+
+              {imageList.length > 1 && (
+                <>
+                  <button
+                    onClick={prevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white text-black rounded-full w-12 h-12 flex items-center justify-center shadow-xl border text-2xl font-bold"
+                  >
+                    ‹
+                  </button>
+
+                  <button
+                    onClick={nextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white text-black rounded-full w-12 h-12 flex items-center justify-center shadow-xl border text-2xl font-bold"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
             </div>
 
+            {imageList.length > 1 && (
+              <div className="mt-4 overflow-x-auto">
+                <div className="flex gap-3">
+                  {imageList.map((img: string, i: number) => (
+                    <img
+                      key={i}
+                      src={img}
+                      onClick={() => setSelectedIndex(i)}
+                      className={`flex-shrink-0 w-24 h-20 object-cover rounded-lg cursor-pointer border-2 transition ${
+                        selectedIndex === i
+                          ? "border-blue-500"
+                          : "border-transparent opacity-70 hover:opacity-100"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="mt-6 bg-white border rounded-2xl p-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                 <InfoCard label="Type" value={liveAuction?.propertyType} />
                 <InfoCard label="Beds" value={liveAuction?.beds} />
                 <InfoCard label="Baths" value={liveAuction?.baths} />
                 <InfoCard label="Sqft" value={liveAuction?.sqft} />
+                <InfoCard label="Year Built" value={liveAuction?.yearBuilt ?? "—"} />
               </div>
 
               <div className="text-gray-700 whitespace-pre-line">
@@ -165,146 +201,58 @@ export default function AuctionClient({
           </div>
 
           {/* RIGHT */}
-          <aside className="lg:sticky lg:top-24">
-            <div className="bg-white border rounded-2xl p-6">
+          <div className="h-full">
+            <div className="sticky top-24">
 
-              {showAlert && (
-                <div className="mb-3 text-sm font-medium text-orange-600">
-                  🔥 {lastBidderName} just placed a bid
-                </div>
-              )}
+              <div className="bg-white border rounded-2xl p-6">
 
-              <p className="text-sm text-gray-500">
-                Current Winning Bid
-              </p>
-
-              <p className="text-3xl mt-2">
-                ${liveAuction?.highestBid?.toLocaleString?.() || 0}
-              </p>
-
-              {session && liveAuction?.bidCount > 0 && (
-                <div className="mt-3 text-sm font-medium">
-                  {isWinning ? (
-                    <div className="text-green-600">
-                      🟢 You are currently winning
-                    </div>
-                  ) : (
-                    <div className="text-red-600">
-                      🔴 You’ve been outbid
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="mt-3 text-sm">
-                🔥 {watchingCount} watching • ⚡ {liveAuction?.bidCount || 0} bids
-              </div>
-
-              <div className="mt-4">
-                {auctionEnd && (
-                  <AuctionCountdown endsAt={new Date(auctionEnd)} />
+                {showAlert && (
+                  <div className="mb-3 text-sm font-medium text-orange-600">
+                    🔥 {lastBidderName} just placed a bid
+                  </div>
                 )}
-              </div>
 
-              {/* POST STATUS */}
-              {liveAuction.status === "CLOSED" && session && (
-                <div className="mt-4 p-4 rounded-xl border bg-gray-50">
-                  {session.user.id === liveAuction.winnerId ? (
-                    <div className="text-green-700 font-semibold">
-                      🎉 You won this auction
-                    </div>
-                  ) : session.user.id === liveAuction.sellerId ? (
-                    <div className="text-blue-700 font-semibold">
-                      🏁 Your auction has ended
-                    </div>
+                <p className="text-sm text-gray-500">
+                  Current Winning Bid
+                </p>
+
+                <p className="text-3xl mt-2">
+                  ${liveAuction?.highestBid?.toLocaleString?.() || 0}
+                </p>
+
+                <div className="mt-3 text-sm">
+                  🔥 {watchingCount} watching • ⚡ {liveAuction?.bidCount || 0} bids
+                </div>
+
+                <div className="mt-4">
+                  {auctionEnd && (
+                    <AuctionCountdown endsAt={new Date(auctionEnd)} />
+                  )}
+                </div>
+
+                <div className="mt-6">
+                  {session ? (
+                    <BidForm
+                      slug={liveAuction.slug}
+                      minimumBid={minimumBid}
+                      currentBid={liveAuction.highestBid || 0}
+                    />
                   ) : (
-                    <div className="text-gray-600 text-sm">
-                      Auction ended
-                    </div>
+                    <button
+                      onClick={() =>
+                        (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction.slug}`)
+                      }
+                      className="w-full bg-black text-white py-3 rounded-xl"
+                    >
+                      Sign In to Bid
+                    </button>
                   )}
                 </div>
-              )}
 
-              {/* 🔥 IDENTITY + CTA */}
-              {liveAuction.status === "CLOSED" && (
-                <div className="mt-4 p-4 border rounded-xl bg-white space-y-4">
-
-                  {session?.user?.id === liveAuction.winnerId && liveAuction.seller && (
-                    <div>
-                      <p className="text-sm text-gray-500 mb-2">Seller</p>
-                      <div className="flex items-center gap-3 mb-3">
-                        <img
-                          src={liveAuction.seller.avatarUrl || "/default-avatar.png"}
-                          className="w-10 h-10 rounded-full border"
-                        />
-                        <Link href={`/user/${liveAuction.seller.id}`}>
-                          {liveAuction.seller.name || "Anonymous"}
-                        </Link>
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          document
-                            .getElementById("auction-messages")
-                            ?.scrollIntoView({ behavior: "smooth" })
-                        }
-                        className="w-full bg-black text-white py-2 rounded-lg text-sm"
-                      >
-                        Message Seller
-                      </button>
-                    </div>
-                  )}
-
-                  {session?.user?.id === liveAuction.sellerId && liveAuction.winner && (
-                    <div>
-                      <p className="text-sm text-gray-500 mb-2">Winning Bidder</p>
-                      <div className="flex items-center gap-3 mb-3">
-                        <img
-                          src={liveAuction.winner.avatarUrl || "/default-avatar.png"}
-                          className="w-10 h-10 rounded-full border"
-                        />
-                        <Link href={`/user/${liveAuction.winner.id}`}>
-                          {liveAuction.winner.name || "Anonymous"}
-                        </Link>
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          document
-                            .getElementById("auction-messages")
-                            ?.scrollIntoView({ behavior: "smooth" })
-                        }
-                        className="w-full bg-black text-white py-2 rounded-lg text-sm"
-                      >
-                        Message Buyer
-                      </button>
-                    </div>
-                  )}
-
-                </div>
-              )}
-
-              <div className="mt-6">
-                {session ? (
-                  <BidForm
-                    slug={liveAuction.slug}
-                    minimumBid={minimumBid}
-                    currentBid={liveAuction.highestBid || 0}
-                  />
-                ) : (
-                  <button
-                    onClick={() =>
-                      (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction.slug}`)
-                    }
-                    className="w-full bg-black text-white py-3 rounded-xl"
-                  >
-                    Sign In to Bid
-                  </button>
-                )}
               </div>
 
             </div>
-          </aside>
+          </div>
 
         </div>
 

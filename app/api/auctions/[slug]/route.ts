@@ -24,6 +24,12 @@ export async function GET(
             },
           },
         },
+        seller: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
@@ -44,22 +50,18 @@ export async function GET(
       auction.bids[0]?.bidder?.name || "Someone";
 
     return Response.json({
-      highestBid,
+      ...auction, // ✅ THIS IS THE KEY FIX
 
-      // ✅ Keep consistent
+      highestBid,
       endAt: auction.endAt
         ? auction.endAt.toISOString()
         : null,
-
       bidCount: auction.bidCount ?? 0,
-
-      // 🔥 NEW
       leadingBidderId,
       lastBidderName,
     });
   } catch (err) {
     console.error("AUCTION FETCH ERROR:", err);
-
     return new Response("Server error", { status: 500 });
   }
 }
