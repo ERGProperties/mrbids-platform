@@ -20,82 +20,100 @@ export const authOptions: NextAuthOptions = {
           const subject = "Sign in to MrBids";
 
           const html = `
-            <div style="margin:0; padding:0; background:#f5f5f5; font-family:Arial, sans-serif;">
+          <div style="margin:0; padding:0; background:#f4f4f5; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
 
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td align="center" style="padding:40px 0;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td align="center" style="padding:40px 16px;">
 
-                    <!-- CONTAINER -->
-                    <table width="600" style="background:#ffffff; border-radius:12px; overflow:hidden;">
+                  <!-- CONTAINER -->
+                  <table width="100%" style="max-width:600px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
 
-                      <!-- HEADER -->
-                      <tr>
-                        <td style="padding:20px; text-align:center; border-bottom:1px solid #eee;">
-                          <img 
-                            src="https://mrbids.com/logo.png" 
-                            alt="MrBids"
-                            style="height:40px;"
-                          />
-                        </td>
-                      </tr>
+                    <!-- HEADER -->
+                    <tr>
+                      <td style="padding:28px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
+                        <img 
+                          src="https://mrbids.com/logo.png" 
+                          alt="MrBids"
+                          style="height:52px;"
+                        />
+                      </td>
+                    </tr>
 
-                      <!-- BODY -->
-                      <tr>
-                        <td style="padding:30px;">
+                    <!-- BODY -->
+                    <tr>
+                      <td style="padding:34px 28px;">
 
-                          <h2 style="margin-top:0; font-size:22px;">
-                            Sign in to MrBids
-                          </h2>
+                        <h1 style="margin:0 0 12px; font-size:24px; font-weight:700; color:#111;">
+                          Your secure login link is ready
+                        </h1>
 
-                          <p style="font-size:16px; color:#333;">
-                            Click the button below to securely access your account.
-                          </p>
+                        <p style="margin:0 0 18px; font-size:16px; color:#444;">
+                          You're one click away from accessing your live auctions, bids, and opportunities.
+                        </p>
 
-                          <div style="text-align:center; margin:30px 0;">
-                            <a 
-                              href="${url}" 
-                              style="
-                                display:inline-block;
-                                padding:14px 26px;
-                                background:#000;
-                                color:#ffffff;
-                                text-decoration:none;
-                                border-radius:8px;
-                                font-weight:bold;
-                                font-size:15px;
-                              "
-                            >
-                              Sign In
-                            </a>
-                          </div>
+                        <p style="margin:0 0 28px; font-size:14px; color:#666;">
+                          This secure login link was requested from your device.
+                        </p>
 
-                          <p style="font-size:14px; color:#666;">
-                            This secure link will expire shortly.
-                          </p>
+                        <!-- CTA -->
+                        <div style="text-align:center; margin:30px 0;">
+                          <a 
+                            href="${url}" 
+                            style="
+                              display:inline-block;
+                              padding:16px 34px;
+                              background:#000;
+                              color:#ffffff;
+                              text-decoration:none;
+                              border-radius:10px;
+                              font-weight:700;
+                              font-size:16px;
+                              letter-spacing:0.3px;
+                            "
+                          >
+                            Sign In to MrBids
+                          </a>
+                        </div>
 
-                          <p style="font-size:14px; color:#666;">
-                            If you didn’t request this email, you can safely ignore it.
-                          </p>
+                        <!-- Secondary -->
+                        <p style="margin:24px 0 0; font-size:13px; color:#777; text-align:center;">
+                          Or copy and paste this link into your browser:
+                        </p>
 
-                        </td>
-                      </tr>
+                        <p style="word-break:break-all; font-size:12px; color:#999; text-align:center; margin-top:8px;">
+                          ${url}
+                        </p>
 
-                      <!-- FOOTER -->
-                      <tr>
-                        <td style="padding:20px; text-align:center; font-size:12px; color:#888; border-top:1px solid #eee;">
-                          © ${new Date().getFullYear()} MrBids<br/>
-                          Real-time real estate auctions
-                        </td>
-                      </tr>
+                      </td>
+                    </tr>
 
-                    </table>
+                    <!-- FOOTER -->
+                    <tr>
+                      <td style="padding:22px; text-align:center; border-top:1px solid #f1f1f1;">
 
-                  </td>
-                </tr>
-              </table>
+                        <p style="margin:0 0 6px; font-size:13px; color:#555; font-weight:500;">
+                          MrBids — Real-time real estate auctions
+                        </p>
 
-            </div>
+                        <p style="margin:0; font-size:12px; color:#888;">
+                          Built for investors, wholesalers, and dealmakers
+                        </p>
+
+                        <p style="margin-top:14px; font-size:11px; color:#aaa;">
+                          This link expires shortly. If you didn’t request this, you can safely ignore this email.
+                        </p>
+
+                      </td>
+                    </tr>
+
+                  </table>
+
+                </td>
+              </tr>
+            </table>
+
+          </div>
           `;
 
           const text = `Sign in to MrBids\n${url}`;
