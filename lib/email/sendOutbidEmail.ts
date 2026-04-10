@@ -1,5 +1,4 @@
 import { resend, EMAIL_FROM } from "./mailer";
-import { baseTemplate } from "./templates/baseTemplate";
 
 export async function sendOutbidEmail({
   to,
@@ -10,66 +9,89 @@ export async function sendOutbidEmail({
   address: string;
   auctionUrl: string;
 }) {
-  const subject = "You've been outbid";
+  const html = `
+  <div style="margin:0; padding:0; background:#f4f4f5; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
 
-  const content = `
-    <h2 style="margin-top:0; font-size:22px;">You've been outbid</h2>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding:40px 16px;">
 
-    <p style="font-size:16px; color:#333; margin:16px 0;">
-      Someone just placed a higher bid on:
-    </p>
+          <table width="100%" style="max-width:600px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
 
-    <p style="font-size:18px; font-weight:bold; margin:20px 0;">
-      ${address}
-    </p>
+            <!-- HEADER -->
+            <tr>
+              <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
+                <img src="https://mrbids.com/logo.png" style="height:60px;" />
+              </td>
+            </tr>
 
-    <div style="text-align:center; margin:30px 0;">
-      <a 
-        href="${auctionUrl}"
-        style="
-          display:inline-block;
-          padding:14px 26px;
-          background:#000;
-          color:#ffffff;
-          text-decoration:none;
-          border-radius:8px;
-          font-weight:bold;
-          font-size:15px;
-        "
-      >
-        Place a New Bid
-      </a>
-    </div>
+            <!-- BODY -->
+            <tr>
+              <td style="padding:34px 28px;">
 
-    <p style="font-size:14px; color:#666; margin-top:20px;">
-      Stay competitive — auctions move fast and bids can change quickly.
-    </p>
-  `;
+                <h1 style="margin:0 0 12px; font-size:22px; font-weight:700;">
+                  You've been outbid
+                </h1>
 
-  const html = baseTemplate({
-    title: subject,
-    preview: "You've been outbid — place a new bid now",
-    content,
-  });
+                <p style="font-size:16px; color:#444; margin-bottom:20px;">
+                  Someone placed a higher bid on:
+                </p>
 
-  // ✅ Plain text fallback (important for inbox delivery)
-  const text = `
-You've been outbid
+                <p style="font-size:18px; font-weight:600; margin:20px 0;">
+                  ${address}
+                </p>
 
-Someone placed a higher bid on:
-${address}
+                <p style="font-size:15px; color:#666;">
+                  Jump back in before it's gone — auctions move fast.
+                </p>
 
-Place a new bid:
-${auctionUrl}
+                <div style="text-align:center; margin:30px 0;">
+                  <a href="${auctionUrl}" style="
+                    display:inline-block;
+                    padding:16px 34px;
+                    background:#000;
+                    color:#fff;
+                    text-decoration:none;
+                    border-radius:10px;
+                    font-weight:700;
+                    font-size:16px;
+                  ">
+                    Place a New Bid
+                  </a>
+                </div>
 
-Stay competitive — auctions move fast.
+                <p style="font-size:13px; color:#888; text-align:center;">
+                  Stay competitive — this deal won’t wait.
+                </p>
+
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td style="padding:22px; text-align:center; border-top:1px solid #f1f1f1;">
+                <p style="font-size:13px; color:#555;">
+                  MrBids — Real-time real estate auctions
+                </p>
+                <p style="font-size:12px; color:#888;">
+                  Built for investors, wholesalers, and dealmakers
+                </p>
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+
+  </div>
   `;
 
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject,
+    subject: "You've been outbid — take it back",
     html,
-    text, // ✅ improves deliverability
   });
 }

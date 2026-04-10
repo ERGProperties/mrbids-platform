@@ -43,6 +43,7 @@ export async function emitNotificationEvent(params: EmitEventParams) {
         await sendHighestBidderEmail({
           to: user.email,
           address: auction.title,
+          bidAmount: params.bidAmount || 0, // ✅ FIXED
           auctionUrl,
         });
 

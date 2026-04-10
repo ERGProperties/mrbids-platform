@@ -35,7 +35,7 @@ export const authOptions: NextAuthOptions = {
                         <img 
                           src="https://mrbids.com/logo.png" 
                           alt="MrBids"
-                          style="height:52px;"
+                          style="height:60px;"
                         />
                       </td>
                     </tr>

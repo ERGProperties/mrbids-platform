@@ -1,70 +1,99 @@
 import { resend, EMAIL_FROM } from "./mailer";
-import { baseTemplate } from "./templates/baseTemplate";
 
 export async function sendHighestBidderEmail({
   to,
   address,
+  bidAmount,
   auctionUrl,
 }: {
   to: string;
   address: string;
+  bidAmount: number;
   auctionUrl: string;
 }) {
-  const subject = "You're the highest bidder 🎉";
+  const html = `
+  <div style="margin:0; padding:0; background:#f4f4f5; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
 
-  const content = `
-    <h2 style="margin-top:0;">You're the highest bidder 🎉</h2>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding:40px 16px;">
 
-    <p style="font-size:16px;">
-      You're currently winning:
-    </p>
+          <table width="100%" style="max-width:600px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
 
-    <p style="font-size:18px; font-weight:bold; margin:20px 0;">
-      ${address}
-    </p>
+            <!-- HEADER -->
+            <tr>
+              <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
+                <img src="https://mrbids.com/logo.png" style="height:60px;" />
+              </td>
+            </tr>
 
-    <div style="text-align:center; margin:30px 0;">
-      <a 
-        href="${auctionUrl}"
-        style="
-          display:inline-block;
-          padding:14px 24px;
-          background:#000;
-          color:#fff;
-          text-decoration:none;
-          border-radius:8px;
-          font-weight:bold;
-        "
-      >
-        View Auction
-      </a>
-    </div>
+            <!-- BODY -->
+            <tr>
+              <td style="padding:34px 28px;">
 
-    <p style="font-size:14px; color:#666;">
-      Stay alert — other bidders may jump in at any time.
-    </p>
-  `;
+                <h1 style="margin:0 0 12px; font-size:22px; font-weight:700;">
+                  You're in the lead 🎉
+                </h1>
 
-  const html = baseTemplate({
-    title: subject,
-    preview: "You're currently winning this auction",
-    content,
-  });
+                <p style="font-size:16px; color:#444;">
+                  You're currently the highest bidder on:
+                </p>
 
-  const text = `
-You're the highest bidder!
+                <p style="font-size:18px; font-weight:600; margin:20px 0;">
+                  ${address}
+                </p>
 
-Auction: ${address}
+                <p style="font-size:16px; color:#000; font-weight:600;">
+                  Your bid: $${bidAmount.toLocaleString()}
+                </p>
 
-View auction:
-${auctionUrl}
+                <p style="font-size:14px; color:#666; margin-top:10px;">
+                  Stay alert — other bidders may try to take the lead.
+                </p>
+
+                <div style="text-align:center; margin:30px 0;">
+                  <a href="${auctionUrl}" style="
+                    display:inline-block;
+                    padding:16px 34px;
+                    background:#000;
+                    color:#fff;
+                    text-decoration:none;
+                    border-radius:10px;
+                    font-weight:700;
+                    font-size:16px;
+                  ">
+                    View Auction
+                  </a>
+                </div>
+
+              </td>
+            </tr>
+
+            <!-- FOOTER -->
+            <tr>
+              <td style="padding:22px; text-align:center; border-top:1px solid #f1f1f1;">
+                <p style="font-size:13px; color:#555;">
+                  MrBids — Real-time real estate auctions
+                </p>
+                <p style="font-size:12px; color:#888;">
+                  Built for investors, wholesalers, and dealmakers
+                </p>
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+
+  </div>
   `;
 
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject,
+    subject: "You're the highest bidder 🎉",
     html,
-    text,
   });
 }
