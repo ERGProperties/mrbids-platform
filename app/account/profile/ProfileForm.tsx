@@ -1,23 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ProfileForm({ user }: { user: any }) {
+  const router = useRouter();
+
   const [name, setName] = useState(user.name || "");
   const [bio, setBio] = useState(user.bio || "");
   const [avatarUrl, setAvatarUrl] = useState(user.avatarUrl || "");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
-  // 🔥 Upload to Cloudinary
+  // Upload to Cloudinary
   async function handleImageUpload(file: File) {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "mrbids_upload"); // 👈 your preset
+    formData.append("upload_preset", "mrbids_upload");
 
     const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dx1okt4vf/image/upload", // 👈 replace this
+      "https://api.cloudinary.com/v1_1/dx1okt4vf/image/upload",
       {
         method: "POST",
         body: formData,
@@ -32,6 +36,7 @@ export default function ProfileForm({ user }: { user: any }) {
     e.preventDefault();
     setLoading(true);
     setSuccess(false);
+    setError("");
 
     try {
       const res = await fetch("/api/user/profile", {
@@ -42,11 +47,21 @@ export default function ProfileForm({ user }: { user: any }) {
         body: JSON.stringify({ name, bio, avatarUrl }),
       });
 
-      if (res.ok) {
-        setSuccess(true);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Failed to update profile");
+        return;
       }
+
+      setSuccess(true);
+
+      // 🔥 CRITICAL FIX: Refresh server data
+      router.refresh();
+
     } catch (err) {
       console.error(err);
+      setError("Something went wrong");
     }
 
     setLoading(false);
@@ -55,7 +70,7 @@ export default function ProfileForm({ user }: { user: any }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
 
-      {/* 🔥 AVATAR UPLOAD */}
+      {/* AVATAR */}
       <div>
         <label className="block text-sm font-medium mb-2">
           Profile Photo
@@ -75,6 +90,7 @@ export default function ProfileForm({ user }: { user: any }) {
               setAvatarUrl(url);
             } catch (err) {
               console.error("Upload failed:", err);
+              setError("Image upload failed");
             }
 
             setUploading(false);
@@ -82,7 +98,6 @@ export default function ProfileForm({ user }: { user: any }) {
           className="w-full border rounded-xl p-3"
         />
 
-        {/* Preview */}
         {avatarUrl && (
           <img
             src={avatarUrl}
@@ -106,7 +121,6 @@ export default function ProfileForm({ user }: { user: any }) {
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full border rounded-xl p-3"
-          placeholder="Your name or company"
         />
       </div>
 
@@ -119,7 +133,6 @@ export default function ProfileForm({ user }: { user: any }) {
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           className="w-full border rounded-xl p-3 h-28"
-          placeholder="Investor buying in TX/FL..."
         />
       </div>
 
@@ -136,6 +149,13 @@ export default function ProfileForm({ user }: { user: any }) {
       {success && (
         <p className="text-green-600 text-sm">
           Profile updated successfully
+        </p>
+      )}
+
+      {/* ERROR */}
+      {error && (
+        <p className="text-red-600 text-sm">
+          {error}
         </p>
       )}
     </form>
