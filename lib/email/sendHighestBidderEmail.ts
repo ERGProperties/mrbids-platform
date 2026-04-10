@@ -1,7 +1,7 @@
 import { resend, EMAIL_FROM } from "./mailer";
 import { baseTemplate } from "./templates/baseTemplate";
 
-export async function sendOutbidEmail({
+export async function sendHighestBidderEmail({
   to,
   address,
   auctionUrl,
@@ -10,13 +10,13 @@ export async function sendOutbidEmail({
   address: string;
   auctionUrl: string;
 }) {
-  const subject = "You've been outbid";
+  const subject = "You're the highest bidder 🎉";
 
   const content = `
-    <h2 style="margin-top:0; font-size:22px;">You've been outbid</h2>
+    <h2 style="margin-top:0;">You're the highest bidder 🎉</h2>
 
-    <p style="font-size:16px; color:#333; margin:16px 0;">
-      Someone just placed a higher bid on:
+    <p style="font-size:16px;">
+      You're currently winning:
     </p>
 
     <p style="font-size:18px; font-weight:bold; margin:20px 0;">
@@ -28,41 +28,36 @@ export async function sendOutbidEmail({
         href="${auctionUrl}"
         style="
           display:inline-block;
-          padding:14px 26px;
+          padding:14px 24px;
           background:#000;
-          color:#ffffff;
+          color:#fff;
           text-decoration:none;
           border-radius:8px;
           font-weight:bold;
-          font-size:15px;
         "
       >
-        Place a New Bid
+        View Auction
       </a>
     </div>
 
-    <p style="font-size:14px; color:#666; margin-top:20px;">
-      Stay competitive — auctions move fast and bids can change quickly.
+    <p style="font-size:14px; color:#666;">
+      Stay alert — other bidders may jump in at any time.
     </p>
   `;
 
   const html = baseTemplate({
     title: subject,
-    preview: "You've been outbid — place a new bid now",
+    preview: "You're currently winning this auction",
     content,
   });
 
-  // ✅ Plain text fallback (important for inbox delivery)
   const text = `
-You've been outbid
+You're the highest bidder!
 
-Someone placed a higher bid on:
-${address}
+Auction: ${address}
 
-Place a new bid:
+View auction:
 ${auctionUrl}
-
-Stay competitive — auctions move fast.
   `;
 
   await resend.emails.send({
@@ -70,6 +65,6 @@ Stay competitive — auctions move fast.
     to,
     subject,
     html,
-    text, // ✅ improves deliverability
+    text,
   });
 }

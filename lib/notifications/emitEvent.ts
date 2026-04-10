@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { sendEmail } from "./email";
 import { sendPushNotification } from "./push";
+
+// ✅ IMPORT YOUR NEW BRANDED EMAILS
+import { sendOutbidEmail } from "@/lib/email/sendOutbidEmail";
+import { sendHighestBidderEmail } from "@/lib/email/sendHighestBidderEmail";
 
 export type NotificationEvent =
   | "NEW_HIGHEST_BID"
@@ -30,19 +33,17 @@ export async function emitNotificationEvent(params: EmitEventParams) {
       return;
     }
 
+    const auctionUrl = `https://mrbids.com/auctions/${auction.slug}`;
+
     // =========================
     // NEW HIGHEST BID
     // =========================
     if (params.type === "NEW_HIGHEST_BID") {
       try {
-        await sendEmail({
+        await sendHighestBidderEmail({
           to: user.email,
-          subject: "You're currently the highest bidder 🎉",
-          html: `
-            <h2>You're winning!</h2>
-            <p>Auction: ${auction.title}</p>
-            <p>Your bid: $${params.bidAmount}</p>
-          `,
+          address: auction.title,
+          auctionUrl,
         });
 
         console.log("Highest bidder email sent:", user.email);
@@ -56,19 +57,10 @@ export async function emitNotificationEvent(params: EmitEventParams) {
     // =========================
     if (params.type === "OUTBID") {
       try {
-        await sendEmail({
+        await sendOutbidEmail({
           to: user.email,
-          subject: "You've been outbid — place a higher bid",
-          html: `
-            <h2>You've been outbid</h2>
-            <p>Auction: ${auction.title}</p>
-            <p>Current bid: $${params.bidAmount}</p>
-            <p>
-              <a href="https://mrbids.com/auctions/${auction.slug}">
-                Place a higher bid
-              </a>
-            </p>
-          `,
+          address: auction.title,
+          auctionUrl,
         });
 
         console.log("Outbid email sent:", user.email);
@@ -76,7 +68,7 @@ export async function emitNotificationEvent(params: EmitEventParams) {
         console.error("Outbid email failed:", err);
       }
 
-      // ⭐ PUSH NOTIFICATIONS (NEW)
+      // ⭐ PUSH NOTIFICATIONS (unchanged)
       try {
         const subscriptions =
           await prisma.pushSubscription.findMany({
