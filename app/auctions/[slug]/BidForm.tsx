@@ -43,9 +43,9 @@ export default function BidForm({
 
       const data = await res.json();
 
-      // 🚨 NEW: Profile incomplete → force profile completion
+      // 🔥 FIXED: Profile incomplete → redirect WITH callback
       if (data.error === "PROFILE_INCOMPLETE") {
-        window.location.href = `/account/profile`;
+        window.location.href = `/account/profile?callbackUrl=/auctions/${slug}`;
         return;
       }
 
@@ -64,6 +64,7 @@ export default function BidForm({
 
       // Refresh auction UI
       router.refresh();
+
     } catch (err: any) {
       console.error("BID ERROR:", err);
       setMessage("Something went wrong.");
