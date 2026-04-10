@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
-import { sendEmail } from "@/lib/email/sendEmail";
+
+// ✅ NEW EMAILS
+import { sendAuctionWonEmail } from "@/lib/email/sendAuctionWonEmail";
+import { sendSellerWinnerEmail } from "@/lib/email/sendSellerWinnerEmail";
 
 export async function finalizeAuction(auctionId: string) {
   const auction = await prisma.auction.findUnique({
@@ -46,40 +49,28 @@ export async function finalizeAuction(auctionId: string) {
     },
   });
 
-  // 🚨 SEND EMAILS
+  // 🚨 SEND PREMIUM EMAILS
   if (buyer && auction.seller) {
     try {
-      // 📧 Email seller
+      // 📧 Seller → gets buyer info
       if (auction.seller.email) {
-        await sendEmail({
+        await sendSellerWinnerEmail({
           to: auction.seller.email,
-          subject: "Your auction has ended 🎉",
-          text: `
-Your auction has ended.
-
-Winning Bid: $${highestBid.amount}
-
-Buyer:
-${buyer.name || "Anonymous"}
-${buyer.email}
-          `,
+          address: auction.title,
+          winningBid: highestBid.amount,
+          buyerName: buyer.name || "Anonymous",
+          buyerEmail: buyer.email || "",
         });
       }
 
-      // 📧 Email buyer
+      // 📧 Buyer → gets seller info
       if (buyer.email) {
-        await sendEmail({
+        await sendAuctionWonEmail({
           to: buyer.email,
-          subject: "You won the auction 🎉",
-          text: `
-Congratulations! You won the auction.
-
-Winning Bid: $${highestBid.amount}
-
-Seller:
-${auction.seller.name || "Anonymous"}
-${auction.seller.email}
-          `,
+          address: auction.title,
+          winningBid: highestBid.amount,
+          sellerName: auction.seller.name || "Anonymous",
+          sellerEmail: auction.seller.email || "",
         });
       }
 
@@ -88,7 +79,7 @@ ${auction.seller.email}
     }
   }
 
-  // 💬 CREATE INITIAL MESSAGE THREAD (NEW 🔥)
+  // 💬 CREATE INITIAL MESSAGE THREAD
   if (buyer && auction.seller) {
     try {
       await prisma.message.create({
