@@ -1,319 +1,99 @@
-export const dynamic = "force-dynamic";
-
-import Link from "next/link";
-import { getAllAuctions } from "@/lib/repositories/auctionRepository";
-
-/* ---------- IMAGE HELPERS ---------- */
-
-function getPrimaryImage(auction: any) {
-  if (
-    typeof auction?.coverImage === "string" &&
-    auction.coverImage.startsWith("http")
-  ) {
-    return auction.coverImage;
-  }
-
-  if (!Array.isArray(auction?.images)) return null;
-
-  const first = auction.images.find(
-    (img: unknown) =>
-      typeof img === "string" && img.startsWith("http")
-  );
-
-  return first || null;
-}
-
-function AuctionImage({ src }: { src: string | null }) {
+export default function WaterDamagePage() {
   return (
-    <div className="h-full w-full bg-gray-100 overflow-hidden">
-      {typeof src === "string" && src.length > 0 ? (
-        <img
-          src={src}
-          alt=""
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
-      ) : (
-        <div className="h-full w-full flex items-center justify-center text-sm text-gray-400">
-          No image available
-        </div>
-      )}
-    </div>
-  );
-}
+    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+      <div className="max-w-md w-full">
 
-/* ---------- HELPERS ---------- */
-
-function formatCurrency(value?: number | null) {
-  if (!value) return "—";
-
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-/* 🔥 FINAL STABLE COUNTDOWN */
-function formatTimeRemaining(endAt?: Date | string | null) {
-  if (!endAt) return "—";
-
-  const end = new Date(endAt);
-  if (isNaN(end.getTime())) return "—";
-
-  const diffMs = end.getTime() - Date.now();
-
-  if (diffMs <= 0) return "Ending Soon"; // 👈 softer than "Ended"
-
-  const totalMinutes = Math.floor(diffMs / (1000 * 60));
-
-  // 🔥 KEY FIX: always guarantee at least 1 minute
-  if (totalMinutes <= 0) return "1m";
-
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
-
-  if (days > 0) {
-    return `${days}d ${hours}h`;
-  }
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
-
-  return `${minutes}m`;
-}
-
-function getTimeStatus(endAt?: Date | string | null) {
-  if (!endAt) return "LIVE NOW";
-
-  const end = new Date(endAt);
-  if (isNaN(end.getTime())) return "LIVE NOW";
-
-  const diff = end.getTime() - Date.now();
-
-  if (diff <= 0) return "ENDING SOON";
-  if (diff < 1000 * 60 * 60 * 24) return "ENDING SOON";
-
-  return "LIVE NOW";
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const styles =
-    status === "ENDING SOON"
-      ? "bg-red-100 text-red-700"
-      : "bg-green-100 text-green-700";
-
-  return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${styles}`}
-    >
-      {status}
-    </span>
-  );
-}
-
-/* ---------- PAGE ---------- */
-
-export default async function HomePage() {
-  let auctions: any[] = [];
-
-  try {
-    const result = await getAllAuctions();
-    auctions = Array.isArray(result) ? result : [];
-  } catch (err) {
-    console.error("Failed loading auctions:", err);
-  }
-
-  const live = auctions.filter((a) => a?.status === "LIVE");
-
-  const sortedLive = [...live].sort((a, b) => {
-    const aEnd = new Date(a?.endAt || 0).getTime();
-    const bEnd = new Date(b?.endAt || 0).getTime();
-    return aEnd - bEnd;
-  });
-
-  const featured = sortedLive.length > 0 ? sortedLive[0] : null;
-
-  return (
-    <main className="bg-white">
-
-      {/* HERO */}
-      <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
-        <div className="max-w-3xl">
-
-          <p className="text-sm font-medium text-gray-500 mb-6 uppercase tracking-[0.18em]">
-            Private Marketplace for Real Assets
+        {/* BRAND */}
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-blue-600">
+            24/7 Water Damage Help
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Serving Your Area • 24/7 Emergency Response
           </p>
+        </div>
 
-          <h1 className="text-6xl md:text-7xl font-semibold leading-[1.05]">
-            Seller-Direct
-            <br />
-            Real Estate Auctions
+        {/* HERO */}
+        <div className="bg-white p-6 rounded-2xl shadow-md">
+
+          <h1 className="text-2xl font-bold text-center mb-2">
+            Water Damage? Get Immediate Help Near You
           </h1>
 
-          <p className="mt-10 text-xl text-gray-600">
-            Verified buyers compete transparently while sellers retain full control.
+          <p className="text-center text-gray-600 mb-4">
+            Fast response from local professionals. Available now.
           </p>
 
-          <div className="mt-14 flex gap-4">
-            <Link href="/auctions" className="px-10 py-5 bg-black text-white rounded-full">
-              Browse Auctions
-            </Link>
-
-            <Link href="/sell-property" className="px-10 py-5 border rounded-full">
-              Sell a Property
-            </Link>
+          {/* TRUST BADGES */}
+          <div className="flex justify-center gap-3 text-xs text-gray-500 mb-4">
+            <span>✔ 24/7 Service</span>
+            <span>✔ Fast Response</span>
+            <span>✔ No Obligation</span>
           </div>
+
+          {/* FORM */}
+          <form
+            action="https://formspree.io/f/your-form-id"
+            method="POST"
+            className="flex flex-col gap-3"
+          >
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              required
+              className="border border-gray-300 p-3 rounded-lg"
+            />
+
+            <input
+              type="tel"
+              name="phone"
+              placeholder="Phone Number"
+              required
+              className="border border-gray-300 p-3 rounded-lg"
+            />
+
+            <input
+              type="text"
+              name="zip"
+              placeholder="Zip Code"
+              required
+              className="border border-gray-300 p-3 rounded-lg"
+            />
+
+            <textarea
+              name="message"
+              placeholder="What happened?"
+              rows={3}
+              className="border border-gray-300 p-3 rounded-lg"
+            />
+
+            <button className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-lg font-semibold">
+              Get Help Now
+            </button>
+          </form>
+
+          {/* CALL CTA */}
+          <a
+            href="tel:+1234567890"
+            className="block text-center mt-4 text-blue-600 font-semibold"
+          >
+            Or Call Now
+          </a>
+
+          {/* TRUST TEXT */}
+          <p className="text-xs text-gray-500 mt-4 text-center">
+            We connect you with trusted local water damage specialists.
+          </p>
 
         </div>
-      </section>
 
-      {/* FEATURED */}
-      {featured && (
-        <section className="border-y bg-gray-50">
-          <div className="max-w-7xl mx-auto px-6 py-24">
+        {/* SOCIAL PROOF / URGENCY */}
+        <p className="text-center text-xs text-gray-400 mt-4">
+          Homeowners are getting help in your area right now
+        </p>
 
-            <div className="flex items-center gap-3 mb-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-gray-500">
-                Featured Auction
-              </p>
-              <StatusBadge status={getTimeStatus(featured?.endAt)} />
-            </div>
-
-            <div className="grid lg:grid-cols-2 bg-white border rounded-3xl overflow-hidden">
-
-              <div className="h-[460px]">
-                <AuctionImage src={getPrimaryImage(featured)} />
-              </div>
-
-              <div className="p-12 flex flex-col justify-center">
-
-                <h2 className="text-4xl font-semibold">
-                  {featured?.title}
-                </h2>
-
-                <p className="mt-4 text-sm text-gray-600">
-                  {featured?.addressLine}
-                  <br />
-                  {featured?.cityStateZip}
-                </p>
-
-                {/* 🔥 FINAL TIMER */}
-                <p className="mt-5 text-sm font-semibold text-gray-900">
-                  ⏳ {formatTimeRemaining(featured?.endAt)}
-                </p>
-
-                <div className="mt-6 text-sm text-gray-700 space-y-1">
-
-                  <p>
-                    Starting Bid:{" "}
-                    <span className="font-semibold">
-                      {formatCurrency(featured?.startingBid)}
-                    </span>
-                  </p>
-
-                  <p>
-                    Seller ARV:{" "}
-                    <span className="font-semibold">
-                      {formatCurrency(featured?.arv)}
-                    </span>
-                  </p>
-
-                </div>
-
-                <Link
-                  href={`/auctions/${featured?.slug}`}
-                  className="inline-block mt-10 px-8 py-3 bg-black text-white rounded-full"
-                >
-                  View Featured Auction
-                </Link>
-
-              </div>
-
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* LIVE AUCTIONS */}
-      <section className="bg-white">
-        <div className="max-w-7xl mx-auto px-6 py-24">
-
-          <div className="flex items-center justify-between mb-12">
-            <h2 className="text-4xl font-semibold">
-              Live Auctions
-            </h2>
-
-            <Link href="/auctions" className="text-sm font-medium">
-              View all →
-            </Link>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-10">
-
-            {sortedLive.slice(0, 3).map((auction) => (
-
-              <div key={auction.id} className="border rounded-3xl overflow-hidden">
-
-                <div className="h-60">
-                  <AuctionImage src={getPrimaryImage(auction)} />
-                </div>
-
-                <div className="p-7">
-
-                  <StatusBadge status={getTimeStatus(auction?.endAt)} />
-
-                  <h3 className="mt-4 text-xl font-semibold">
-                    {auction?.title}
-                  </h3>
-
-                  <p className="mt-2 text-sm text-gray-600">
-                    {auction?.addressLine}
-                    <br />
-                    {auction?.cityStateZip}
-                  </p>
-
-                  {/* 🔥 FINAL TIMER */}
-                  <p className="mt-3 text-sm font-semibold text-gray-900">
-                    ⏳ {formatTimeRemaining(auction?.endAt)}
-                  </p>
-
-                  <div className="mt-4 text-sm space-y-1">
-
-                    <p>
-                      Starting Bid:{" "}
-                      <span className="font-semibold">
-                        {formatCurrency(auction?.startingBid)}
-                      </span>
-                    </p>
-
-                    <p>
-                      Seller ARV:{" "}
-                      <span className="font-semibold">
-                        {formatCurrency(auction?.arv)}
-                      </span>
-                    </p>
-
-                  </div>
-
-                  <Link
-                    href={`/auctions/${auction?.slug}`}
-                    className="inline-block mt-6 px-6 py-2 bg-black text-white rounded-full text-sm"
-                  >
-                    View Auction
-                  </Link>
-
-                </div>
-              </div>
-
-            ))}
-
-          </div>
-        </div>
-      </section>
-
+      </div>
     </main>
   );
 }
