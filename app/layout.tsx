@@ -43,7 +43,6 @@ export default function RootLayout({
       <body className="bg-white text-gray-900 antialiased flex flex-col min-h-screen">
         <SessionProvider>
 
-          {/* 🔥 THIS CONTROLS HEADER + FOOTER VISIBILITY */}
           <LayoutWrapper>
             {children}
           </LayoutWrapper>
