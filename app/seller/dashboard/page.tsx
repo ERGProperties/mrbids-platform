@@ -1,14 +1,18 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
 
-import { authOptions } from "@/lib/authOptions";
-import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 
 import { redirect } from "next/navigation";
 
+import { prisma } from "@/lib/prisma";
+
+import { authOptions } from "@/lib/authOptions";
+
 export default async function SellerDashboardPage() {
 
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(
+    authOptions
+  );
 
   if (!session?.user?.email) {
     redirect("/coming-soon");
@@ -34,98 +38,96 @@ export default async function SellerDashboardPage() {
       {/* HERO */}
       <section className="max-w-7xl mx-auto px-6 pt-32 pb-20">
 
-        <div className="max-w-3xl">
+        <div className="border rounded-[2rem] p-8 md:p-12">
 
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.18em] mb-6">
-            Seller Dashboard
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center gap-8">
 
-          <h1 className="text-5xl md:text-7xl font-semibold leading-[1.02]">
-            Welcome Back
-          </h1>
+            {/* AVATAR */}
+            <div>
 
-          <p className="mt-8 text-xl text-gray-600">
-            Manage your LIVE marketplace auctions and seller activity.
-          </p>
+              {user.avatarUrl ? (
 
-        </div>
+                <img
+                  src={user.avatarUrl}
+                  alt={user.name || "Seller"}
+                  className="w-32 h-32 rounded-full object-cover border"
+                />
 
-      </section>
+              ) : (
 
-      {/* SELLER INFO */}
-      <section className="pb-24">
+                <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center text-3xl font-semibold text-gray-500">
+                  {user.name?.charAt(0) || "M"}
+                </div>
 
-        <div className="max-w-7xl mx-auto px-6">
-
-          <div className="border rounded-3xl p-8 md:p-12">
-
-            <div className="grid md:grid-cols-3 gap-10">
-
-              <div>
-
-                <p className="text-sm text-gray-500 mb-2">
-                  Seller Category
-                </p>
-
-                <p className="text-2xl font-semibold">
-                  {user.sellerCategory || "—"}
-                </p>
-
-              </div>
-
-              <div>
-
-                <p className="text-sm text-gray-500 mb-2">
-                  TikTok Username
-                </p>
-
-                <p className="text-2xl font-semibold">
-                  {user.tiktokUsername || "—"}
-                </p>
-
-              </div>
-
-              <div>
-
-                <p className="text-sm text-gray-500 mb-2">
-                  Seller Status
-                </p>
-
-                <p className="text-2xl font-semibold text-green-600">
-                  ACTIVE
-                </p>
-
-              </div>
+              )}
 
             </div>
 
-            <div className="mt-14">
+            {/* SELLER INFO */}
+            <div className="flex-1">
 
-              <p className="text-sm text-gray-500 mb-4">
-                Seller Bio
+              <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.18em] mb-4">
+                Seller Dashboard
               </p>
 
-              <div className="border rounded-2xl p-6 text-gray-700 leading-relaxed">
-                {user.sellerBio || "No seller bio yet."}
+              <h1 className="text-5xl font-semibold leading-tight">
+                {user.name || "Marketplace Seller"}
+              </h1>
+
+              <div className="mt-5 flex flex-wrap gap-3">
+
+                <span className="px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
+                  {user.sellerCategory || "Seller"}
+                </span>
+
+                <span className="px-4 py-2 rounded-full border text-sm font-medium">
+                  ACTIVE SELLER
+                </span>
+
               </div>
 
-            </div>
+              {user.tiktokUsername && (
 
-            {/* CTA */}
-            <div className="mt-14 flex flex-wrap gap-4">
+                <p className="mt-6 text-lg text-gray-600">
+                  TikTok:{" "}
+                  <span className="font-medium">
+                    {user.tiktokUsername}
+                  </span>
+                </p>
 
-              <button className="px-8 py-4 rounded-full bg-black text-white">
-                Create Marketplace Auction
-              </button>
-
-              <Link
-                href="/live"
-                className="px-8 py-4 rounded-full border"
-              >
-                Browse LIVE Auctions
-              </Link>
+              )}
 
             </div>
+
+          </div>
+
+          {/* BIO */}
+          <div className="mt-14">
+
+            <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.18em] mb-4">
+              Seller Bio
+            </p>
+
+            <div className="border rounded-2xl p-6 text-gray-700 leading-relaxed text-lg">
+              {user.sellerBio ||
+                "No seller bio yet."}
+            </div>
+
+          </div>
+
+          {/* CTA */}
+          <div className="mt-14 flex flex-wrap gap-4">
+
+            <button className="px-8 py-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition">
+              Create Marketplace Auction
+            </button>
+
+            <Link
+              href="/live"
+              className="px-8 py-4 rounded-full border font-medium hover:bg-gray-50 transition"
+            >
+              Browse LIVE Auctions
+            </Link>
 
           </div>
 

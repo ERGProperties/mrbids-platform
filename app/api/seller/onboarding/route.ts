@@ -1,16 +1,21 @@
 import { NextResponse } from "next/server";
+
 import { getServerSession } from "next-auth";
 
 import { prisma } from "@/lib/prisma";
+
 import { authOptions } from "@/lib/authOptions";
 
 export async function POST(req: Request) {
 
   try {
 
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(
+      authOptions
+    );
 
     if (!session?.user?.email) {
+
       return NextResponse.json(
         {
           error: "Unauthorized",
@@ -19,11 +24,14 @@ export async function POST(req: Request) {
           status: 401,
         }
       );
+
     }
 
     const body = await req.json();
 
     const {
+      name,
+      avatarUrl,
       sellerCategory,
       tiktokUsername,
       sellerBio,
@@ -36,6 +44,7 @@ export async function POST(req: Request) {
     });
 
     if (!user) {
+
       return NextResponse.json(
         {
           error: "User not found",
@@ -44,19 +53,27 @@ export async function POST(req: Request) {
           status: 404,
         }
       );
+
     }
 
-    const updatedUser = await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        isMarketplaceSeller: true,
-        sellerCategory,
-        tiktokUsername,
-        sellerBio,
-      },
-    });
+    const updatedUser =
+      await prisma.user.update({
+
+        where: {
+          id: user.id,
+        },
+
+        data: {
+          name,
+          avatarUrl,
+
+          isMarketplaceSeller: true,
+
+          sellerCategory,
+          tiktokUsername,
+          sellerBio,
+        },
+      });
 
     return NextResponse.json({
       success: true,
@@ -72,11 +89,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       {
-        error: "Failed to complete onboarding",
+        error:
+          "Failed to complete onboarding",
       },
       {
         status: 500,
       }
     );
+
   }
 }

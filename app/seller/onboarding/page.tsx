@@ -1,27 +1,75 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function SellerOnboardingPage() {
 
   const [form, setForm] = useState({
+    name: "",
     sellerCategory: "Jewelry",
     tiktokUsername: "",
     sellerBio: "",
+    avatarUrl: "",
   });
+
+  const [previewImage, setPreviewImage] =
+    useState("");
 
   const [loading, setLoading] = useState(false);
 
-  const [success, setSuccess] = useState(false);
-
   const [error, setError] = useState("");
+
+  async function handleImageUpload(
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
+
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    try {
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.error || "Upload failed"
+        );
+      }
+
+      setForm({
+        ...form,
+        avatarUrl: data.url,
+      });
+
+      setPreviewImage(data.url);
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError("Failed to upload image");
+
+    }
+  }
 
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
+
     e.preventDefault();
 
     setLoading(true);
+
     setError("");
 
     try {
@@ -45,12 +93,14 @@ export default function SellerOnboardingPage() {
         );
       }
 
-      window.location.href = "/seller/dashboard";
+      window.location.href =
+        "/seller/dashboard";
 
     } catch (err: any) {
 
       setError(
-        err.message || "Failed to complete onboarding"
+        err.message ||
+        "Failed to complete onboarding"
       );
 
     } finally {
@@ -72,136 +122,170 @@ export default function SellerOnboardingPage() {
           </p>
 
           <h1 className="text-5xl md:text-6xl font-semibold leading-[1.02]">
-            Complete Your Seller Profile
+            Create Your Seller Profile
           </h1>
 
           <p className="mt-8 text-xl text-gray-600">
-            Tell buyers what you sell on MrBids.
+            Build your LIVE marketplace identity.
           </p>
 
         </div>
 
         <div className="border rounded-3xl p-8 md:p-12">
 
-          {success ? (
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-8"
+          >
 
-            <div className="text-center py-8">
+            {/* NAME */}
+            <div>
 
-              <div className="text-6xl mb-6">
-                🚀
-              </div>
+              <label className="block text-sm font-medium mb-3">
+                Seller Name
+              </label>
 
-              <h2 className="text-3xl font-semibold">
-                Seller Profile Created
-              </h2>
-
-              <p className="mt-4 text-gray-600">
-                Your marketplace seller account is now active.
-              </p>
+              <input
+                type="text"
+                required
+                value={form.name}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    name: e.target.value,
+                  })
+                }
+                placeholder="Your seller name"
+                className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
+              />
 
             </div>
 
-          ) : (
+            {/* PROFILE PHOTO */}
+            <div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-8"
-            >
+              <label className="block text-sm font-medium mb-3">
+                Profile Photo
+              </label>
 
-              {/* CATEGORY */}
-              <div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="w-full border rounded-2xl px-5 py-4"
+              />
 
-                <label className="block text-sm font-medium mb-3">
-                  Primary Selling Category
-                </label>
+              {previewImage && (
 
-                <select
-                  value={form.sellerCategory}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      sellerCategory: e.target.value,
-                    })
-                  }
-                  className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
-                >
-                  <option>Jewelry</option>
-                  <option>Electronics</option>
-                  <option>Sneakers</option>
-                  <option>Collectibles</option>
-                  <option>Liquidation</option>
-                  <option>Luxury Items</option>
-                  <option>Storage Finds</option>
-                  <option>Other</option>
-                </select>
+                <div className="mt-6">
 
-              </div>
+                  <img
+                    src={previewImage}
+                    alt="Preview"
+                    className="w-28 h-28 rounded-full object-cover border"
+                  />
 
-              {/* TIKTOK */}
-              <div>
-
-                <label className="block text-sm font-medium mb-3">
-                  TikTok Username
-                </label>
-
-                <input
-                  type="text"
-                  value={form.tiktokUsername}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      tiktokUsername: e.target.value,
-                    })
-                  }
-                  placeholder="@username"
-                  className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
-                />
-
-              </div>
-
-              {/* BIO */}
-              <div>
-
-                <label className="block text-sm font-medium mb-3">
-                  Seller Bio
-                </label>
-
-                <textarea
-                  rows={5}
-                  value={form.sellerBio}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      sellerBio: e.target.value,
-                    })
-                  }
-                  placeholder="Tell buyers about what you sell..."
-                  className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black resize-none"
-                />
-
-              </div>
-
-              {/* ERROR */}
-              {error && (
-                <div className="text-red-600 text-sm">
-                  {error}
                 </div>
+
               )}
 
-              {/* SUBMIT */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+            </div>
+
+            {/* CATEGORY */}
+            <div>
+
+              <label className="block text-sm font-medium mb-3">
+                Primary Selling Category
+              </label>
+
+              <select
+                value={form.sellerCategory}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    sellerCategory:
+                      e.target.value,
+                  })
+                }
+                className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
               >
-                {loading
-                  ? "Creating Seller Profile..."
-                  : "Complete Seller Setup"}
-              </button>
+                <option>Jewelry</option>
+                <option>Electronics</option>
+                <option>Sneakers</option>
+                <option>Collectibles</option>
+                <option>Liquidation</option>
+                <option>Luxury Items</option>
+                <option>Storage Finds</option>
+                <option>Other</option>
+              </select>
 
-            </form>
+            </div>
 
-          )}
+            {/* TIKTOK */}
+            <div>
+
+              <label className="block text-sm font-medium mb-3">
+                TikTok Username
+              </label>
+
+              <input
+                type="text"
+                value={form.tiktokUsername}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    tiktokUsername:
+                      e.target.value,
+                  })
+                }
+                placeholder="@username"
+                className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
+              />
+
+            </div>
+
+            {/* BIO */}
+            <div>
+
+              <label className="block text-sm font-medium mb-3">
+                Seller Bio
+              </label>
+
+              <textarea
+                rows={5}
+                value={form.sellerBio}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    sellerBio:
+                      e.target.value,
+                  })
+                }
+                placeholder="Tell buyers about what you sell..."
+                className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black resize-none"
+              />
+
+            </div>
+
+            {/* ERROR */}
+            {error && (
+              <div className="text-red-600 text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* SUBMIT */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+            >
+              {loading
+                ? "Creating Seller Profile..."
+                : "Complete Seller Setup"}
+            </button>
+
+          </form>
 
         </div>
 
