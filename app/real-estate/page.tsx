@@ -139,10 +139,11 @@ export default async function RealEstatePage() {
 
       {/* HERO */}
       <section className="max-w-7xl mx-auto px-6 pt-36 pb-28">
+
         <div className="max-w-3xl">
 
           <p className="text-sm font-medium text-gray-500 mb-6 uppercase tracking-[0.18em]">
-            Private Marketplace for Real Assets
+            Real Estate Marketplace
           </p>
 
           <h1 className="text-6xl md:text-7xl font-semibold leading-[1.05]">
@@ -152,10 +153,12 @@ export default async function RealEstatePage() {
           </h1>
 
           <p className="mt-10 text-xl text-gray-600">
-            Verified buyers compete transparently while sellers retain full control.
+            Browse investment opportunities, distressed properties,
+            and seller-direct real estate auctions.
           </p>
 
-          <div className="mt-14 flex gap-4">
+          <div className="mt-14 flex flex-wrap gap-4">
+
             <Link
               href="/real-estate/auctions"
               className="px-10 py-5 bg-black text-white rounded-full"
@@ -169,9 +172,11 @@ export default async function RealEstatePage() {
             >
               Sell a Property
             </Link>
+
           </div>
 
         </div>
+
       </section>
 
       {/* FEATURED */}
@@ -246,7 +251,7 @@ export default async function RealEstatePage() {
 
           <div className="flex items-center justify-between mb-12">
             <h2 className="text-4xl font-semibold">
-              Live Auctions
+              Live Real Estate Auctions
             </h2>
 
             <Link

@@ -124,7 +124,7 @@ export default async function HomePage() {
               </Link>
 
               <Link
-                href="/sell"
+                href="/coming-soon"
                 className="w-full sm:w-auto text-center px-8 md:px-10 py-4 md:py-5 border rounded-full"
               >
                 Start Selling
@@ -321,6 +321,262 @@ export default async function HomePage() {
               </div>
 
             ))}
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* LIVE NOW */}
+      <section className="bg-white">
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-24">
+
+          <div className="flex items-center justify-between mb-10 md:mb-12">
+
+            <h2 className="text-3xl md:text-4xl font-semibold">
+              LIVE Now
+            </h2>
+
+            <Link
+              href="/live"
+              className="text-sm font-medium"
+            >
+              View all →
+            </Link>
+
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-10">
+
+            {liveAuctions.map((auction) => (
+
+              <div
+                key={auction.id}
+                className="group border rounded-3xl overflow-hidden hover:shadow-xl transition"
+              >
+
+                <div className="relative h-72 overflow-hidden">
+
+                  <img
+                    src={auction.image}
+                    alt={auction.title}
+                    className="h-full w-full object-cover group-hover:scale-105 transition duration-500"
+                  />
+
+                  <div className="absolute top-5 left-5">
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-red-600 text-white">
+                      LIVE
+                    </span>
+                  </div>
+
+                </div>
+
+                <div className="p-7">
+
+                  <h3 className="text-2xl font-semibold">
+                    {auction.title}
+                  </h3>
+
+                  <div className="mt-5 flex items-center justify-between text-sm">
+
+                    <span className="font-medium">
+                      {auction.viewers}
+                    </span>
+
+                    <span className="text-gray-500">
+                      {auction.status}
+                    </span>
+
+                  </div>
+
+                  <Link
+                    href={
+                      auction.slug
+                        ? `/real-estate/auctions/${auction.slug}`
+                        : "/live"
+                    }
+                    className="inline-block mt-6 px-6 py-3 bg-black text-white rounded-full text-sm"
+                  >
+                    Join LIVE Auction
+                  </Link>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* FEATURED AUCTIONS */}
+      <section className="border-t bg-gray-50">
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-24">
+
+          <div className="flex items-center justify-between mb-10 md:mb-12">
+
+            <h2 className="text-3xl md:text-4xl font-semibold">
+              Featured Auctions
+            </h2>
+
+            <Link
+              href="/real-estate"
+              className="text-sm font-medium"
+            >
+              Browse all →
+            </Link>
+
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-10">
+
+            {auctions.slice(0, 6).map((auction) => (
+
+              <div
+                key={auction.id}
+                className="group bg-white border rounded-3xl overflow-hidden hover:shadow-xl transition"
+              >
+
+                <div className="relative h-72 overflow-hidden">
+
+                  <img
+                    src={
+                      getPrimaryImage(auction) ||
+                      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1200&auto=format&fit=crop"
+                    }
+                    alt={auction.title}
+                    className="h-full w-full object-cover group-hover:scale-105 transition duration-500"
+                  />
+
+                  <div className="absolute top-5 left-5">
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-black text-white">
+                      FEATURED
+                    </span>
+                  </div>
+
+                </div>
+
+                <div className="p-7">
+
+                  <h3 className="text-2xl font-semibold">
+                    {auction.title || "Auction Listing"}
+                  </h3>
+
+                  <p className="mt-3 text-sm text-gray-500">
+                    {auction.cityStateZip || "Marketplace Auction"}
+                  </p>
+
+                  <div className="mt-6 flex items-center justify-between">
+
+                    <div>
+                      <p className="text-xs text-gray-500">
+                        Starting Bid
+                      </p>
+
+                      <p className="text-xl font-semibold">
+                        {auction.startingBid
+                          ? `$${Number(auction.startingBid).toLocaleString()}`
+                          : "$1"}
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className="text-xs text-gray-500">
+                        Status
+                      </p>
+
+                      <p className="text-sm font-medium">
+                        {auction.status || "LIVE"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Link
+                    href={`/real-estate/auctions/${auction.slug}`}
+                    className="inline-block mt-8 px-6 py-3 bg-black text-white rounded-full text-sm"
+                  >
+                    View Auction
+                  </Link>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* SELL CTA */}
+      <section className="border-t">
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-24 md:py-28 text-center">
+
+          <h2 className="text-4xl md:text-5xl font-semibold leading-tight">
+            Turn Your Inventory Into
+            <br />
+            LIVE Sales
+          </h2>
+
+          <p className="mt-8 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+            Reach engaged buyers through high-energy LIVE auctions and
+            real-time bidding experiences.
+          </p>
+
+          <div className="mt-12">
+
+            <Link
+              href="/coming-soon"
+              className="px-10 py-5 bg-black text-white rounded-full"
+            >
+              Become a Seller
+            </Link>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* REAL ESTATE */}
+      <section className="bg-gray-50 border-t">
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-24">
+
+          <div className="max-w-3xl">
+
+            <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.18em] mb-6">
+              Real Estate Auctions
+            </p>
+
+            <h2 className="text-4xl md:text-5xl font-semibold leading-tight">
+              Explore Investment Properties
+            </h2>
+
+            <p className="mt-8 text-lg md:text-xl text-gray-600">
+              Browse distressed properties, off-market opportunities,
+              and seller-direct real estate auctions.
+            </p>
+
+            <div className="mt-12">
+
+              <Link
+                href="/real-estate"
+                className="px-10 py-5 bg-black text-white rounded-full"
+              >
+                Explore Real Estate
+              </Link>
+
+            </div>
 
           </div>
 
