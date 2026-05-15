@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import CountdownTimer from "@/components/CountdownTimer";
+
 export default function AuctionClient({
   auction,
 }: {
@@ -174,6 +176,9 @@ export default function AuctionClient({
           </div>
 
         </div>
+
+        {/* COUNTDOWN TIMER */}
+        <CountdownTimer endAt={auction.endAt} />
 
         {/* CURRENT BID */}
         <div>
