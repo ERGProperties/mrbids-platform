@@ -20,6 +20,7 @@ enum AuctionStatus {
 
 enum MarketplaceAuctionStatus {
   DRAFT
+  SCHEDULED
   LIVE
   ENDED
 }
@@ -114,7 +115,9 @@ model MarketplaceAuction {
   startingBid   Int
   bidIncrement  Int @default(1)
 
-  currentBid    Int?
+  // LIVE BIDDING
+  currentBid    Int @default(0)
+  bidCount      Int @default(0)
 
   startAt       DateTime?
   endAt         DateTime?
@@ -124,8 +127,28 @@ model MarketplaceAuction {
   sellerId      String
   seller        User @relation(fields: [sellerId], references: [id])
 
+  // RELATIONS
+  bids          MarketplaceBid[]
+
   @@index([sellerId])
   @@index([status])
+}
+
+model MarketplaceBid {
+  id          String   @id @default(cuid())
+
+  amount      Int
+
+  createdAt   DateTime @default(now())
+
+  auctionId   String
+  auction     MarketplaceAuction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  bidderId    String
+  bidder      User @relation(fields: [bidderId], references: [id])
+
+  @@index([auctionId, createdAt])
+  @@index([bidderId])
 }
 
 model Bid {
@@ -215,6 +238,8 @@ model User {
   auctions  Auction[] @relation("SellerAuctions")
 
   marketplaceAuctions MarketplaceAuction[]
+
+  marketplaceBids MarketplaceBid[]
 
   // WON AUCTIONS
   wonAuctions Auction[] @relation("AuctionWinner")
