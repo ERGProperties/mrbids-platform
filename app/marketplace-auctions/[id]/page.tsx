@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 import { prisma } from "@/lib/prisma";
 
 import { notFound } from "next/navigation";
@@ -23,6 +27,106 @@ export default async function MarketplaceAuctionPage({
   if (!auction) {
     notFound();
   }
+
+  return (
+    <AuctionClient auction={auction} />
+  );
+}
+
+function AuctionClient({
+  auction,
+}: {
+  auction: any;
+}) {
+
+  const [
+    amount,
+    setAmount,
+  ] = useState(
+    auction.currentBid > 0
+      ? auction.currentBid + auction.bidIncrement
+      : auction.startingBid
+  );
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    success,
+    setSuccess,
+  ] = useState("");
+
+  async function handleBid() {
+
+    try {
+
+      setLoading(true);
+
+      setError("");
+      setSuccess("");
+
+      const response = await fetch(
+        `/api/marketplace-auctions/${auction.id}/bid`,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            amount,
+          }),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+
+        setError(
+          data.error ||
+            "Failed to place bid"
+        );
+
+        return;
+      }
+
+      setSuccess(
+        "Bid placed successfully!"
+      );
+
+      window.location.reload();
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        "Something went wrong"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  }
+
+  const minimumBid =
+    auction.currentBid > 0
+      ? auction.currentBid +
+        auction.bidIncrement
+      : auction.startingBid;
 
   return (
     <main className="min-h-screen bg-white">
@@ -53,10 +157,14 @@ export default async function MarketplaceAuctionPage({
           {/* DETAILS */}
           <div>
 
-            <div className="mb-6">
+            <div className="flex items-center gap-4 mb-6">
 
               <span className="inline-flex px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
                 {auction.category}
+              </span>
+
+              <span className="inline-flex px-4 py-2 rounded-full bg-red-500 text-white text-sm font-medium">
+                {auction.status}
               </span>
 
             </div>
@@ -67,6 +175,7 @@ export default async function MarketplaceAuctionPage({
 
             <div className="mt-8 space-y-6">
 
+              {/* SELLER */}
               <div>
 
                 <p className="text-sm text-gray-500 mb-2">
@@ -122,6 +231,7 @@ export default async function MarketplaceAuctionPage({
 
               </div>
 
+              {/* CURRENT BID */}
               <div>
 
                 <p className="text-sm text-gray-500 mb-2">
@@ -133,8 +243,67 @@ export default async function MarketplaceAuctionPage({
                   {auction.currentBid?.toLocaleString()}
                 </p>
 
+                <p className="mt-2 text-sm text-gray-500">
+                  {auction.bidCount} bids
+                </p>
+
               </div>
 
+              {/* MINIMUM BID */}
+              <div className="border rounded-2xl p-6">
+
+                <p className="text-sm text-gray-500 mb-2">
+                  Minimum Bid
+                </p>
+
+                <p className="text-3xl font-semibold">
+                  $
+                  {minimumBid.toLocaleString()}
+                </p>
+
+              </div>
+
+              {/* BID INPUT */}
+              <div>
+
+                <label className="block text-sm text-gray-500 mb-2">
+                  Your Bid
+                </label>
+
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) =>
+                    setAmount(
+                      Number(
+                        e.target.value
+                      )
+                    )
+                  }
+                  className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold outline-none focus:ring-2 focus:ring-black"
+                />
+
+              </div>
+
+              {/* ERROR */}
+              {error && (
+
+                <div className="border border-red-200 bg-red-50 text-red-600 rounded-2xl p-4">
+                  {error}
+                </div>
+
+              )}
+
+              {/* SUCCESS */}
+              {success && (
+
+                <div className="border border-green-200 bg-green-50 text-green-600 rounded-2xl p-4">
+                  {success}
+                </div>
+
+              )}
+
+              {/* DESCRIPTION */}
               <div>
 
                 <p className="text-sm text-gray-500 mb-3">
@@ -149,8 +318,16 @@ export default async function MarketplaceAuctionPage({
               </div>
 
               {/* BID BUTTON */}
-              <button className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition">
-                Place Bid
+              <button
+                onClick={handleBid}
+                disabled={loading}
+                className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+              >
+
+                {loading
+                  ? "Placing Bid..."
+                  : "Place Bid"}
+
               </button>
 
             </div>
