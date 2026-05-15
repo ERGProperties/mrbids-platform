@@ -24,13 +24,35 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
           {/* NAV */}
           <nav className="flex items-center gap-8">
-            <Link href="/auctions" className="text-sm font-medium text-gray-700 hover:text-gray-900">
-              Browse Auctions
+
+            <Link
+              href="/live"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+              Live Auctions
             </Link>
 
-            <Link href="/sell-property" className="text-sm font-medium text-gray-700 hover:text-gray-900">
-              Sell a Property
+            <Link
+              href="/categories"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+              Categories
             </Link>
+
+            <Link
+              href="/real-estate"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+              Real Estate
+            </Link>
+
+            <Link
+              href="/sell"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900"
+            >
+              Sell
+            </Link>
+
           </nav>
 
         </div>
@@ -43,50 +65,84 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
 
       {/* ================= FOOTER ================= */}
       <footer className="border-t border-gray-100 bg-white">
+
         <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-3 gap-10">
 
           <div>
-            <p className="text-sm font-semibold text-gray-900">MrBids</p>
+            <p className="text-sm font-semibold text-gray-900">
+              MrBids
+            </p>
+
             <p className="mt-4 text-sm text-gray-600 max-w-sm">
-              A private, seller-direct real estate auction marketplace.
+              LIVE auctions for real estate, collectibles, electronics,
+              liquidation deals, jewelry, and rare finds.
             </p>
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-900">Marketplace</p>
+
+            <p className="text-sm font-semibold text-gray-900">
+              Marketplace
+            </p>
+
             <ul className="mt-4 space-y-3 text-sm text-gray-600">
+
               <li>
-                <Link href="/auctions" className="hover:underline">
-                  Browse Auctions
+                <Link href="/live" className="hover:underline">
+                  Live Auctions
                 </Link>
               </li>
+
               <li>
-                <Link href="/sell-property" className="hover:underline">
-                  Sell a Property
+                <Link href="/categories" className="hover:underline">
+                  Categories
                 </Link>
               </li>
+
+              <li>
+                <Link href="/real-estate" className="hover:underline">
+                  Real Estate
+                </Link>
+              </li>
+
+              <li>
+                <Link href="/sell" className="hover:underline">
+                  Sell on MrBids
+                </Link>
+              </li>
+
             </ul>
+
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-900">Legal</p>
+
+            <p className="text-sm font-semibold text-gray-900">
+              Legal
+            </p>
+
             <ul className="mt-4 space-y-3 text-sm text-gray-600">
+
               <li>
                 <Link href="/terms" className="hover:underline">
                   Terms of Service
                 </Link>
               </li>
+
               <li>
                 <Link href="/privacy" className="hover:underline">
                   Privacy Policy
                 </Link>
               </li>
+
               <li>
                 <Link href="/disclosures" className="hover:underline">
                   Disclosures
                 </Link>
               </li>
+
             </ul>
+
           </div>
 
         </div>
@@ -94,6 +150,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         <div className="border-t border-gray-100 py-6 text-center text-xs text-gray-400">
           © {new Date().getFullYear()} MrBids. All rights reserved.
         </div>
+
       </footer>
     </>
   )
