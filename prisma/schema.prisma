@@ -56,7 +56,7 @@ model Auction {
   status        AuctionStatus @default(DRAFT)
   result        String?
 
-  // 🔥 WINNER
+  // WINNER
   winnerId      String?
   winner        User? @relation("AuctionWinner", fields: [winnerId], references: [id])
 
@@ -144,21 +144,6 @@ model Message {
   @@index([receiverId])
 }
 
-model SellerApplication {
-  id         String   @id @default(cuid())
-
-  createdAt  DateTime @default(now())
-
-  fullName   String
-  email      String
-  tiktok     String?
-
-  category   String
-  inventory  String
-
-  status     String   @default("PENDING")
-}
-
 model User {
   id        String   @id @default(cuid())
 
@@ -171,8 +156,16 @@ model User {
 
   /* PROFILE */
 
-  bio       String?
-  avatarUrl String?
+  bio                 String?
+  avatarUrl           String?
+
+  // MARKETPLACE SELLER
+
+  isMarketplaceSeller Boolean @default(false)
+
+  sellerCategory      String?
+  tiktokUsername      String?
+  sellerBio           String?
 
   createdAt DateTime @default(now())
 
@@ -183,7 +176,7 @@ model User {
   bids      Bid[]
   auctions  Auction[] @relation("SellerAuctions")
 
-  // 🔥 WON AUCTIONS
+  // WON AUCTIONS
   wonAuctions Auction[] @relation("AuctionWinner")
 
   questions Question[]

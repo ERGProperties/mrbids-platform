@@ -1,16 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 
-export default function ComingSoonPage() {
+export default function SellerOnboardingPage() {
 
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    tiktok: "",
-    category: "Jewelry",
-    inventory: "",
-  });
+  const [email, setEmail] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -27,36 +22,29 @@ export default function ComingSoonPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/seller-application", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+
+      const result = await signIn("email", {
+        email,
+        redirect: false,
+        callbackUrl: "/seller/onboarding",
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(
-          data.error || "Something went wrong"
-        );
+      if (result?.error) {
+        throw new Error(result.error);
       }
 
       setSuccess(true);
 
-      setForm({
-        fullName: "",
-        email: "",
-        tiktok: "",
-        category: "Jewelry",
-        inventory: "",
-      });
-
     } catch (err: any) {
-      setError(err.message || "Failed to submit");
+
+      setError(
+        err.message || "Failed to send login link"
+      );
+
     } finally {
+
       setLoading(false);
+
     }
   }
 
@@ -75,33 +63,32 @@ export default function ComingSoonPage() {
         </h1>
 
         <p className="mt-8 text-xl text-gray-600 max-w-2xl mx-auto">
-          Apply to become an early seller on the next generation
-          of LIVE marketplace auctions.
+          Start selling on MrBids using secure passwordless login.
         </p>
 
       </section>
 
-      {/* FORM */}
+      {/* LOGIN */}
       <section className="pb-32">
 
-        <div className="max-w-3xl mx-auto px-6">
+        <div className="max-w-2xl mx-auto px-6">
 
           <div className="border rounded-3xl p-8 md:p-12">
 
             {success ? (
 
-              <div className="text-center py-10">
+              <div className="text-center py-8">
 
                 <div className="text-6xl mb-6">
-                  ✅
+                  ✉️
                 </div>
 
                 <h2 className="text-3xl font-semibold">
-                  Application Submitted
+                  Check Your Email
                 </h2>
 
                 <p className="mt-4 text-gray-600">
-                  Thank you for applying to become a seller on MrBids.
+                  We sent you a secure Magic Link to continue seller onboarding.
                 </p>
 
               </div>
@@ -113,30 +100,6 @@ export default function ComingSoonPage() {
                 className="space-y-8"
               >
 
-                {/* NAME */}
-                <div>
-
-                  <label className="block text-sm font-medium mb-3">
-                    Full Name
-                  </label>
-
-                  <input
-                    type="text"
-                    required
-                    value={form.fullName}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        fullName: e.target.value,
-                      })
-                    }
-                    placeholder="Your name"
-                    className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
-                  />
-
-                </div>
-
-                {/* EMAIL */}
                 <div>
 
                   <label className="block text-sm font-medium mb-3">
@@ -146,12 +109,9 @@ export default function ComingSoonPage() {
                   <input
                     type="email"
                     required
-                    value={form.email}
+                    value={email}
                     onChange={(e) =>
-                      setForm({
-                        ...form,
-                        email: e.target.value,
-                      })
+                      setEmail(e.target.value)
                     }
                     placeholder="you@example.com"
                     className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
@@ -159,96 +119,20 @@ export default function ComingSoonPage() {
 
                 </div>
 
-                {/* TIKTOK */}
-                <div>
-
-                  <label className="block text-sm font-medium mb-3">
-                    TikTok Username
-                  </label>
-
-                  <input
-                    type="text"
-                    value={form.tiktok}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        tiktok: e.target.value,
-                      })
-                    }
-                    placeholder="@username"
-                    className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
-                  />
-
-                </div>
-
-                {/* CATEGORY */}
-                <div>
-
-                  <label className="block text-sm font-medium mb-3">
-                    Primary Selling Category
-                  </label>
-
-                  <select
-                    value={form.category}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        category: e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
-                  >
-                    <option>Jewelry</option>
-                    <option>Electronics</option>
-                    <option>Sneakers</option>
-                    <option>Collectibles</option>
-                    <option>Liquidation</option>
-                    <option>Luxury Items</option>
-                    <option>Storage Finds</option>
-                    <option>Other</option>
-                  </select>
-
-                </div>
-
-                {/* INVENTORY */}
-                <div>
-
-                  <label className="block text-sm font-medium mb-3">
-                    Tell Us About Your Inventory
-                  </label>
-
-                  <textarea
-                    rows={5}
-                    required
-                    value={form.inventory}
-                    onChange={(e) =>
-                      setForm({
-                        ...form,
-                        inventory: e.target.value,
-                      })
-                    }
-                    placeholder="Describe what you plan to sell..."
-                    className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black resize-none"
-                  />
-
-                </div>
-
-                {/* ERROR */}
                 {error && (
-                  <div className="text-red-600 text-sm">
+                  <div className="text-sm text-red-600">
                     {error}
                   </div>
                 )}
 
-                {/* SUBMIT */}
                 <button
                   type="submit"
                   disabled={loading}
                   className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
                 >
                   {loading
-                    ? "Submitting..."
-                    : "Submit Seller Application"}
+                    ? "Sending Magic Link..."
+                    : "Continue With Magic Link"}
                 </button>
 
               </form>
