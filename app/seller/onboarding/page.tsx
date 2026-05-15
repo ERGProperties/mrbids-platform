@@ -12,54 +12,38 @@ export default function SellerOnboardingPage() {
     avatarUrl: "",
   });
 
-  const [previewImage, setPreviewImage] =
-    useState("");
-
   const [loading, setLoading] = useState(false);
+
+  const [uploading, setUploading] =
+    useState(false);
 
   const [error, setError] = useState("");
 
+  // CLOUDINARY DIRECT UPLOAD
   async function handleImageUpload(
-    e: React.ChangeEvent<HTMLInputElement>
+    file: File
   ) {
-
-    const file = e.target.files?.[0];
-
-    if (!file) return;
 
     const formData = new FormData();
 
     formData.append("file", file);
 
-    try {
+    formData.append(
+      "upload_preset",
+      "mrbids_upload"
+    );
 
-      const res = await fetch("/api/upload", {
+    const res = await fetch(
+      "https://api.cloudinary.com/v1_1/dx1okt4vf/image/upload",
+      {
         method: "POST",
         body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(
-          data.error || "Upload failed"
-        );
       }
+    );
 
-      setForm({
-        ...form,
-        avatarUrl: data.url,
-      });
+    const data = await res.json();
 
-      setPreviewImage(data.url);
-
-    } catch (err) {
-
-      console.error(err);
-
-      setError("Failed to upload image");
-
-    }
+    return data.secure_url;
   }
 
   async function handleSubmit(
@@ -79,7 +63,8 @@ export default function SellerOnboardingPage() {
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type":
+              "application/json",
           },
           body: JSON.stringify(form),
         }
@@ -89,7 +74,8 @@ export default function SellerOnboardingPage() {
 
       if (!res.ok) {
         throw new Error(
-          data.error || "Something went wrong"
+          data.error ||
+          "Something went wrong"
         );
       }
 
@@ -171,22 +157,61 @@ export default function SellerOnboardingPage() {
               <input
                 type="file"
                 accept="image/*"
-                onChange={handleImageUpload}
+                onChange={async (e) => {
+
+                  const file =
+                    e.target.files?.[0];
+
+                  if (!file) return;
+
+                  setUploading(true);
+
+                  try {
+
+                    const url =
+                      await handleImageUpload(
+                        file
+                      );
+
+                    setForm({
+                      ...form,
+                      avatarUrl: url,
+                    });
+
+                  } catch (err) {
+
+                    console.error(err);
+
+                    setError(
+                      "Image upload failed"
+                    );
+
+                  }
+
+                  setUploading(false);
+
+                }}
                 className="w-full border rounded-2xl px-5 py-4"
               />
 
-              {previewImage && (
+              {form.avatarUrl && (
 
                 <div className="mt-6">
 
                   <img
-                    src={previewImage}
+                    src={form.avatarUrl}
                     alt="Preview"
                     className="w-28 h-28 rounded-full object-cover border"
                   />
 
                 </div>
 
+              )}
+
+              {uploading && (
+                <p className="text-sm text-gray-500 mt-3">
+                  Uploading image...
+                </p>
               )}
 
             </div>
@@ -277,7 +302,9 @@ export default function SellerOnboardingPage() {
             {/* SUBMIT */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={
+                loading || uploading
+              }
               className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
             >
               {loading
