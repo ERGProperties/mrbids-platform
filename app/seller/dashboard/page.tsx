@@ -118,9 +118,12 @@ export default async function SellerDashboardPage() {
           {/* CTA */}
           <div className="mt-14 flex flex-wrap gap-4">
 
-            <button className="px-8 py-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition">
+            <Link
+              href="/seller/create-auction"
+              className="px-8 py-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+            >
               Create Marketplace Auction
-            </button>
+            </Link>
 
             <Link
               href="/live"
