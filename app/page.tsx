@@ -5,39 +5,13 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 
-const fallbackAuctions = [
-  {
-    id: "1",
-    title: "Luxury Jewelry Auction",
-    viewers: "214 viewers",
-    status: "Ending Soon",
-    image:
-      "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: "2",
-    title: "Sneaker Heat Drop",
-    viewers: "487 viewers",
-    status: "LIVE NOW",
-    image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: "3",
-    title: "Electronics Liquidation",
-    viewers: "352 viewers",
-    status: "Hot Bidding",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop",
-  },
-];
-
 const activityFeed = [
   "Luxury watch sold for $2,450",
+  "Sneaker auction hit 300+ bids",
+  "Electronics liquidation sold LIVE",
   "Storage unit auction reached 128 bids",
-  "Sneaker drop attracted 487 LIVE viewers",
-  "Gold chain auction ended in 3 minutes",
-  "Electronics liquidation sold out LIVE",
+  "Jewelry auction ended in 2 minutes",
+  "Rare collectible card sold for $5,200",
 ];
 
 function getPrimaryImage(auction: any) {
@@ -63,15 +37,18 @@ function getPrimaryImage(auction: any) {
 
 export default async function HomePage() {
 
-  let auctions: any[] = [];
+  // REAL ESTATE
+  let realEstateAuctions: any[] = [];
 
   try {
 
-    const result = await getAllAuctions();
+    const result =
+      await getAllAuctions();
 
-    auctions = Array.isArray(result)
-      ? result
-      : [];
+    realEstateAuctions =
+      Array.isArray(result)
+        ? result
+        : [];
 
   } catch (err) {
 
@@ -82,7 +59,7 @@ export default async function HomePage() {
 
   }
 
-  // MARKETPLACE AUCTIONS
+  // MARKETPLACE
   const marketplaceAuctions =
     await prisma.marketplaceAuction.findMany({
 
@@ -97,26 +74,6 @@ export default async function HomePage() {
       take: 6,
 
     });
-
-  const liveAuctions =
-    auctions.length > 0
-      ? auctions.slice(0, 3).map(
-          (auction) => ({
-            id: auction.id,
-            title:
-              auction.title ||
-              "LIVE Auction",
-            viewers: "LIVE Bidding",
-            status: "LIVE NOW",
-            image:
-              getPrimaryImage(
-                auction
-              ) ||
-              "https://images.unsplash.com/photo-1607082350899-7e105aa886ae?q=80&w=1600&auto=format&fit=crop",
-            slug: auction.slug,
-          })
-        )
-      : fallbackAuctions;
 
   return (
     <main className="bg-white text-black">
@@ -150,8 +107,8 @@ export default async function HomePage() {
             <p className="mt-8 md:mt-10 text-lg md:text-xl text-gray-600 max-w-2xl">
               Discover jewelry, electronics,
               collectibles, liquidation deals,
-              real estate, and rare finds during
-              fast-paced LIVE auctions.
+              rare finds, and real estate
+              through fast-paced LIVE auctions.
             </p>
 
             <div className="mt-10 md:mt-14 flex flex-col sm:flex-row gap-4">
@@ -172,6 +129,47 @@ export default async function HomePage() {
 
             </div>
 
+            {/* STATS */}
+            <div className="mt-14 grid grid-cols-3 gap-6">
+
+              <div>
+
+                <p className="text-3xl md:text-4xl font-semibold">
+                  LIVE
+                </p>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  Auctions Daily
+                </p>
+
+              </div>
+
+              <div>
+
+                <p className="text-3xl md:text-4xl font-semibold">
+                  $1
+                </p>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  Starting Bids
+                </p>
+
+              </div>
+
+              <div>
+
+                <p className="text-3xl md:text-4xl font-semibold">
+                  24/7
+                </p>
+
+                <p className="mt-2 text-sm text-gray-500">
+                  Marketplace Energy
+                </p>
+
+              </div>
+
+            </div>
+
           </div>
 
           {/* RIGHT */}
@@ -187,6 +185,59 @@ export default async function HomePage() {
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
+              {/* LIVE BADGE */}
+              <div className="absolute top-6 left-6">
+
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-600 text-white text-sm font-semibold">
+
+                  <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+
+                  LIVE NOW
+
+                </div>
+
+              </div>
+
+              {/* LIVE CARD */}
+              <div className="absolute bottom-6 left-6 right-6 bg-white rounded-3xl p-6 shadow-xl">
+
+                <div className="flex items-center justify-between gap-4">
+
+                  <div>
+
+                    <p className="text-sm text-gray-500">
+                      Trending Auction
+                    </p>
+
+                    <h3 className="mt-2 text-2xl font-semibold">
+                      Luxury Jewelry Drop
+                    </h3>
+
+                  </div>
+
+                  <div className="text-right">
+
+                    <p className="text-sm text-gray-500">
+                      Current Bid
+                    </p>
+
+                    <p className="mt-2 text-3xl font-semibold">
+                      $1,250
+                    </p>
+
+                  </div>
+
+                </div>
+
+                <Link
+                  href="/marketplace-auctions"
+                  className="block text-center w-full mt-6 py-4 bg-black text-white rounded-full font-medium"
+                >
+                  Join LIVE Auction
+                </Link>
+
+              </div>
+
             </div>
 
           </div>
@@ -195,15 +246,117 @@ export default async function HomePage() {
 
       </section>
 
-      {/* MARKETPLACE AUCTIONS */}
-      <section className="border-t bg-white">
+      {/* ACTIVITY FEED */}
+      <section className="border-y bg-black text-white overflow-hidden">
+
+        <div className="flex gap-12 whitespace-nowrap py-5 px-6 animate-pulse">
+
+          {activityFeed.map(
+            (item, index) => (
+
+              <div
+                key={index}
+                className="text-sm font-medium"
+              >
+                🔥 {item}
+              </div>
+
+            )
+          )}
+
+        </div>
+
+      </section>
+
+      {/* CATEGORIES */}
+      <section className="bg-gray-50 border-b">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-24">
 
-          <div className="flex items-center justify-between mb-10 md:mb-12">
+          <div className="flex items-center justify-between mb-12">
 
-            <h2 className="text-3xl md:text-4xl font-semibold">
-              Marketplace Auctions
+            <h2 className="text-4xl font-semibold">
+              Browse Categories
+            </h2>
+
+            <Link
+              href="/categories"
+              className="text-sm font-medium"
+            >
+              View all →
+            </Link>
+
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            {[
+              {
+                title: "Jewelry",
+                image:
+                  "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?q=80&w=1200&auto=format&fit=crop",
+              },
+              {
+                title: "Electronics",
+                image:
+                  "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop",
+              },
+              {
+                title: "Collectibles",
+                image:
+                  "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?q=80&w=1200&auto=format&fit=crop",
+              },
+              {
+                title: "Liquidation",
+                image:
+                  "https://images.unsplash.com/photo-1553413077-190dd305871c?q=80&w=1200&auto=format&fit=crop",
+              },
+            ].map((category) => (
+
+              <div
+                key={category.title}
+                className="group relative rounded-3xl overflow-hidden h-[320px]"
+              >
+
+                <img
+                  src={category.image}
+                  alt={category.title}
+                  className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition duration-500"
+                />
+
+                <div className="absolute inset-0 bg-black/40" />
+
+                <div className="relative h-full flex flex-col justify-end p-8 text-white">
+
+                  <h3 className="text-3xl font-semibold">
+                    {category.title}
+                  </h3>
+
+                  <p className="mt-3 text-sm text-white/80">
+                    Explore LIVE auctions and exclusive deals.
+                  </p>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* MARKETPLACE AUCTIONS */}
+      <section className="bg-white">
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-24">
+
+          <div className="flex items-center justify-between mb-12">
+
+            <h2 className="text-4xl font-semibold">
+              LIVE Marketplace Auctions
             </h2>
 
             <Link
@@ -351,6 +504,38 @@ export default async function HomePage() {
             </div>
 
           )}
+
+        </div>
+
+      </section>
+
+      {/* SELL CTA */}
+      <section className="border-t">
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-24 md:py-28 text-center">
+
+          <h2 className="text-4xl md:text-5xl font-semibold leading-tight">
+            Turn Your Inventory Into
+            <br />
+            LIVE Sales
+          </h2>
+
+          <p className="mt-8 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+            Reach engaged buyers through
+            high-energy LIVE auctions and
+            real-time bidding experiences.
+          </p>
+
+          <div className="mt-12">
+
+            <Link
+              href="/coming-soon"
+              className="px-10 py-5 bg-black text-white rounded-full"
+            >
+              Become a Seller
+            </Link>
+
+          </div>
 
         </div>
 
