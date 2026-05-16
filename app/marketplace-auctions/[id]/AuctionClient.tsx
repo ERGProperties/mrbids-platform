@@ -41,8 +41,42 @@ export default function AuctionClient({
 
     const channel =
       pusherClient.subscribe(
-        `auction-${initialAuction.id}`
+        `presence-auction-${initialAuction.id}`
       );
+
+    channel.bind(
+      "pusher:subscription_succeeded",
+      (members: any) => {
+
+        setViewerCount(
+          members.count
+        );
+
+      }
+    );
+
+    channel.bind(
+      "pusher:member_added",
+      () => {
+
+        setViewerCount(
+          (prev) => prev + 1
+        );
+
+      }
+    );
+
+    channel.bind(
+      "pusher:member_removed",
+      () => {
+
+        setViewerCount(
+          (prev) =>
+            Math.max(prev - 1, 0)
+        );
+
+      }
+    );
 
     channel.bind(
       "new-bid",
@@ -62,7 +96,7 @@ export default function AuctionClient({
       channel.unbind_all();
 
       pusherClient.unsubscribe(
-        `auction-${initialAuction.id}`
+        `presence-auction-${initialAuction.id}`
       );
 
     };
@@ -98,6 +132,11 @@ export default function AuctionClient({
     statusLoading,
     setStatusLoading,
   ] = useState(false);
+
+  const [
+    viewerCount,
+    setViewerCount,
+  ] = useState(0);
 
   async function handleBid() {
 
@@ -300,6 +339,19 @@ export default function AuctionClient({
 
         {/* COUNTDOWN TIMER */}
         <CountdownTimer endAt={auction.endAt} />
+
+        {/* LIVE VIEWERS */}
+        <div className="border rounded-2xl p-6 bg-black text-white">
+
+          <p className="text-sm text-gray-300 mb-2">
+            LIVE Viewers
+          </p>
+
+          <p className="text-4xl font-semibold">
+            {viewerCount}
+          </p>
+
+        </div>
 
         {/* CURRENT BID */}
         <div>

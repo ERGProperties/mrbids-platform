@@ -8,5 +8,10 @@ export const pusherClient =
       cluster:
         process.env
           .NEXT_PUBLIC_PUSHER_CLUSTER!,
+
+      channelAuthorization: {
+        endpoint:
+          "/api/pusher/auth",
+      },
     }
   );
