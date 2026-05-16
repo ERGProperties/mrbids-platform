@@ -35,6 +35,11 @@ export default function AuctionClient({
     setSuccess,
   ] = useState("");
 
+  const [
+    statusLoading,
+    setStatusLoading,
+  ] = useState(false);
+
   async function handleBid() {
 
     try {
@@ -90,6 +95,63 @@ export default function AuctionClient({
     } finally {
 
       setLoading(false);
+
+    }
+  }
+
+  async function updateStatus(
+    status: string
+  ) {
+
+    try {
+
+      setStatusLoading(true);
+
+      setError("");
+
+      const response =
+        await fetch(
+          `/api/marketplace-auctions/${auction.id}/status`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              status,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+
+        setError(
+          data.error ||
+            "Failed to update auction"
+        );
+
+        return;
+      }
+
+      window.location.reload();
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        "Something went wrong"
+      );
+
+    } finally {
+
+      setStatusLoading(false);
 
     }
   }
@@ -263,6 +325,31 @@ export default function AuctionClient({
             {auction.description ||
               "No description provided."}
           </div>
+
+        </div>
+
+        {/* SELLER CONTROLS */}
+        <div className="flex gap-3">
+
+          <button
+            onClick={() =>
+              updateStatus("LIVE")
+            }
+            disabled={statusLoading}
+            className="flex-1 py-4 rounded-full bg-green-600 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+          >
+            Start LIVE
+          </button>
+
+          <button
+            onClick={() =>
+              updateStatus("ENDED")
+            }
+            disabled={statusLoading}
+            className="flex-1 py-4 rounded-full bg-gray-900 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+          >
+            End Auction
+          </button>
 
         </div>
 
