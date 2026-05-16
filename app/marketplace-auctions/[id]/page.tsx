@@ -66,7 +66,7 @@ export default async function MarketplaceAuctionPage({
           </div>
 
           {/* CLIENT COMPONENT */}
-          <AuctionClient auction={auction} />
+          <AuctionClient initialAuction={auction} />
 
         </div>
 
