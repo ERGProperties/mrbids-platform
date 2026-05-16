@@ -77,6 +77,16 @@ export default function AuctionClient({
     setActivityMessage,
   ] = useState("");
 
+  const [
+    chatMessage,
+    setChatMessage,
+  ] = useState("");
+
+  const [
+    chatMessages,
+    setChatMessages,
+  ] = useState<any[]>([]);
+
   useEffect(() => {
 
     const channel =
@@ -144,6 +154,20 @@ export default function AuctionClient({
           setActivityMessage("");
 
         }, 2000);
+
+      }
+    );
+
+    channel.bind(
+      "client-chat-message",
+      (message: any) => {
+
+        setChatMessages(
+          (prev) => [
+            ...prev,
+            message,
+          ]
+        );
 
       }
     );
@@ -274,6 +298,32 @@ export default function AuctionClient({
       setStatusLoading(false);
 
     }
+  }
+
+  function sendChatMessage() {
+
+    if (!chatMessage.trim())
+      return;
+
+    const message = {
+      user: "Viewer",
+      text: chatMessage,
+    };
+
+    pusherClient.send_event(
+      "client-chat-message",
+      message,
+      `presence-auction-${initialAuction.id}`
+    );
+
+    setChatMessages(
+      (prev) => [
+        ...prev,
+        message,
+      ]
+    );
+
+    setChatMessage("");
   }
 
   const minimumBid =
@@ -529,6 +579,80 @@ export default function AuctionClient({
               )
 
             )}
+
+          </div>
+
+        </div>
+
+        {/* LIVE CHAT */}
+        <div className="border rounded-2xl overflow-hidden">
+
+          <div className="p-5 border-b bg-gray-50">
+
+            <p className="font-semibold">
+              LIVE Chat
+            </p>
+
+          </div>
+
+          <div className="h-72 overflow-y-auto p-5 space-y-4 bg-white">
+
+            {chatMessages.length === 0 ? (
+
+              <p className="text-gray-500 text-sm">
+                No messages yet.
+              </p>
+
+            ) : (
+
+              chatMessages.map(
+                (
+                  message,
+                  index
+                ) => (
+
+                  <div
+                    key={index}
+                    className="text-sm"
+                  >
+
+                    <span className="font-semibold mr-2">
+                      {message.user}:
+                    </span>
+
+                    <span>
+                      {message.text}
+                    </span>
+
+                  </div>
+
+                )
+              )
+
+            )}
+
+          </div>
+
+          <div className="border-t p-4 flex gap-3">
+
+            <input
+              type="text"
+              value={chatMessage}
+              onChange={(e) =>
+                setChatMessage(
+                  e.target.value
+                )
+              }
+              placeholder="Send a message..."
+              className="flex-1 border rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-black"
+            />
+
+            <button
+              onClick={sendChatMessage}
+              className="px-6 rounded-full bg-black text-white font-medium hover:opacity-90"
+            >
+              Send
+            </button>
 
           </div>
 
