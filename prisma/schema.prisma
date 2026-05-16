@@ -70,8 +70,6 @@ model Auction {
   bidCount      Int @default(0)
   durationDays  Int?
 
-  /* RELATIONS */
-
   bids          Bid[]
   questions     Question[]
   messages      Message[]
@@ -79,18 +77,12 @@ model Auction {
   sellerId      String?
   seller        User? @relation("SellerAuctions", fields: [sellerId], references: [id])
 
-  /* SERVICE FEE */
-
   serviceFeeAmount Int?
   serviceFeeStatus ServiceFeeStatus?
   serviceFeePaidAt DateTime?
 
-  /* EMAIL FLAGS */
-
   endingSoonSent  Boolean @default(false)
   endedEmailsSent Boolean @default(false)
-
-  /* TIMESTAMPS */
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -115,7 +107,6 @@ model MarketplaceAuction {
   startingBid   Int
   bidIncrement  Int @default(1)
 
-  // LIVE BIDDING
   currentBid    Int @default(0)
   bidCount      Int @default(0)
 
@@ -127,7 +118,10 @@ model MarketplaceAuction {
   sellerId      String
   seller        User @relation(fields: [sellerId], references: [id])
 
-  // RELATIONS
+  // WINNER
+  winnerId      String?
+  winner        User? @relation("MarketplaceAuctionWinner", fields: [winnerId], references: [id])
+
   bids          MarketplaceBid[]
 
   @@index([sellerId])
@@ -153,6 +147,7 @@ model MarketplaceBid {
 
 model Bid {
   id        String   @id @default(cuid())
+
   amount    Int
   createdAt DateTime @default(now())
 
@@ -214,12 +209,8 @@ model User {
 
   role      Role @default(USER)
 
-  /* PROFILE */
-
   bio                 String?
   avatarUrl           String?
-
-  // MARKETPLACE SELLER
 
   isMarketplaceSeller Boolean @default(false)
 
@@ -231,8 +222,6 @@ model User {
 
   isVerifiedBidder Boolean @default(false)
 
-  /* RELATIONS */
-
   bids      Bid[]
 
   auctions  Auction[] @relation("SellerAuctions")
@@ -241,8 +230,9 @@ model User {
 
   marketplaceBids MarketplaceBid[]
 
-  // WON AUCTIONS
   wonAuctions Auction[] @relation("AuctionWinner")
+
+  wonMarketplaceAuctions MarketplaceAuction[] @relation("MarketplaceAuctionWinner")
 
   questions Question[]
 
