@@ -4,6 +4,10 @@ import { prisma } from "@/lib/prisma";
 
 import { pusherServer } from "@/lib/pusher";
 
+import { sendAuctionWonEmail } from "@/lib/email/sendAuctionWonEmail";
+
+import { sendSellerWinnerEmail } from "@/lib/email/sendSellerWinnerEmail";
+
 export async function POST(
   req: Request,
   {
@@ -14,9 +18,7 @@ export async function POST(
     };
   }
 ) {
-
   try {
-
     const auction =
       await prisma.marketplaceAuction.findUnique({
         where: {
@@ -24,6 +26,8 @@ export async function POST(
         },
 
         include: {
+          seller: true,
+
           bids: {
             orderBy: {
               amount:
@@ -31,12 +35,15 @@ export async function POST(
             },
 
             take: 1,
+
+            include: {
+              bidder: true,
+            },
           },
         },
       });
 
     if (!auction) {
-
       return NextResponse.json(
         {
           error:
@@ -46,18 +53,15 @@ export async function POST(
           status: 404,
         }
       );
-
     }
 
     if (
       auction.status ===
       "ENDED"
     ) {
-
       return NextResponse.json({
         success: true,
       });
-
     }
 
     const winningBid =
@@ -97,6 +101,58 @@ export async function POST(
         },
       });
 
+    // SEND WINNER EMAIL
+    if (
+      winningBid?.bidder
+        ?.email
+    ) {
+      await sendAuctionWonEmail({
+        to:
+          winningBid
+            .bidder.email,
+
+        address:
+          auction.title,
+
+        winningBid:
+          winningBid.amount,
+
+        sellerName:
+          auction.seller.name ||
+          "Seller",
+
+        sellerEmail:
+          auction.seller.email,
+      });
+    }
+
+    // SEND SELLER EMAIL
+    if (
+      auction.seller?.email &&
+      winningBid?.bidder
+    ) {
+      await sendSellerWinnerEmail({
+        to:
+          auction.seller.email,
+
+        address:
+          auction.title,
+
+        winningBid:
+          winningBid.amount,
+
+        buyerName:
+          winningBid.bidder
+            .name ||
+          "Winner",
+
+        buyerEmail:
+          winningBid.bidder
+            .email,
+      });
+    }
+
+    // REALTIME BROADCAST
     await pusherServer.trigger(
       `auction-${auction.id}`,
       "auction-ended",
@@ -106,9 +162,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
     });
-
   } catch (error) {
-
     console.error(error);
 
     return NextResponse.json(
@@ -120,6 +174,5 @@ export async function POST(
         status: 500,
       }
     );
-
   }
 }

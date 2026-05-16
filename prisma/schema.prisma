@@ -199,6 +199,26 @@ model Message {
   @@index([receiverId])
 }
 
+model NotificationLog {
+  id          String   @id @default(cuid())
+
+  userId      String
+
+  type        String
+
+  auctionId   String?
+
+  createdAt   DateTime @default(now())
+
+  metadata    Json?
+
+  user        User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+  @@index([auctionId])
+}
+
 model User {
   id        String   @id @default(cuid())
 
@@ -240,6 +260,8 @@ model User {
   receivedMessages Message[] @relation("ReceivedMessages")
 
   pushSubscriptions PushSubscription[]
+
+  notificationLogs NotificationLog[]
 
   accounts  Account[]
   sessions  Session[]

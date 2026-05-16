@@ -8,24 +8,25 @@ import { prisma } from "@/lib/prisma";
 
 import { pusherServer } from "@/lib/pusher";
 
+import { sendOutbidEmail } from "@/lib/email/sendOutbidEmail";
+
 export async function POST(
   req: Request,
-  { params }: {
+  {
+    params,
+  }: {
     params: {
       id: string;
     };
   }
 ) {
-
   try {
-
     const session =
       await getServerSession(
         authOptions
       );
 
     if (!session?.user?.email) {
-
       return NextResponse.json(
         {
           error: "Unauthorized",
@@ -34,7 +35,6 @@ export async function POST(
           status: 401,
         }
       );
-
     }
 
     const body =
@@ -47,7 +47,6 @@ export async function POST(
       !amount ||
       amount <= 0
     ) {
-
       return NextResponse.json(
         {
           error:
@@ -57,7 +56,6 @@ export async function POST(
           status: 400,
         }
       );
-
     }
 
     // GET USER
@@ -70,7 +68,6 @@ export async function POST(
       });
 
     if (!user) {
-
       return NextResponse.json(
         {
           error:
@@ -80,7 +77,6 @@ export async function POST(
           status: 404,
         }
       );
-
     }
 
     // GET AUCTION
@@ -92,7 +88,6 @@ export async function POST(
       });
 
     if (!auction) {
-
       return NextResponse.json(
         {
           error:
@@ -102,7 +97,6 @@ export async function POST(
           status: 404,
         }
       );
-
     }
 
     // AUCTION MUST BE LIVE
@@ -110,7 +104,6 @@ export async function POST(
       auction.status !==
       "LIVE"
     ) {
-
       return NextResponse.json(
         {
           error:
@@ -120,7 +113,6 @@ export async function POST(
           status: 400,
         }
       );
-
     }
 
     // AUCTION MUST NOT BE ENDED
@@ -129,7 +121,6 @@ export async function POST(
       new Date() >
         auction.endAt
     ) {
-
       return NextResponse.json(
         {
           error:
@@ -139,7 +130,6 @@ export async function POST(
           status: 400,
         }
       );
-
     }
 
     // SELLER CANNOT BID
@@ -147,7 +137,6 @@ export async function POST(
       auction.sellerId ===
       user.id
     ) {
-
       return NextResponse.json(
         {
           error:
@@ -157,7 +146,6 @@ export async function POST(
           status: 400,
         }
       );
-
     }
 
     // CALCULATE MINIMUM BID
@@ -174,7 +162,6 @@ export async function POST(
     if (
       amount < minimumBid
     ) {
-
       return NextResponse.json(
         {
           error: `Minimum bid is ${minimumBid}`,
@@ -183,8 +170,23 @@ export async function POST(
           status: 400,
         }
       );
-
     }
+
+    // PREVIOUS HIGHEST BIDDER
+    const previousHighestBid =
+      await prisma.marketplaceBid.findFirst({
+        where: {
+          auctionId: auction.id,
+        },
+
+        orderBy: {
+          amount: "desc",
+        },
+
+        include: {
+          bidder: true,
+        },
+      });
 
     // CREATE BID
     const bid =
@@ -205,7 +207,6 @@ export async function POST(
       auction.endAt;
 
     if (auction.endAt) {
-
       const now =
         Date.now();
 
@@ -225,13 +226,11 @@ export async function POST(
         secondsRemaining <=
         15
       ) {
-
         updatedEndAt =
           new Date(
             endTime +
               15 * 1000
           );
-
       }
     }
 
@@ -279,6 +278,27 @@ export async function POST(
         },
       });
 
+    // SEND OUTBID EMAIL
+    if (
+      previousHighestBid &&
+      previousHighestBid.bidderId !==
+        user.id &&
+      previousHighestBid.bidder
+        ?.email
+    ) {
+      await sendOutbidEmail({
+        to:
+          previousHighestBid
+            .bidder.email,
+
+        address:
+          auction.title,
+
+        auctionUrl:
+          `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
+      });
+    }
+
     // REALTIME BROADCAST
     await pusherServer.trigger(
       `auction-${auction.id}`,
@@ -290,9 +310,7 @@ export async function POST(
       success: true,
       bid,
     });
-
   } catch (error) {
-
     console.error(error);
 
     return NextResponse.json(
@@ -304,6 +322,5 @@ export async function POST(
         status: 500,
       }
     );
-
   }
 }
