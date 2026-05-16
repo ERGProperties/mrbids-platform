@@ -1,135 +1,309 @@
-import { NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
+import { NextResponse } from "next/server";
 
-import { authOptions } from "@/lib/authOptions"
-import { prisma } from "@/lib/prisma"
+import { getServerSession } from "next-auth";
+
+import { authOptions } from "@/lib/authOptions";
+
+import { prisma } from "@/lib/prisma";
+
+import { pusherServer } from "@/lib/pusher";
 
 export async function POST(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: {
+    params: {
+      id: string;
+    };
+  }
 ) {
+
   try {
-    const session = await getServerSession(authOptions)
+
+    const session =
+      await getServerSession(
+        authOptions
+      );
 
     if (!session?.user?.email) {
+
       return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      )
+        {
+          error: "Unauthorized",
+        },
+        {
+          status: 401,
+        }
+      );
+
     }
 
-    const body = await req.json()
+    const body =
+      await req.json();
 
-    const amount = Number(body.amount)
+    const amount =
+      Number(body.amount);
 
-    if (!amount || amount <= 0) {
+    if (
+      !amount ||
+      amount <= 0
+    ) {
+
       return NextResponse.json(
-        { error: "Invalid bid amount" },
-        { status: 400 }
-      )
+        {
+          error:
+            "Invalid bid amount",
+        },
+        {
+          status: 400,
+        }
+      );
+
     }
 
     // GET USER
-    const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
-    })
+    const user =
+      await prisma.user.findUnique({
+        where: {
+          email:
+            session.user.email,
+        },
+      });
 
     if (!user) {
+
       return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      )
+        {
+          error:
+            "User not found",
+        },
+        {
+          status: 404,
+        }
+      );
+
     }
 
     // GET AUCTION
-    const auction = await prisma.marketplaceAuction.findUnique({
-      where: {
-        id: params.id,
-      },
-    })
+    const auction =
+      await prisma.marketplaceAuction.findUnique({
+        where: {
+          id: params.id,
+        },
+      });
 
     if (!auction) {
+
       return NextResponse.json(
-        { error: "Auction not found" },
-        { status: 404 }
-      )
+        {
+          error:
+            "Auction not found",
+        },
+        {
+          status: 404,
+        }
+      );
+
     }
 
     // AUCTION MUST BE LIVE
-    if (auction.status !== "LIVE") {
+    if (
+      auction.status !==
+      "LIVE"
+    ) {
+
       return NextResponse.json(
-        { error: "Auction is not live" },
-        { status: 400 }
-      )
+        {
+          error:
+            "Auction is not live",
+        },
+        {
+          status: 400,
+        }
+      );
+
     }
 
     // AUCTION MUST NOT BE ENDED
-    if (auction.endAt && new Date() > auction.endAt) {
+    if (
+      auction.endAt &&
+      new Date() >
+        auction.endAt
+    ) {
+
       return NextResponse.json(
-        { error: "Auction has ended" },
-        { status: 400 }
-      )
+        {
+          error:
+            "Auction has ended",
+        },
+        {
+          status: 400,
+        }
+      );
+
     }
 
     // SELLER CANNOT BID
-    if (auction.sellerId === user.id) {
+    if (
+      auction.sellerId ===
+      user.id
+    ) {
+
       return NextResponse.json(
-        { error: "You cannot bid on your own auction" },
-        { status: 400 }
-      )
+        {
+          error:
+            "You cannot bid on your own auction",
+        },
+        {
+          status: 400,
+        }
+      );
+
     }
 
     // CALCULATE MINIMUM BID
     const currentBid =
-      auction.currentBid && auction.currentBid > 0
+      auction.currentBid &&
+      auction.currentBid > 0
         ? auction.currentBid
-        : auction.startingBid
+        : auction.startingBid;
 
-    const minimumBid = currentBid + auction.bidIncrement
+    const minimumBid =
+      currentBid +
+      auction.bidIncrement;
 
-    if (amount < minimumBid) {
+    if (
+      amount < minimumBid
+    ) {
+
       return NextResponse.json(
         {
           error: `Minimum bid is ${minimumBid}`,
         },
-        { status: 400 }
-      )
+        {
+          status: 400,
+        }
+      );
+
     }
 
     // CREATE BID
-    const bid = await prisma.marketplaceBid.create({
-      data: {
-        amount,
-        auctionId: auction.id,
-        bidderId: user.id,
-      },
-    })
+    const bid =
+      await prisma.marketplaceBid.create({
+        data: {
+          amount,
+
+          auctionId:
+            auction.id,
+
+          bidderId:
+            user.id,
+        },
+      });
+
+    // ANTI-SNIPE LOGIC
+    let updatedEndAt =
+      auction.endAt;
+
+    if (auction.endAt) {
+
+      const now =
+        Date.now();
+
+      const endTime =
+        new Date(
+          auction.endAt
+        ).getTime();
+
+      const secondsRemaining =
+        Math.floor(
+          (endTime - now) /
+            1000
+        );
+
+      // EXTEND IF UNDER 15 SECONDS
+      if (
+        secondsRemaining <=
+        15
+      ) {
+
+        updatedEndAt =
+          new Date(
+            endTime +
+              15 * 1000
+          );
+
+      }
+    }
 
     // UPDATE AUCTION
     await prisma.marketplaceAuction.update({
       where: {
         id: auction.id,
       },
+
       data: {
-        currentBid: amount,
+        currentBid:
+          amount,
+
         bidCount: {
           increment: 1,
         },
+
+        endAt:
+          updatedEndAt,
       },
-    })
+    });
+
+    // FETCH UPDATED AUCTION
+    const updatedAuction =
+      await prisma.marketplaceAuction.findUnique({
+        where: {
+          id: auction.id,
+        },
+
+        include: {
+          seller: true,
+
+          bids: {
+            include: {
+              bidder: true,
+            },
+
+            orderBy: {
+              createdAt:
+                "desc",
+            },
+
+            take: 10,
+          },
+        },
+      });
+
+    // REALTIME BROADCAST
+    await pusherServer.trigger(
+      `auction-${auction.id}`,
+      "new-bid",
+      updatedAuction
+    );
 
     return NextResponse.json({
       success: true,
       bid,
-    })
+    });
+
   } catch (error) {
-    console.error(error)
+
+    console.error(error);
 
     return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 }
-    )
+      {
+        error:
+          "Something went wrong",
+      },
+      {
+        status: 500,
+      }
+    );
+
   }
 }
