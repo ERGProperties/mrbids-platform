@@ -20,6 +20,18 @@ export default async function MarketplaceAuctionPage({
 
       include: {
         seller: true,
+
+        bids: {
+          include: {
+            bidder: true,
+          },
+
+          orderBy: {
+            createdAt: "desc",
+          },
+
+          take: 10,
+        },
       },
     });
 

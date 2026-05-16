@@ -2,13 +2,35 @@
 
 import { useState } from "react";
 
+import useSWR from "swr";
+
 import CountdownTimer from "@/components/CountdownTimer";
 
+const fetcher = (
+  url: string
+) =>
+  fetch(url).then((res) =>
+    res.json()
+  );
+
 export default function AuctionClient({
-  auction,
+  initialAuction,
 }: {
-  auction: any;
+  initialAuction: any;
 }) {
+
+  const {
+    data: auction,
+  } = useSWR(
+    `/api/marketplace-auctions/${initialAuction.id}`,
+    fetcher,
+    {
+      fallbackData:
+        initialAuction,
+
+      refreshInterval: 3000,
+    }
+  );
 
   const [
     amount,
@@ -82,8 +104,6 @@ export default function AuctionClient({
         "Bid placed successfully!"
       );
 
-      window.location.reload();
-
     } catch (err) {
 
       console.error(err);
@@ -139,7 +159,9 @@ export default function AuctionClient({
         return;
       }
 
-      window.location.reload();
+      setSuccess(
+        "Updated successfully!"
+      );
 
     } catch (err) {
 
@@ -313,6 +335,70 @@ export default function AuctionClient({
           </div>
 
         )}
+
+        {/* BID HISTORY */}
+        <div>
+
+          <div className="flex items-center justify-between mb-4">
+
+            <p className="text-sm text-gray-500">
+              Recent Bids
+            </p>
+
+            <p className="text-sm text-gray-400">
+              Live Activity
+            </p>
+
+          </div>
+
+          <div className="border rounded-2xl divide-y overflow-hidden">
+
+            {auction.bids.length === 0 ? (
+
+              <div className="p-6 text-gray-500">
+                No bids yet.
+              </div>
+
+            ) : (
+
+              auction.bids.map(
+                (bid: any) => (
+
+                  <div
+                    key={bid.id}
+                    className="flex items-center justify-between p-5"
+                  >
+
+                    <div>
+
+                      <p className="font-medium">
+                        {bid.bidder.name ||
+                          "Anonymous Bidder"}
+                      </p>
+
+                      <p className="text-sm text-gray-500">
+                        {new Date(
+                          bid.createdAt
+                        ).toLocaleString()}
+                      </p>
+
+                    </div>
+
+                    <p className="text-xl font-semibold">
+                      $
+                      {bid.amount.toLocaleString()}
+                    </p>
+
+                  </div>
+
+                )
+              )
+
+            )}
+
+          </div>
+
+        </div>
 
         {/* DESCRIPTION */}
         <div>
