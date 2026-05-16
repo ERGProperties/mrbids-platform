@@ -37,6 +37,46 @@ export default function AuctionClient({
     }
   );
 
+  const [
+    amount,
+    setAmount,
+  ] = useState(
+    auction.currentBid > 0
+      ? auction.currentBid +
+          auction.bidIncrement
+      : auction.startingBid
+  );
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const [
+    success,
+    setSuccess,
+  ] = useState("");
+
+  const [
+    statusLoading,
+    setStatusLoading,
+  ] = useState(false);
+
+  const [
+    viewerCount,
+    setViewerCount,
+  ] = useState(0);
+
+  const [
+    activityMessage,
+    setActivityMessage,
+  ] = useState("");
+
   useEffect(() => {
 
     const channel =
@@ -91,6 +131,23 @@ export default function AuctionClient({
       }
     );
 
+    channel.bind(
+      "client-user-bidding",
+      () => {
+
+        setActivityMessage(
+          "Someone is placing a bid..."
+        );
+
+        setTimeout(() => {
+
+          setActivityMessage("");
+
+        }, 2000);
+
+      }
+    );
+
     return () => {
 
       channel.unbind_all();
@@ -102,41 +159,6 @@ export default function AuctionClient({
     };
 
   }, [initialAuction.id]);
-
-  const [
-    amount,
-    setAmount,
-  ] = useState(
-    auction.currentBid > 0
-      ? auction.currentBid +
-          auction.bidIncrement
-      : auction.startingBid
-  );
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(false);
-
-  const [
-    error,
-    setError,
-  ] = useState("");
-
-  const [
-    success,
-    setSuccess,
-  ] = useState("");
-
-  const [
-    statusLoading,
-    setStatusLoading,
-  ] = useState(false);
-
-  const [
-    viewerCount,
-    setViewerCount,
-  ] = useState(0);
 
   async function handleBid() {
 
@@ -353,6 +375,17 @@ export default function AuctionClient({
 
         </div>
 
+        {/* LIVE ACTIVITY */}
+        {activityMessage && (
+
+          <div className="border border-green-200 bg-green-50 rounded-2xl p-4 text-green-700 font-medium animate-pulse">
+
+            {activityMessage}
+
+          </div>
+
+        )}
+
         {/* CURRENT BID */}
         <div>
 
@@ -402,6 +435,18 @@ export default function AuctionClient({
                 )
               )
             }
+            onFocus={() => {
+
+              pusherClient.send_event(
+                "client-user-bidding",
+                {
+                  user:
+                    "Someone",
+                },
+                `presence-auction-${initialAuction.id}`
+              );
+
+            }}
             className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold outline-none focus:ring-2 focus:ring-black"
           />
 
