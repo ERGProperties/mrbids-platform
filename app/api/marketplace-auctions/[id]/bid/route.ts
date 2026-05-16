@@ -286,17 +286,68 @@ export async function POST(
       previousHighestBid.bidder
         ?.email
     ) {
-      await sendOutbidEmail({
-        to:
-          previousHighestBid
-            .bidder.email,
 
-        address:
-          auction.title,
+      // CHECK RECENT EMAIL
+      const fiveMinutesAgo =
+        new Date(
+          Date.now() -
+            5 * 60 * 1000
+        );
 
-        auctionUrl:
-          `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
-      });
+      const recentNotification =
+        await prisma.notificationLog.findFirst({
+          where: {
+            userId:
+              previousHighestBid.bidderId,
+
+            auctionId:
+              auction.id,
+
+            type:
+              "OUTBID_EMAIL",
+
+            createdAt: {
+              gte:
+                fiveMinutesAgo,
+            },
+          },
+        });
+
+      // ONLY SEND IF NO RECENT EMAIL
+      if (!recentNotification) {
+
+        await sendOutbidEmail({
+          to:
+            previousHighestBid
+              .bidder.email,
+
+          address:
+            auction.title,
+
+          auctionUrl:
+            `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
+        });
+
+        // LOG NOTIFICATION
+        await prisma.notificationLog.create({
+          data: {
+            userId:
+              previousHighestBid.bidderId,
+
+            auctionId:
+              auction.id,
+
+            type:
+              "OUTBID_EMAIL",
+
+            metadata: {
+              bidAmount:
+                amount,
+            },
+          },
+        });
+
+      }
     }
 
     // REALTIME BROADCAST

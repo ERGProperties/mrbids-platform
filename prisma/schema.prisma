@@ -124,6 +124,8 @@ model MarketplaceAuction {
 
   bids          MarketplaceBid[]
 
+  endingSoonSent Boolean @default(false)
+
   @@index([sellerId])
   @@index([status])
 }
