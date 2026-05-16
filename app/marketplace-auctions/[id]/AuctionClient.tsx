@@ -1,10 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
-import useSWR from "swr";
+import useSWR, {
+  mutate,
+} from "swr";
 
 import CountdownTimer from "@/components/CountdownTimer";
+
+import { pusherClient } from "@/lib/pusher-client";
 
 const fetcher = (
   url: string
@@ -27,10 +34,40 @@ export default function AuctionClient({
     {
       fallbackData:
         initialAuction,
-
-      refreshInterval: 3000,
     }
   );
+
+  useEffect(() => {
+
+    const channel =
+      pusherClient.subscribe(
+        `auction-${initialAuction.id}`
+      );
+
+    channel.bind(
+      "new-bid",
+      (updatedAuction: any) => {
+
+        mutate(
+          `/api/marketplace-auctions/${initialAuction.id}/live`,
+          updatedAuction,
+          false
+        );
+
+      }
+    );
+
+    return () => {
+
+      channel.unbind_all();
+
+      pusherClient.unsubscribe(
+        `auction-${initialAuction.id}`
+      );
+
+    };
+
+  }, [initialAuction.id]);
 
   const [
     amount,
