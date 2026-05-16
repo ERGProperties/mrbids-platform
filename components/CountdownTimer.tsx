@@ -1,11 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
 export default function CountdownTimer({
   endAt,
+  onExpire,
 }: {
-  endAt: string | Date | null;
+  endAt: string;
+  onExpire?: () => void;
 }) {
 
   const [
@@ -13,104 +18,92 @@ export default function CountdownTimer({
     setTimeLeft,
   ] = useState("");
 
-  const [
-    ended,
-    setEnded,
-  ] = useState(false);
-
   useEffect(() => {
 
-    if (!endAt) return;
-
-    function updateTimer() {
-
-      const end =
-        new Date(endAt).getTime();
-
-      const now = Date.now();
-
-      const distance =
-        end - now;
-
-      if (distance <= 0) {
-
-        setEnded(true);
-
-        setTimeLeft("Auction Ended");
-
-        return;
-      }
-
-      const days = Math.floor(
-        distance /
-          (1000 * 60 * 60 * 24)
-      );
-
-      const hours = Math.floor(
-        (distance %
-          (1000 * 60 * 60 * 24)) /
-          (1000 * 60 * 60)
-      );
-
-      const minutes = Math.floor(
-        (distance %
-          (1000 * 60 * 60)) /
-          (1000 * 60)
-      );
-
-      const seconds = Math.floor(
-        (distance %
-          (1000 * 60)) /
-          1000
-      );
-
-      if (days > 0) {
-
-        setTimeLeft(
-          `${days}d ${hours}h ${minutes}m`
-        );
-
-      } else {
-
-        setTimeLeft(
-          `${hours}h ${minutes}m ${seconds}s`
-        );
-
-      }
-    }
-
-    updateTimer();
-
     const interval =
-      setInterval(updateTimer, 1000);
+      setInterval(() => {
+
+        const now =
+          new Date().getTime();
+
+        const end =
+          new Date(
+            endAt
+          ).getTime();
+
+        const distance =
+          end - now;
+
+        if (distance <= 0) {
+
+          setTimeLeft(
+            "Auction Ended"
+          );
+
+          clearInterval(
+            interval
+          );
+
+          if (onExpire) {
+            onExpire();
+          }
+
+          return;
+        }
+
+        const days =
+          Math.floor(
+            distance /
+              (1000 * 60 * 60 * 24)
+          );
+
+        const hours =
+          Math.floor(
+            (
+              distance %
+              (1000 * 60 * 60 * 24)
+            ) /
+              (1000 * 60 * 60)
+          );
+
+        const minutes =
+          Math.floor(
+            (
+              distance %
+              (1000 * 60 * 60)
+            ) /
+              (1000 * 60)
+          );
+
+        const seconds =
+          Math.floor(
+            (
+              distance %
+              (1000 * 60)
+            ) / 1000
+          );
+
+        setTimeLeft(
+          `${days}d ${hours}h ${minutes}m ${seconds}s`
+        );
+
+      }, 1000);
 
     return () =>
-      clearInterval(interval);
+      clearInterval(
+        interval
+      );
 
-  }, [endAt]);
+  }, [endAt, onExpire]);
 
   return (
-    <div
-      className={`rounded-2xl p-6 border ${
-        ended
-          ? "bg-gray-100 border-gray-200"
-          : "bg-red-50 border-red-200"
-      }`}
-    >
+    <div className="border rounded-2xl p-6">
 
       <p className="text-sm text-gray-500 mb-2">
-        {ended
-          ? "Status"
-          : "Time Remaining"}
+        Time Remaining
       </p>
 
-      <p
-        className={`text-3xl font-semibold ${
-          ended
-            ? "text-gray-700"
-            : "text-red-600"
-        }`}
-      >
+      <p className="text-3xl font-semibold">
         {timeLeft}
       </p>
 

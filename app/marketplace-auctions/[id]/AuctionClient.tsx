@@ -147,6 +147,19 @@ export default function AuctionClient({
     );
 
     channel.bind(
+      "auction-ended",
+      (updatedAuction: any) => {
+
+        mutate(
+          `/api/marketplace-auctions/${initialAuction.id}/live`,
+          updatedAuction,
+          false
+        );
+
+      }
+    );
+
+    channel.bind(
       "client-user-bidding",
       () => {
 
@@ -338,6 +351,24 @@ export default function AuctionClient({
     }
   }
 
+  async function endAuction() {
+
+    try {
+
+      await fetch(
+        `/api/marketplace-auctions/${auction.id}/end`,
+        {
+          method: "POST",
+        }
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+  }
+
   function sendChatMessage() {
 
     if (!chatMessage.trim())
@@ -483,7 +514,10 @@ export default function AuctionClient({
           </div>
 
           {/* COUNTDOWN TIMER */}
-          <CountdownTimer endAt={auction.endAt} />
+          <CountdownTimer
+            endAt={auction.endAt}
+            onExpire={endAuction}
+          />
 
           {/* LIVE VIEWERS */}
           <div className="border rounded-2xl p-6 bg-black text-white">
@@ -800,11 +834,16 @@ export default function AuctionClient({
           {/* BID BUTTON */}
           <button
             onClick={handleBid}
-            disabled={loading}
+            disabled={
+              loading ||
+              auction.status === "ENDED"
+            }
             className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
           >
 
-            {loading
+            {auction.status === "ENDED"
+              ? "Auction Ended"
+              : loading
               ? "Placing Bid..."
               : "Place Bid"}
 
