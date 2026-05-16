@@ -22,7 +22,7 @@ export default function AuctionClient({
   const {
     data: auction,
   } = useSWR(
-    `/api/marketplace-auctions/${initialAuction.id}`,
+    `/api/marketplace-auctions/${initialAuction.id}/live`,
     fetcher,
     {
       fallbackData:
