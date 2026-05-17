@@ -79,10 +79,17 @@ export async function POST(
       title,
       description,
       category,
+
+      retailPrice,
+
       coverImage,
+
       images,
+
       startingBid,
+
       bidIncrement,
+
       durationMinutes,
     } = body;
 
@@ -116,6 +123,14 @@ export async function POST(
           description,
 
           category,
+
+          // RETAIL PRICE
+          retailPrice:
+            retailPrice
+              ? Number(
+                  retailPrice
+                )
+              : null,
 
           coverImage,
 
