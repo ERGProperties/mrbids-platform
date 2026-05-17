@@ -63,7 +63,6 @@ model Auction {
   status        AuctionStatus @default(DRAFT)
   result        String?
 
-  // WINNER
   winnerId      String?
   winner        User? @relation("AuctionWinner", fields: [winnerId], references: [id])
 
@@ -110,6 +109,8 @@ model MarketplaceAuction {
   currentBid    Int @default(0)
   bidCount      Int @default(0)
 
+  durationMinutes Int @default(5)
+
   startAt       DateTime?
   endAt         DateTime?
 
@@ -118,7 +119,6 @@ model MarketplaceAuction {
   sellerId      String
   seller        User @relation(fields: [sellerId], references: [id])
 
-  // WINNER
   winnerId      String?
   winner        User? @relation("MarketplaceAuctionWinner", fields: [winnerId], references: [id])
 
@@ -187,10 +187,10 @@ model Message {
   auction    Auction  @relation(fields: [auctionId], references: [id])
 
   senderId   String
-  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  sender     User @relation("SentMessages", fields: [senderId], references: [id])
 
   receiverId String
-  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiver   User @relation("ReceivedMessages", fields: [receiverId], references: [id])
 
   body       String
 

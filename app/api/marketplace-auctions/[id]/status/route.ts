@@ -70,6 +70,23 @@ export async function POST(
         where: {
           id: params.id,
         },
+
+        include: {
+          seller: true,
+
+          bids: {
+            include: {
+              bidder: true,
+            },
+
+            orderBy: {
+              createdAt:
+                "desc",
+            },
+
+            take: 10,
+          },
+        },
       });
 
     if (!auction) {
@@ -131,6 +148,49 @@ export async function POST(
 
     }
 
+    let updateData: any = {
+      status,
+    };
+
+    // START LIVE
+    if (
+      status === "LIVE"
+    ) {
+
+      const startAt =
+        new Date();
+
+      const endAt =
+        new Date(
+          Date.now() +
+          auction.durationMinutes *
+            60 *
+            1000
+        );
+
+      updateData = {
+        status:
+          "LIVE",
+
+        startAt,
+
+        endAt,
+      };
+
+    }
+
+    // END AUCTION
+    if (
+      status === "ENDED"
+    ) {
+
+      updateData = {
+        status:
+          "ENDED",
+      };
+
+    }
+
     // UPDATE
     const updatedAuction =
       await prisma.marketplaceAuction.update({
@@ -138,12 +198,13 @@ export async function POST(
           id: auction.id,
         },
 
-        data: {
-          status,
-        },
+        data:
+          updateData,
 
         include: {
           seller: true,
+
+          winner: true,
 
           bids: {
             include: {
@@ -160,7 +221,7 @@ export async function POST(
         },
       });
 
-    // PUSHER UPDATE
+    // REALTIME PUSH
     await pusherServer.trigger(
       `auction-${auction.id}`,
       "auction-updated",

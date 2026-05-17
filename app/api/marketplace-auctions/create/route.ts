@@ -142,20 +142,22 @@ export async function POST(
           sellerId:
             user.id,
 
+          // AUCTION STARTS AS SCHEDULED
           status:
-            "LIVE",
+            "SCHEDULED",
 
+          // STARTS WHEN SELLER CLICKS LIVE
           startAt:
-            new Date(),
+            null,
 
+          // SET WHEN LIVE STARTS
           endAt:
-            new Date(
-              Date.now() +
-              Number(
-                durationMinutes || 5
-              ) *
-                60 *
-                1000
+            null,
+
+          // STORE DURATION
+          durationMinutes:
+            Number(
+              durationMinutes || 5
             ),
 
         },

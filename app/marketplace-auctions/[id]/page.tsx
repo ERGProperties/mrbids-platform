@@ -2,6 +2,10 @@ import { prisma } from "@/lib/prisma";
 
 import { notFound } from "next/navigation";
 
+import { getServerSession } from "next-auth";
+
+import { authOptions } from "@/lib/authOptions";
+
 import AuctionClient from "./AuctionClient";
 
 export default async function MarketplaceAuctionPage({
@@ -12,6 +16,11 @@ export default async function MarketplaceAuctionPage({
   };
 }) {
 
+  const session =
+    await getServerSession(
+      authOptions
+    );
+
   const auction =
     await prisma.marketplaceAuction.findUnique({
       where: {
@@ -20,6 +29,8 @@ export default async function MarketplaceAuctionPage({
 
       include: {
         seller: true,
+
+        winner: true,
 
         bids: {
           include: {
@@ -47,6 +58,10 @@ export default async function MarketplaceAuctionPage({
 
         <AuctionClient
           initialAuction={auction}
+          isSeller={
+            session?.user?.email ===
+            auction.seller.email
+          }
         />
 
       </section>

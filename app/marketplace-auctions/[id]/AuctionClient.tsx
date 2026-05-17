@@ -22,8 +22,10 @@ const fetcher = (
 
 export default function AuctionClient({
   initialAuction,
+  isSeller,
 }: {
   initialAuction: any;
+  isSeller: boolean;
 }) {
 
   const {
@@ -165,6 +167,19 @@ export default function AuctionClient({
     );
 
     channel.bind(
+      "auction-updated",
+      (updatedAuction: any) => {
+
+        mutate(
+          `/api/marketplace-auctions/${initialAuction.id}/live`,
+          updatedAuction,
+          false
+        );
+
+      }
+    );
+
+    channel.bind(
       "client-user-bidding",
       () => {
 
@@ -240,6 +255,24 @@ export default function AuctionClient({
 
   }, [initialAuction.id]);
 
+  // AUTO UPDATE BID INPUT
+  useEffect(() => {
+
+    if (!auction) return;
+
+    setAmount(
+      auction.currentBid > 0
+        ? auction.currentBid +
+            auction.bidIncrement
+        : auction.startingBid
+    );
+
+  }, [
+    auction.currentBid,
+    auction.bidIncrement,
+    auction.startingBid,
+  ]);
+
   async function handleBid() {
 
     try {
@@ -295,6 +328,80 @@ export default function AuctionClient({
     } finally {
 
       setLoading(false);
+
+    }
+  }
+
+  async function updateStatus(
+    status: string
+  ) {
+
+    try {
+
+      setStatusLoading(true);
+
+      setError("");
+
+      setSuccess("");
+
+      const response =
+        await fetch(
+          `/api/marketplace-auctions/${auction.id}/status`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              status,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+
+        setError(
+          data.error ||
+          "Failed to update auction"
+        );
+
+        return;
+      }
+
+      // LIVE CELEBRATION
+      if (
+        status === "LIVE"
+      ) {
+
+        setSuccess(
+          `🎉 Your auction is LIVE!\n\nShare this link:\n${window.location.href}`
+        );
+
+      } else {
+
+        setSuccess(
+          "Auction updated successfully!"
+        );
+
+      }
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        "Something went wrong"
+      );
+
+    } finally {
+
+      setStatusLoading(false);
 
     }
   }
@@ -411,7 +518,6 @@ export default function AuctionClient({
 
             )}
 
-            {/* LEFT */}
             {auction.images?.length > 1 && (
 
               <button
@@ -430,7 +536,6 @@ export default function AuctionClient({
 
             )}
 
-            {/* RIGHT */}
             {auction.images?.length > 1 && (
 
               <button
@@ -452,7 +557,6 @@ export default function AuctionClient({
 
           </div>
 
-          {/* THUMBNAILS */}
           {auction.images?.length > 1 && (
 
             <div className="flex gap-3 mt-5 overflow-x-auto">
@@ -556,18 +660,6 @@ export default function AuctionClient({
                       "Marketplace Seller"}
                   </p>
 
-                  {auction.seller
-                    .tiktokUsername && (
-
-                    <p className="text-gray-500">
-                      {
-                        auction.seller
-                          .tiktokUsername
-                      }
-                    </p>
-
-                  )}
-
                 </div>
 
               </div>
@@ -575,10 +667,32 @@ export default function AuctionClient({
             </div>
 
             {/* COUNTDOWN */}
-            <CountdownTimer
-              endAt={auction.endAt}
-              onExpire={endAuction}
-            />
+            {auction.status === "LIVE" &&
+              auction.endAt && (
+
+              <CountdownTimer
+                endAt={auction.endAt}
+                onExpire={endAuction}
+              />
+
+            )}
+
+            {/* SCHEDULED */}
+            {auction.status === "SCHEDULED" && (
+
+              <div className="border rounded-2xl p-6 bg-yellow-50 border-yellow-200">
+
+                <p className="text-sm font-medium text-yellow-700 mb-2">
+                  Auction Scheduled
+                </p>
+
+                <p className="text-yellow-900 text-lg">
+                  Waiting for seller to start LIVE auction.
+                </p>
+
+              </div>
+
+            )}
 
             {/* VIEWERS */}
             <div className="border rounded-2xl p-6 bg-black text-white">
@@ -646,7 +760,7 @@ export default function AuctionClient({
             {/* ERROR */}
             {error && (
 
-              <div className="border border-red-200 bg-red-50 text-red-600 rounded-2xl p-4">
+              <div className="border border-red-200 bg-red-50 text-red-600 rounded-2xl p-4 whitespace-pre-line">
                 {error}
               </div>
 
@@ -655,8 +769,40 @@ export default function AuctionClient({
             {/* SUCCESS */}
             {success && (
 
-              <div className="border border-green-200 bg-green-50 text-green-600 rounded-2xl p-4">
+              <div className="border border-green-200 bg-green-50 text-green-600 rounded-2xl p-4 whitespace-pre-line">
                 {success}
+              </div>
+
+            )}
+
+            {/* SELLER CONTROLS */}
+            {isSeller && (
+
+              <div className="flex gap-3">
+
+                <button
+                  onClick={() =>
+                    updateStatus("LIVE")
+                  }
+                  disabled={
+                    statusLoading ||
+                    auction.status === "LIVE"
+                  }
+                  className="flex-1 py-4 rounded-full bg-green-600 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+                >
+                  Start LIVE
+                </button>
+
+                <button
+                  onClick={() =>
+                    updateStatus("ENDED")
+                  }
+                  disabled={statusLoading}
+                  className="flex-1 py-4 rounded-full bg-gray-900 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+                >
+                  End Auction
+                </button>
+
               </div>
 
             )}
@@ -666,12 +812,14 @@ export default function AuctionClient({
               onClick={handleBid}
               disabled={
                 loading ||
-                auction.status === "ENDED"
+                auction.status !== "LIVE"
               }
               className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
             >
 
-              {auction.status === "ENDED"
+              {auction.status === "SCHEDULED"
+                ? "Waiting For LIVE Start"
+                : auction.status === "ENDED"
                 ? "Auction Ended"
                 : loading
                 ? "Placing Bid..."
