@@ -176,7 +176,6 @@ export default function AuctionClient({
 
   }, [initialAuction.id]);
 
-  // AUTO UPDATE BID INPUT
   useEffect(() => {
 
     if (!auction) return;
@@ -354,7 +353,7 @@ export default function AuctionClient({
     <>
 
       {/* REACTIONS */}
-      <div className="fixed bottom-10 right-10 pointer-events-none z-50 space-y-2">
+      <div className="fixed bottom-10 right-6 pointer-events-none z-50 space-y-2">
 
         {reactions.map(
           (reaction) => (
@@ -371,7 +370,7 @@ export default function AuctionClient({
 
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-14">
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-14">
 
         {/* LEFT SIDE */}
         <div>
@@ -388,7 +387,7 @@ export default function AuctionClient({
                   ]
                 }
                 alt={auction.title}
-                className="w-full rounded-3xl border object-cover aspect-square"
+                className="w-full rounded-3xl border object-cover aspect-square max-h-[70vh]"
               />
 
             ) : (
@@ -409,7 +408,7 @@ export default function AuctionClient({
                         : prev - 1
                   )
                 }
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/70 text-white text-2xl"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/70 text-white text-xl md:text-2xl"
               >
                 ←
               </button>
@@ -429,9 +428,10 @@ export default function AuctionClient({
                         : prev + 1
                   )
                 }
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/70 text-white text-2xl"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/70 text-white text-xl md:text-2xl"
               >
                 →
+
               </button>
 
             )}
@@ -441,7 +441,7 @@ export default function AuctionClient({
           {/* THUMBNAILS */}
           {auction.images?.length > 1 && (
 
-            <div className="flex gap-3 mt-5 overflow-x-auto">
+            <div className="flex gap-2 md:gap-3 mt-4 md:mt-5 overflow-x-auto pb-2">
 
               {auction.images.map(
                 (
@@ -457,7 +457,7 @@ export default function AuctionClient({
                       )
                     }
                     className={`
-                      border rounded-2xl overflow-hidden min-w-[90px]
+                      border rounded-2xl overflow-hidden min-w-[70px] md:min-w-[90px]
                       ${
                         selectedImage === index
                           ? "border-black"
@@ -469,7 +469,7 @@ export default function AuctionClient({
                     <img
                       src={image}
                       alt={`Thumbnail ${index + 1}`}
-                      className="w-24 h-24 object-cover"
+                      className="w-16 h-16 md:w-24 md:h-24 object-cover"
                     />
 
                   </button>
@@ -487,7 +487,7 @@ export default function AuctionClient({
         <div>
 
           {/* HEADER */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="flex flex-wrap items-center gap-3 mb-6">
 
             <span className="inline-flex px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
               {auction.category}
@@ -500,7 +500,7 @@ export default function AuctionClient({
           </div>
 
           {/* TITLE */}
-          <h1 className="text-5xl font-semibold leading-tight">
+          <h1 className="text-3xl md:text-5xl font-semibold leading-tight">
             {auction.title}
           </h1>
 
@@ -509,7 +509,7 @@ export default function AuctionClient({
 
             <div className="mt-6">
 
-              <p className="text-lg text-gray-600 leading-relaxed whitespace-pre-wrap">
+              <p className="text-base md:text-lg text-gray-600 leading-relaxed whitespace-pre-wrap">
                 {auction.description}
               </p>
 
@@ -538,12 +538,12 @@ export default function AuctionClient({
                       auction.seller.name ||
                       "Seller"
                     }
-                    className="w-14 h-14 rounded-full object-cover border"
+                    className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border"
                   />
 
                 ) : (
 
-                  <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-500">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-500">
                     {auction.seller.name?.charAt(0) ||
                       "M"}
                   </div>
@@ -552,7 +552,7 @@ export default function AuctionClient({
 
                 <div>
 
-                  <p className="font-semibold text-lg">
+                  <p className="font-semibold text-base md:text-lg">
                     {auction.seller.name ||
                       "Marketplace Seller"}
                   </p>
@@ -577,13 +577,13 @@ export default function AuctionClient({
             {/* SCHEDULED */}
             {auction.status === "SCHEDULED" && (
 
-              <div className="border rounded-2xl p-6 bg-yellow-50 border-yellow-200">
+              <div className="border rounded-2xl p-5 md:p-6 bg-yellow-50 border-yellow-200">
 
                 <p className="text-sm font-medium text-yellow-700 mb-2">
                   Auction Scheduled
                 </p>
 
-                <p className="text-yellow-900 text-lg">
+                <p className="text-yellow-900">
                   Waiting for seller to start LIVE auction.
                 </p>
 
@@ -594,13 +594,13 @@ export default function AuctionClient({
             {/* ENDED */}
             {auction.status === "ENDED" && (
 
-              <div className="border rounded-2xl p-6 bg-gray-100 border-gray-200">
+              <div className="border rounded-2xl p-5 md:p-6 bg-gray-100 border-gray-200">
 
                 <p className="text-sm font-medium text-gray-600 mb-2">
                   Auction Ended
                 </p>
 
-                <p className="text-gray-900 text-lg">
+                <p className="text-gray-900">
                   This auction is no longer accepting bids.
                 </p>
 
@@ -609,13 +609,13 @@ export default function AuctionClient({
             )}
 
             {/* VIEWERS */}
-            <div className="border rounded-2xl p-6 bg-black text-white">
+            <div className="border rounded-2xl p-5 md:p-6 bg-black text-white">
 
               <p className="text-sm text-gray-300 mb-2">
                 LIVE Viewers
               </p>
 
-              <p className="text-4xl font-semibold">
+              <p className="text-3xl md:text-4xl font-semibold">
                 {viewerCount}
               </p>
 
@@ -628,7 +628,7 @@ export default function AuctionClient({
                 Current Bid
               </p>
 
-              <p className="text-5xl font-semibold">
+              <p className="text-4xl md:text-5xl font-semibold">
                 $
                 {auction.currentBid?.toLocaleString()}
               </p>
@@ -638,13 +638,13 @@ export default function AuctionClient({
             {/* RETAIL PRICE */}
             {auction.retailPrice && (
 
-              <div className="border rounded-2xl p-6 bg-green-50 border-green-200">
+              <div className="border rounded-2xl p-5 md:p-6 bg-green-50 border-green-200">
 
                 <p className="text-sm text-green-700 mb-2 font-medium">
                   Retail Price
                 </p>
 
-                <p className="text-3xl font-semibold text-green-900">
+                <p className="text-2xl md:text-3xl font-semibold text-green-900">
                   $
                   {auction.retailPrice.toLocaleString()}
                 </p>
@@ -655,7 +655,7 @@ export default function AuctionClient({
                     Current Savings
                   </p>
 
-                  <p className="text-2xl font-semibold text-green-900">
+                  <p className="text-xl md:text-2xl font-semibold text-green-900">
 
                     $
                     {Math.max(
@@ -673,13 +673,13 @@ export default function AuctionClient({
             )}
 
             {/* MINIMUM BID */}
-            <div className="border rounded-2xl p-6">
+            <div className="border rounded-2xl p-5 md:p-6">
 
               <p className="text-sm text-gray-500 mb-2">
                 Minimum Bid
               </p>
 
-              <p className="text-3xl font-semibold">
+              <p className="text-2xl md:text-3xl font-semibold">
                 $
                 {minimumBid.toLocaleString()}
               </p>
@@ -706,7 +706,7 @@ export default function AuctionClient({
                 disabled={
                   auction.status !== "LIVE"
                 }
-                className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold disabled:bg-gray-100"
+                className="w-full border rounded-2xl px-5 py-4 text-xl md:text-2xl font-semibold disabled:bg-gray-100"
               />
 
             </div>
@@ -732,7 +732,7 @@ export default function AuctionClient({
             {/* SELLER CONTROLS */}
             {isSeller && (
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
 
                 <button
                   onClick={() =>
