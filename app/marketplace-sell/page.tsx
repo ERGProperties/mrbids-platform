@@ -99,7 +99,24 @@ export default function MarketplaceSellPage() {
     const data =
       await response.json();
 
-    return data.secure_url;
+    console.log(
+      "Cloudinary upload response:",
+      data
+    );
+
+    if (!response.ok) {
+
+      throw new Error(
+        data.error?.message ||
+        "Cloudinary upload failed"
+      );
+
+    }
+
+    return (
+      data.secure_url ||
+      data.url
+    );
   }
 
   async function handleCoverUpload(
@@ -125,11 +142,12 @@ export default function MarketplaceSellPage() {
         imageUrl
       );
 
-    } catch (err) {
+    } catch (err: any) {
 
       console.error(err);
 
       setError(
+        err.message ||
         "Failed to upload cover image"
       );
 
@@ -181,11 +199,12 @@ export default function MarketplaceSellPage() {
         ]
       );
 
-    } catch (err) {
+    } catch (err: any) {
 
       console.error(err);
 
       setError(
+        err.message ||
         "Failed to upload images"
       );
 
@@ -276,11 +295,12 @@ export default function MarketplaceSellPage() {
         `/marketplace-auctions/${data.auction.id}`
       );
 
-    } catch (err) {
+    } catch (err: any) {
 
       console.error(err);
 
       setError(
+        err.message ||
         "Something went wrong"
       );
 
