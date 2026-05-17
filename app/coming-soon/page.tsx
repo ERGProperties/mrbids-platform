@@ -37,7 +37,7 @@ export default function SellerOnboardingPage() {
           redirect: false,
 
           callbackUrl:
-            "/sell",
+            "/marketplace-sell",
         });
 
       if (result?.error) {

@@ -6,19 +6,23 @@ import { prisma } from "@/lib/prisma";
 
 import { authOptions } from "@/lib/authOptions";
 
-export async function POST(req: Request) {
+export async function POST(
+  req: Request
+) {
 
   try {
 
-    const session = await getServerSession(
-      authOptions
-    );
+    const session =
+      await getServerSession(
+        authOptions
+      );
 
     if (!session?.user?.email) {
 
       return NextResponse.json(
         {
-          error: "Unauthorized",
+          error:
+            "Unauthorized",
         },
         {
           status: 401,
@@ -27,17 +31,20 @@ export async function POST(req: Request) {
 
     }
 
-    const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
-    });
+    let user =
+      await prisma.user.findUnique({
+        where: {
+          email:
+            session.user.email,
+        },
+      });
 
     if (!user) {
 
       return NextResponse.json(
         {
-          error: "User not found",
+          error:
+            "User not found",
         },
         {
           status: 404,
@@ -46,21 +53,27 @@ export async function POST(req: Request) {
 
     }
 
-    if (!user.isMarketplaceSeller) {
+    // AUTO-CONVERT USER TO MARKETPLACE SELLER
+    if (
+      !user.isMarketplaceSeller
+    ) {
 
-      return NextResponse.json(
-        {
-          error:
-            "Marketplace seller account required",
-        },
-        {
-          status: 403,
-        }
-      );
+      user =
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+
+          data: {
+            isMarketplaceSeller:
+              true,
+          },
+        });
 
     }
 
-    const body = await req.json();
+    const body =
+      await req.json();
 
     const {
       title,
@@ -71,6 +84,7 @@ export async function POST(req: Request) {
       bidIncrement,
     } = body;
 
+    // VALIDATION
     if (
       !title ||
       !category ||
@@ -89,6 +103,7 @@ export async function POST(req: Request) {
 
     }
 
+    // CREATE AUCTION
     const auction =
       await prisma.marketplaceAuction.create({
 
@@ -104,13 +119,36 @@ export async function POST(req: Request) {
 
           images: [coverImage],
 
-          startingBid,
+          startingBid:
+            Number(
+              startingBid
+            ),
 
-          bidIncrement,
+          bidIncrement:
+            Number(
+              bidIncrement
+            ),
 
-          currentBid: startingBid,
+          currentBid:
+            Number(
+              startingBid
+            ),
 
-          sellerId: user.id,
+          sellerId:
+            user.id,
+
+          status:
+            "LIVE",
+
+          startAt:
+            new Date(),
+
+          // DEFAULT 5-MINUTE AUCTION
+          endAt:
+            new Date(
+              Date.now() +
+              5 * 60 * 1000
+            ),
 
         },
 
