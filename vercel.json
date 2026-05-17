@@ -10,7 +10,7 @@
     },
     {
       "path": "/api/cron/marketplace-ending-soon",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 * * * *"
     }
   ]
 }
