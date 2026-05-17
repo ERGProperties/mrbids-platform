@@ -160,7 +160,7 @@ export default async function RealEstatePage() {
           <div className="mt-14 flex flex-wrap gap-4">
 
             <Link
-              href="/real-estate/auctions"
+              href="/auctions"
               className="px-10 py-5 bg-black text-white rounded-full"
             >
               Browse Auctions
@@ -255,7 +255,7 @@ export default async function RealEstatePage() {
             </h2>
 
             <Link
-              href="/real-estate/auctions"
+              href="/auctions"
               className="text-sm font-medium"
             >
               View all →
