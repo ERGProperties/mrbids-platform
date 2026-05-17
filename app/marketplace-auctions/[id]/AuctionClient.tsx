@@ -387,12 +387,12 @@ export default function AuctionClient({
                   ]
                 }
                 alt={auction.title}
-                className="w-full rounded-3xl border object-cover aspect-[4/5] md:aspect-square max-h-[65vh] md:max-h-[70vh]"
+                className="w-full rounded-3xl border object-cover aspect-square max-h-[70vh]"
               />
 
             ) : (
 
-              <div className="aspect-[4/5] md:aspect-square rounded-3xl bg-gray-100" />
+              <div className="aspect-square rounded-3xl bg-gray-100" />
 
             )}
 
@@ -431,6 +431,7 @@ export default function AuctionClient({
                 className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/70 text-white text-xl md:text-2xl"
               >
                 →
+
               </button>
 
             )}
@@ -506,7 +507,7 @@ export default function AuctionClient({
           {/* DESCRIPTION */}
           {auction.description && (
 
-            <div className="mt-4 md:mt-6">
+            <div className="mt-6">
 
               <p className="text-base md:text-lg text-gray-600 leading-relaxed whitespace-pre-wrap">
                 {auction.description}
@@ -516,7 +517,7 @@ export default function AuctionClient({
 
           )}
 
-          <div className="mt-6 md:mt-8 space-y-5 md:space-y-6">
+          <div className="mt-8 space-y-6">
 
             {/* SELLER */}
             <div>
@@ -627,7 +628,7 @@ export default function AuctionClient({
                 Current Bid
               </p>
 
-              <p className="text-3xl md:text-5xl font-semibold">
+              <p className="text-4xl md:text-5xl font-semibold">
                 $
                 {auction.currentBid?.toLocaleString()}
               </p>
@@ -705,7 +706,7 @@ export default function AuctionClient({
                 disabled={
                   auction.status !== "LIVE"
                 }
-                className="w-full border rounded-2xl px-4 md:px-5 py-3 md:py-4 text-lg md:text-2xl font-semibold disabled:bg-gray-100"
+                className="w-full border rounded-2xl px-5 py-4 text-xl md:text-2xl font-semibold disabled:bg-gray-100"
               />
 
             </div>
