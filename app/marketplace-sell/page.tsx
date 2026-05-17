@@ -1,74 +1,44 @@
 "use client";
 
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
-import {
-  useRouter,
-} from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function MarketplaceSellPage() {
 
   const router =
     useRouter();
 
-  const [
-    title,
-    setTitle,
-  ] = useState("");
+  const [loading, setLoading] =
+    useState(false);
 
-  const [
-    description,
-    setDescription,
-  ] = useState("");
+  const [uploading, setUploading] =
+    useState(false);
 
-  const [
-    category,
-    setCategory,
-  ] = useState("");
+  const [error, setError] =
+    useState("");
 
-  const [
-    retailPrice,
-    setRetailPrice,
-  ] = useState("");
+  const [form, setForm] =
+    useState({
+      title: "",
+      description: "",
+      category: "Jewelry",
 
-  const [
-    startingBid,
-    setStartingBid,
-  ] = useState("");
+      retailPrice: "",
 
-  const [
-    bidIncrement,
-    setBidIncrement,
-  ] = useState("1");
+      startingBid: 1,
 
-  const [
-    durationMinutes,
-    setDurationMinutes,
-  ] = useState("5");
+      bidIncrement: 1,
 
-  const [
-    coverImage,
-    setCoverImage,
-  ] = useState("");
+      durationMinutes: 5,
 
-  const [
-    additionalImages,
-    setAdditionalImages,
-  ] = useState<string[]>([]);
+      coverImage: "",
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(false);
+      images: [] as string[],
+    });
 
-  const [
-    error,
-    setError,
-  ] = useState("");
-
-  async function uploadImage(
+  // CLOUDINARY UPLOAD
+  async function handleImageUpload(
     file: File
   ) {
 
@@ -80,215 +50,81 @@ export default function MarketplaceSellPage() {
       file
     );
 
+    // RESTORED WORKING PRESET
     formData.append(
       "upload_preset",
-      process.env
-        .NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ||
-        ""
+      "mrbids_upload"
     );
 
-    const response =
-      await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+    const res = await fetch(
+      // RESTORED WORKING CLOUD NAME
+      "https://api.cloudinary.com/v1_1/dx1okt4vf/image/upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
     const data =
-      await response.json();
+      await res.json();
 
-    console.log(
-      "Cloudinary upload response:",
-      data
-    );
-
-    if (!response.ok) {
+    if (!res.ok) {
 
       throw new Error(
         data.error?.message ||
-        "Cloudinary upload failed"
+        "Image upload failed"
       );
 
     }
 
-    return (
-      data.secure_url ||
-      data.url
-    );
-  }
-
-  async function handleCoverUpload(
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
-
-    try {
-
-      const file =
-        e.target.files?.[0];
-
-      if (!file)
-        return;
-
-      setLoading(true);
-
-      const imageUrl =
-        await uploadImage(
-          file
-        );
-
-      setCoverImage(
-        imageUrl
-      );
-
-    } catch (err: any) {
-
-      console.error(err);
-
-      setError(
-        err.message ||
-        "Failed to upload cover image"
-      );
-
-    } finally {
-
-      setLoading(false);
-
-    }
-  }
-
-  async function handleAdditionalImages(
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
-
-    try {
-
-      const files =
-        e.target.files;
-
-      if (!files?.length)
-        return;
-
-      setLoading(true);
-
-      const uploadedImages: string[] =
-        [];
-
-      for (
-        let i = 0;
-        i < files.length;
-        i++
-      ) {
-
-        const imageUrl =
-          await uploadImage(
-            files[i]
-          );
-
-        uploadedImages.push(
-          imageUrl
-        );
-
-      }
-
-      setAdditionalImages(
-        (prev) => [
-          ...prev,
-          ...uploadedImages,
-        ]
-      );
-
-    } catch (err: any) {
-
-      console.error(err);
-
-      setError(
-        err.message ||
-        "Failed to upload images"
-      );
-
-    } finally {
-
-      setLoading(false);
-
-    }
+    return data.secure_url;
   }
 
   async function handleSubmit(
-    e: React.FormEvent
+    e: React.FormEvent<HTMLFormElement>
   ) {
 
     e.preventDefault();
 
+    setLoading(true);
+
+    setError("");
+
     try {
 
-      setLoading(true);
+      const res = await fetch(
+        "/api/marketplace-auctions/create",
+        {
+          method: "POST",
 
-      setError("");
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
 
-      const allImages = [
-        coverImage,
-        ...additionalImages,
-      ];
+          body: JSON.stringify({
+            ...form,
 
-      const response =
-        await fetch(
-          "/api/marketplace-auctions/create",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              title,
-              description,
-              category,
-
-              retailPrice:
-                retailPrice
-                  ? Number(
-                      retailPrice
-                    )
-                  : null,
-
-              coverImage,
-
-              images:
-                allImages,
-
-              startingBid:
-                Number(
-                  startingBid
-                ),
-
-              bidIncrement:
-                Number(
-                  bidIncrement
-                ),
-
-              durationMinutes:
-                Number(
-                  durationMinutes
-                ),
-            }),
-          }
-        );
+            retailPrice:
+              form.retailPrice
+                ? Number(
+                    form.retailPrice
+                  )
+                : null,
+          }),
+        }
+      );
 
       const data =
-        await response.json();
+        await res.json();
 
-      if (!response.ok) {
+      if (!res.ok) {
 
-        setError(
+        throw new Error(
           data.error ||
           "Failed to create auction"
         );
 
-        return;
       }
 
       router.push(
@@ -296,8 +132,6 @@ export default function MarketplaceSellPage() {
       );
 
     } catch (err: any) {
-
-      console.error(err);
 
       setError(
         err.message ||
@@ -314,27 +148,27 @@ export default function MarketplaceSellPage() {
   return (
     <main className="min-h-screen bg-white">
 
-      <section className="max-w-3xl mx-auto px-6 py-24">
+      <section className="max-w-3xl mx-auto px-6 pt-24 pb-24">
 
-        <div className="mb-14">
+        <div className="mb-12">
 
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.18em] mb-4">
-            MrBids Marketplace
+          <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.18em] mb-5">
+            Marketplace Seller
           </p>
 
-          <h1 className="text-5xl font-semibold leading-tight">
-            Create Auction
+          <h1 className="text-5xl font-semibold leading-[1.02]">
+            Create Marketplace Auction
           </h1>
 
-          <p className="mt-5 text-lg text-gray-600">
-            Launch a LIVE flash auction or a longer marketplace auction.
+          <p className="mt-6 text-xl text-gray-600">
+            Launch your LIVE marketplace auction on MrBids.
           </p>
 
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-10"
+          className="space-y-8 border rounded-3xl p-8"
         >
 
           {/* TITLE */}
@@ -347,35 +181,16 @@ export default function MarketplaceSellPage() {
             <input
               type="text"
               required
-              value={title}
+              value={form.title}
               onChange={(e) =>
-                setTitle(
-                  e.target.value
-                )
+                setForm({
+                  ...form,
+                  title:
+                    e.target.value,
+                })
               }
               className="w-full border rounded-2xl px-5 py-4"
-              placeholder="Vintage Rolex Watch"
-            />
-
-          </div>
-
-          {/* DESCRIPTION */}
-          <div>
-
-            <label className="block text-sm font-medium mb-3">
-              Description
-            </label>
-
-            <textarea
-              rows={5}
-              value={description}
-              onChange={(e) =>
-                setDescription(
-                  e.target.value
-                )
-              }
-              className="w-full border rounded-2xl px-5 py-4"
-              placeholder="Describe your item..."
+              placeholder="Vintage Gold Bracelet"
             />
 
           </div>
@@ -388,57 +203,48 @@ export default function MarketplaceSellPage() {
             </label>
 
             <select
-              required
-              value={category}
+              value={form.category}
               onChange={(e) =>
-                setCategory(
-                  e.target.value
-                )
+                setForm({
+                  ...form,
+                  category:
+                    e.target.value,
+                })
               }
               className="w-full border rounded-2xl px-5 py-4"
             >
-
-              <option value="">
-                Select Category
-              </option>
-
-              <option value="Jewelry">
-                Jewelry
-              </option>
-
-              <option value="Electronics">
-                Electronics
-              </option>
-
-              <option value="Fashion">
-                Fashion
-              </option>
-
-              <option value="Collectibles">
-                Collectibles
-              </option>
-
-              <option value="Sneakers">
-                Sneakers
-              </option>
-
-              <option value="Luxury">
-                Luxury
-              </option>
-
-              <option value="Art">
-                Art
-              </option>
-
-              <option value="Vehicles">
-                Vehicles
-              </option>
-
-              <option value="Other">
-                Other
-              </option>
-
+              <option>Jewelry</option>
+              <option>Electronics</option>
+              <option>Sneakers</option>
+              <option>Collectibles</option>
+              <option>Luxury Items</option>
+              <option>Storage Finds</option>
+              <option>Other</option>
             </select>
+
+          </div>
+
+          {/* DESCRIPTION */}
+          <div>
+
+            <label className="block text-sm font-medium mb-3">
+              Description
+            </label>
+
+            <textarea
+              required
+              rows={6}
+              value={form.description}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  description:
+                    e.target.value,
+                })
+              }
+              className="w-full border rounded-2xl px-5 py-4 resize-none"
+              placeholder="Describe your item..."
+            />
 
           </div>
 
@@ -452,18 +258,55 @@ export default function MarketplaceSellPage() {
             <input
               type="file"
               accept="image/*"
-              onChange={
-                handleCoverUpload
-              }
+              onChange={async (e) => {
+
+                const file =
+                  e.target.files?.[0];
+
+                if (!file) return;
+
+                setUploading(true);
+
+                try {
+
+                  const imageUrl =
+                    await handleImageUpload(
+                      file
+                    );
+
+                  setForm({
+                    ...form,
+                    coverImage:
+                      imageUrl,
+
+                    images: [
+                      imageUrl,
+                      ...form.images,
+                    ],
+                  });
+
+                } catch (err) {
+
+                  console.error(err);
+
+                  setError(
+                    "Image upload failed"
+                  );
+
+                }
+
+                setUploading(false);
+
+              }}
               className="w-full border rounded-2xl px-5 py-4"
             />
 
-            {coverImage && (
+            {form.coverImage && (
 
               <img
-                src={coverImage}
-                alt="Cover"
-                className="mt-5 rounded-3xl border aspect-square object-cover w-full"
+                src={form.coverImage}
+                alt="Preview"
+                className="mt-6 w-52 h-52 object-cover rounded-2xl border"
               />
 
             )}
@@ -481,17 +324,72 @@ export default function MarketplaceSellPage() {
               type="file"
               multiple
               accept="image/*"
-              onChange={
-                handleAdditionalImages
-              }
+              onChange={async (e) => {
+
+                const files =
+                  Array.from(
+                    e.target.files || []
+                  );
+
+                if (
+                  files.length === 0
+                ) return;
+
+                setUploading(true);
+
+                try {
+
+                  const uploadedImages:
+                    string[] = [];
+
+                  for (const file of files) {
+
+                    const imageUrl =
+                      await handleImageUpload(
+                        file
+                      );
+
+                    uploadedImages.push(
+                      imageUrl
+                    );
+
+                  }
+
+                  setForm({
+                    ...form,
+                    images: [
+                      ...form.images,
+                      ...uploadedImages,
+                    ],
+                  });
+
+                } catch (err) {
+
+                  console.error(err);
+
+                  setError(
+                    "Additional image upload failed"
+                  );
+
+                }
+
+                setUploading(false);
+
+              }}
               className="w-full border rounded-2xl px-5 py-4"
             />
 
-            {additionalImages.length > 0 && (
+            {uploading && (
+              <p className="mt-3 text-sm text-gray-500">
+                Uploading images...
+              </p>
+            )}
 
-              <div className="grid grid-cols-3 gap-4 mt-5">
+            {form.images.length > 0 && (
 
-                {additionalImages.map(
+              <div className="mt-6 grid grid-cols-3 gap-4">
+
+                {form.images.map(
                   (
                     image,
                     index
@@ -500,8 +398,8 @@ export default function MarketplaceSellPage() {
                     <img
                       key={index}
                       src={image}
-                      alt={`Upload ${index}`}
-                      className="rounded-2xl border aspect-square object-cover"
+                      alt={`Image ${index + 1}`}
+                      className="aspect-square object-cover rounded-2xl border"
                     />
 
                   )
@@ -522,11 +420,13 @@ export default function MarketplaceSellPage() {
 
             <input
               type="number"
-              value={retailPrice}
+              value={form.retailPrice}
               onChange={(e) =>
-                setRetailPrice(
-                  e.target.value
-                )
+                setForm({
+                  ...form,
+                  retailPrice:
+                    e.target.value,
+                })
               }
               className="w-full border rounded-2xl px-5 py-4"
               placeholder="250"
@@ -544,14 +444,18 @@ export default function MarketplaceSellPage() {
             <input
               type="number"
               required
-              value={startingBid}
+              min={1}
+              value={form.startingBid}
               onChange={(e) =>
-                setStartingBid(
-                  e.target.value
-                )
+                setForm({
+                  ...form,
+                  startingBid:
+                    Number(
+                      e.target.value
+                    ),
+                })
               }
               className="w-full border rounded-2xl px-5 py-4"
-              placeholder="1"
             />
 
           </div>
@@ -566,11 +470,16 @@ export default function MarketplaceSellPage() {
             <input
               type="number"
               required
-              value={bidIncrement}
+              min={1}
+              value={form.bidIncrement}
               onChange={(e) =>
-                setBidIncrement(
-                  e.target.value
-                )
+                setForm({
+                  ...form,
+                  bidIncrement:
+                    Number(
+                      e.target.value
+                    ),
+                })
               }
               className="w-full border rounded-2xl px-5 py-4"
             />
@@ -585,40 +494,42 @@ export default function MarketplaceSellPage() {
             </label>
 
             <select
-              value={
-                durationMinutes
-              }
+              value={form.durationMinutes}
               onChange={(e) =>
-                setDurationMinutes(
-                  e.target.value
-                )
+                setForm({
+                  ...form,
+                  durationMinutes:
+                    Number(
+                      e.target.value
+                    ),
+                })
               }
               className="w-full border rounded-2xl px-5 py-4"
             >
 
               <optgroup label="LIVE Flash Auctions">
 
-                <option value="1">
+                <option value={1}>
                   1 Minute
                 </option>
 
-                <option value="3">
-                  3 Minutes
-                </option>
-
-                <option value="5">
+                <option value={5}>
                   5 Minutes
                 </option>
 
-                <option value="10">
+                <option value={10}>
                   10 Minutes
                 </option>
 
-                <option value="30">
+                <option value={15}>
+                  15 Minutes
+                </option>
+
+                <option value={30}>
                   30 Minutes
                 </option>
 
-                <option value="60">
+                <option value={60}>
                   1 Hour
                 </option>
 
@@ -626,15 +537,15 @@ export default function MarketplaceSellPage() {
 
               <optgroup label="Marketplace Auctions">
 
-                <option value="1440">
+                <option value={1440}>
                   1 Day
                 </option>
 
-                <option value="4320">
+                <option value={4320}>
                   3 Days
                 </option>
 
-                <option value="10080">
+                <option value={10080}>
                   7 Days
                 </option>
 
@@ -647,7 +558,7 @@ export default function MarketplaceSellPage() {
           {/* ERROR */}
           {error && (
 
-            <div className="border border-red-200 bg-red-50 text-red-600 rounded-2xl p-4">
+            <div className="text-red-600 text-sm">
               {error}
             </div>
 
@@ -656,13 +567,15 @@ export default function MarketplaceSellPage() {
           {/* SUBMIT */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={
+              loading || uploading
+            }
             className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
           >
 
             {loading
               ? "Creating Auction..."
-              : "Create Auction"}
+              : "Create Marketplace Auction"}
 
           </button>
 
