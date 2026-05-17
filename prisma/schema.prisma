@@ -103,12 +103,17 @@ model MarketplaceAuction {
   images        Json?
   coverImage    String?
 
+  // RETAIL VALUE
+  retailPrice   Int?
+
+  // BIDDING
   startingBid   Int
   bidIncrement  Int @default(1)
 
   currentBid    Int @default(0)
   bidCount      Int @default(0)
 
+  // TIMING
   durationMinutes Int @default(5)
 
   startAt       DateTime?
@@ -116,12 +121,15 @@ model MarketplaceAuction {
 
   status        MarketplaceAuctionStatus @default(DRAFT)
 
+  // SELLER
   sellerId      String
   seller        User @relation(fields: [sellerId], references: [id])
 
+  // WINNER
   winnerId      String?
   winner        User? @relation("MarketplaceAuctionWinner", fields: [winnerId], references: [id])
 
+  // BIDS
   bids          MarketplaceBid[]
 
   endingSoonSent Boolean @default(false)

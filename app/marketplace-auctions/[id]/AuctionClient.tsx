@@ -179,70 +179,6 @@ export default function AuctionClient({
       }
     );
 
-    channel.bind(
-      "client-user-bidding",
-      () => {
-
-        setActivityMessage(
-          "Someone is placing a bid..."
-        );
-
-        setTimeout(() => {
-
-          setActivityMessage("");
-
-        }, 2000);
-
-      }
-    );
-
-    channel.bind(
-      "client-chat-message",
-      (message: any) => {
-
-        setChatMessages(
-          (prev) => [
-            ...prev,
-            message,
-          ]
-        );
-
-      }
-    );
-
-    channel.bind(
-      "client-reaction",
-      (reaction: any) => {
-
-        const id =
-          Date.now() +
-          Math.random();
-
-        setReactions(
-          (prev) => [
-            ...prev,
-            {
-              ...reaction,
-              id,
-            },
-          ]
-        );
-
-        setTimeout(() => {
-
-          setReactions(
-            (prev) =>
-              prev.filter(
-                (r) =>
-                  r.id !== id
-              )
-          );
-
-        }, 3000);
-
-      }
-    );
-
     return () => {
 
       channel.unbind_all();
@@ -374,7 +310,6 @@ export default function AuctionClient({
         return;
       }
 
-      // LIVE CELEBRATION
       if (
         status === "LIVE"
       ) {
@@ -424,48 +359,6 @@ export default function AuctionClient({
     }
   }
 
-  function sendChatMessage() {
-
-    if (!chatMessage.trim())
-      return;
-
-    const message = {
-      user: "Viewer",
-      text: chatMessage,
-    };
-
-    pusherClient.send_event(
-      "client-chat-message",
-      message,
-      `presence-auction-${initialAuction.id}`
-    );
-
-    setChatMessages(
-      (prev) => [
-        ...prev,
-        message,
-      ]
-    );
-
-    setChatMessage("");
-  }
-
-  function sendReaction(
-    emoji: string
-  ) {
-
-    const reaction = {
-      emoji,
-    };
-
-    pusherClient.send_event(
-      "client-reaction",
-      reaction,
-      `presence-auction-${initialAuction.id}`
-    );
-
-  }
-
   const minimumBid =
     auction.currentBid > 0
       ? auction.currentBid +
@@ -475,7 +368,6 @@ export default function AuctionClient({
   return (
     <>
 
-      {/* FLOATING REACTIONS */}
       <div className="fixed bottom-10 right-10 pointer-events-none z-50 space-y-2">
 
         {reactions.map(
@@ -707,7 +599,7 @@ export default function AuctionClient({
 
             </div>
 
-            {/* BID */}
+            {/* CURRENT BID */}
             <div>
 
               <p className="text-sm text-gray-500 mb-2">
@@ -720,6 +612,43 @@ export default function AuctionClient({
               </p>
 
             </div>
+
+            {/* RETAIL PRICE */}
+            {auction.retailPrice && (
+
+              <div className="border rounded-2xl p-6 bg-green-50 border-green-200">
+
+                <p className="text-sm text-green-700 mb-2 font-medium">
+                  Retail Price
+                </p>
+
+                <p className="text-3xl font-semibold text-green-900">
+                  $
+                  {auction.retailPrice.toLocaleString()}
+                </p>
+
+                <div className="mt-4">
+
+                  <p className="text-sm text-green-700 mb-1">
+                    Current Savings
+                  </p>
+
+                  <p className="text-2xl font-semibold text-green-900">
+
+                    $
+                    {Math.max(
+                      auction.retailPrice -
+                        auction.currentBid,
+                      0
+                    ).toLocaleString()}
+
+                  </p>
+
+                </div>
+
+              </div>
+
+            )}
 
             {/* MINIMUM */}
             <div className="border rounded-2xl p-6">
