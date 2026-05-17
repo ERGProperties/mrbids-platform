@@ -61,6 +61,7 @@ const categories = [
 ];
 
 export default function CategoriesPage() {
+
   return (
     <main className="bg-white min-h-screen">
 
@@ -97,7 +98,10 @@ export default function CategoriesPage() {
 
               <Link
                 key={category.title}
-                href={category.href || "/live"}
+                href={
+                  category.href ||
+                  "/marketplace-auctions"
+                }
                 className="group border rounded-3xl overflow-hidden hover:shadow-2xl transition bg-white"
               >
 
@@ -112,9 +116,11 @@ export default function CategoriesPage() {
                   <div className="absolute inset-0 bg-black/25" />
 
                   <div className="absolute top-5 left-5">
+
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white text-black">
                       CATEGORY
                     </span>
+
                   </div>
 
                 </div>
