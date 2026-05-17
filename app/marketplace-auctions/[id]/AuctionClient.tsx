@@ -80,21 +80,6 @@ export default function AuctionClient({
   ] = useState(0);
 
   const [
-    activityMessage,
-    setActivityMessage,
-  ] = useState("");
-
-  const [
-    chatMessage,
-    setChatMessage,
-  ] = useState("");
-
-  const [
-    chatMessages,
-    setChatMessages,
-  ] = useState<any[]>([]);
-
-  const [
     reactions,
     setReactions,
   ] = useState<any[]>([]);
@@ -368,6 +353,7 @@ export default function AuctionClient({
   return (
     <>
 
+      {/* REACTIONS */}
       <div className="fixed bottom-10 right-10 pointer-events-none z-50 space-y-2">
 
         {reactions.map(
@@ -387,9 +373,10 @@ export default function AuctionClient({
 
       <div className="grid lg:grid-cols-2 gap-14">
 
-        {/* IMAGE GALLERY */}
+        {/* LEFT SIDE */}
         <div>
 
+          {/* MAIN IMAGE */}
           <div className="relative">
 
             {auction.images?.length > 0 ? (
@@ -410,6 +397,7 @@ export default function AuctionClient({
 
             )}
 
+            {/* PREVIOUS */}
             {auction.images?.length > 1 && (
 
               <button
@@ -428,6 +416,7 @@ export default function AuctionClient({
 
             )}
 
+            {/* NEXT */}
             {auction.images?.length > 1 && (
 
               <button
@@ -449,6 +438,7 @@ export default function AuctionClient({
 
           </div>
 
+          {/* THUMBNAILS */}
           {auction.images?.length > 1 && (
 
             <div className="flex gap-3 mt-5 overflow-x-auto">
@@ -496,6 +486,7 @@ export default function AuctionClient({
         {/* RIGHT SIDE */}
         <div>
 
+          {/* HEADER */}
           <div className="flex items-center gap-4 mb-6">
 
             <span className="inline-flex px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
@@ -508,9 +499,23 @@ export default function AuctionClient({
 
           </div>
 
+          {/* TITLE */}
           <h1 className="text-5xl font-semibold leading-tight">
             {auction.title}
           </h1>
+
+          {/* DESCRIPTION */}
+          {auction.description && (
+
+            <div className="mt-6">
+
+              <p className="text-lg text-gray-600 leading-relaxed whitespace-pre-wrap">
+                {auction.description}
+              </p>
+
+            </div>
+
+          )}
 
           <div className="mt-8 space-y-6">
 
@@ -586,6 +591,23 @@ export default function AuctionClient({
 
             )}
 
+            {/* ENDED */}
+            {auction.status === "ENDED" && (
+
+              <div className="border rounded-2xl p-6 bg-gray-100 border-gray-200">
+
+                <p className="text-sm font-medium text-gray-600 mb-2">
+                  Auction Ended
+                </p>
+
+                <p className="text-gray-900 text-lg">
+                  This auction is no longer accepting bids.
+                </p>
+
+              </div>
+
+            )}
+
             {/* VIEWERS */}
             <div className="border rounded-2xl p-6 bg-black text-white">
 
@@ -650,7 +672,7 @@ export default function AuctionClient({
 
             )}
 
-            {/* MINIMUM */}
+            {/* MINIMUM BID */}
             <div className="border rounded-2xl p-6">
 
               <p className="text-sm text-gray-500 mb-2">
@@ -681,7 +703,10 @@ export default function AuctionClient({
                     )
                   )
                 }
-                className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold"
+                disabled={
+                  auction.status !== "LIVE"
+                }
+                className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold disabled:bg-gray-100"
               />
 
             </div>
@@ -726,7 +751,10 @@ export default function AuctionClient({
                   onClick={() =>
                     updateStatus("ENDED")
                   }
-                  disabled={statusLoading}
+                  disabled={
+                    statusLoading ||
+                    auction.status === "ENDED"
+                  }
                   className="flex-1 py-4 rounded-full bg-gray-900 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
                 >
                   End Auction

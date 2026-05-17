@@ -18,7 +18,9 @@ export async function POST(
     };
   }
 ) {
+
   try {
+
     const auction =
       await prisma.marketplaceAuction.findUnique({
         where: {
@@ -44,6 +46,7 @@ export async function POST(
       });
 
     if (!auction) {
+
       return NextResponse.json(
         {
           error:
@@ -53,20 +56,25 @@ export async function POST(
           status: 404,
         }
       );
+
     }
 
+    // ALREADY ENDED
     if (
       auction.status ===
       "ENDED"
     ) {
+
       return NextResponse.json({
         success: true,
       });
+
     }
 
     const winningBid =
       auction.bids[0];
 
+    // UPDATE DATABASE
     const updatedAuction =
       await prisma.marketplaceAuction.update({
         where: {
@@ -76,6 +84,9 @@ export async function POST(
         data: {
           status:
             "ENDED",
+
+          endAt:
+            new Date(),
 
           winnerId:
             winningBid?.bidderId,
@@ -106,6 +117,7 @@ export async function POST(
       winningBid?.bidder
         ?.email
     ) {
+
       await sendAuctionWonEmail({
         to:
           winningBid
@@ -124,6 +136,7 @@ export async function POST(
         sellerEmail:
           auction.seller.email,
       });
+
     }
 
     // SEND SELLER EMAIL
@@ -131,6 +144,7 @@ export async function POST(
       auction.seller?.email &&
       winningBid?.bidder
     ) {
+
       await sendSellerWinnerEmail({
         to:
           auction.seller.email,
@@ -150,19 +164,32 @@ export async function POST(
           winningBid.bidder
             .email,
       });
+
     }
 
     // REALTIME BROADCAST
+    // FIXED CHANNEL NAME
     await pusherServer.trigger(
-      `auction-${auction.id}`,
+      `presence-auction-${auction.id}`,
       "auction-ended",
+      updatedAuction
+    );
+
+    // ALSO BROADCAST GENERAL UPDATE
+    await pusherServer.trigger(
+      `presence-auction-${auction.id}`,
+      "auction-updated",
       updatedAuction
     );
 
     return NextResponse.json({
       success: true,
+      auction:
+        updatedAuction,
     });
+
   } catch (error) {
+
     console.error(error);
 
     return NextResponse.json(
@@ -174,5 +201,6 @@ export async function POST(
         status: 500,
       }
     );
+
   }
 }
