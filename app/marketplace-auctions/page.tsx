@@ -6,6 +6,25 @@ export const dynamic = "force-dynamic";
 
 export default async function MarketplaceAuctionsPage() {
 
+  // AUTO-END EXPIRED LIVE AUCTIONS
+  await prisma.marketplaceAuction.updateMany({
+
+    where: {
+
+      status: "LIVE",
+
+      endAt: {
+        lte: new Date(),
+      },
+
+    },
+
+    data: {
+      status: "ENDED",
+    },
+
+  });
+
   const auctions =
     await prisma.marketplaceAuction.findMany({
 
