@@ -7,10 +7,6 @@
     {
       "path": "/api/cron/close-auctions",
       "schedule": "5 12 * * *"
-    },
-    {
-      "path": "/api/cron/marketplace-ending-soon",
-      "schedule": "0 * * * *"
     }
   ]
 }
