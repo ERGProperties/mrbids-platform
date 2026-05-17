@@ -3,7 +3,10 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
+
 import { getAllAuctions } from "@/lib/repositories/auctionRepository";
+
+import MarketplaceAuctionCard from "@/components/MarketplaceAuctionCard";
 
 const activityFeed = [
   "Luxury watch sold for $2,450",
@@ -58,6 +61,25 @@ export default async function HomePage() {
     );
 
   }
+
+  // AUTO-END EXPIRED LIVE AUCTIONS
+  await prisma.marketplaceAuction.updateMany({
+
+    where: {
+
+      status: "LIVE",
+
+      endAt: {
+        lte: new Date(),
+      },
+
+    },
+
+    data: {
+      status: "ENDED",
+    },
+
+  });
 
   // MARKETPLACE
   const marketplaceAuctions =
@@ -249,14 +271,14 @@ export default async function HomePage() {
       {/* ACTIVITY FEED */}
       <section className="border-y bg-black text-white overflow-hidden">
 
-        <div className="flex gap-12 whitespace-nowrap py-5 px-6 animate-pulse">
+        <div className="flex gap-12 whitespace-nowrap py-5 px-6 overflow-x-auto">
 
           {activityFeed.map(
             (item, index) => (
 
               <div
                 key={index}
-                className="text-sm font-medium"
+                className="text-sm font-medium flex-shrink-0"
               >
                 🔥 {item}
               </div>
@@ -384,119 +406,15 @@ export default async function HomePage() {
 
           ) : (
 
-            <div className="grid md:grid-cols-3 gap-10">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
 
               {marketplaceAuctions.map(
                 (auction) => (
 
-                  <Link
+                  <MarketplaceAuctionCard
                     key={auction.id}
-                    href={`/marketplace-auctions/${auction.id}`}
-                    className="group border rounded-3xl overflow-hidden hover:shadow-xl transition"
-                  >
-
-                    <div className="relative h-72 overflow-hidden">
-
-                      <img
-                        src={
-                          auction.coverImage ||
-                          "https://images.unsplash.com/photo-1607082350899-7e105aa886ae?q=80&w=1600&auto=format&fit=crop"
-                        }
-                        alt={auction.title}
-                        className="h-full w-full object-cover group-hover:scale-105 transition duration-500"
-                      />
-
-                      <div className="absolute top-5 left-5">
-
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold tracking-wide bg-red-600 text-white">
-                          LIVE
-                        </span>
-
-                      </div>
-
-                    </div>
-
-                    <div className="p-7">
-
-                      <div className="flex items-center justify-between gap-4 mb-4">
-
-                        <span className="px-3 py-1 rounded-full bg-black text-white text-xs font-medium">
-                          {auction.category}
-                        </span>
-
-                        <span className="text-sm text-gray-500">
-                          ACTIVE
-                        </span>
-
-                      </div>
-
-                      <h3 className="text-2xl font-semibold">
-                        {auction.title}
-                      </h3>
-
-                      <div className="mt-6 flex items-center gap-3">
-
-                        {auction.seller.avatarUrl ? (
-
-                          <img
-                            src={
-                              auction.seller.avatarUrl
-                            }
-                            alt={
-                              auction.seller.name ||
-                              "Seller"
-                            }
-                            className="w-10 h-10 rounded-full object-cover border"
-                          />
-
-                        ) : (
-
-                          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-500">
-                            {auction.seller.name?.charAt(0) ||
-                              "M"}
-                          </div>
-
-                        )}
-
-                        <div>
-
-                          <p className="font-medium">
-                            {auction.seller.name ||
-                              "Marketplace Seller"}
-                          </p>
-
-                          {auction.seller
-                            .tiktokUsername && (
-
-                            <p className="text-sm text-gray-500">
-                              {
-                                auction.seller
-                                  .tiktokUsername
-                              }
-                            </p>
-
-                          )}
-
-                        </div>
-
-                      </div>
-
-                      <div className="mt-6">
-
-                        <p className="text-sm text-gray-500 mb-1">
-                          Current Bid
-                        </p>
-
-                        <p className="text-3xl font-semibold">
-                          $
-                          {auction.currentBid?.toLocaleString()}
-                        </p>
-
-                      </div>
-
-                    </div>
-
-                  </Link>
+                    auction={auction}
+                  />
 
                 )
               )}
