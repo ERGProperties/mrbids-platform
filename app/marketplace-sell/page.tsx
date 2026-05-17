@@ -49,14 +49,14 @@ export default function MarketplaceSellPage() {
   ] = useState("5");
 
   const [
-    images,
-    setImages,
-  ] = useState<string[]>([]);
-
-  const [
     coverImage,
     setCoverImage,
   ] = useState("");
+
+  const [
+    additionalImages,
+    setAdditionalImages,
+  ] = useState<string[]>([]);
 
   const [
     loading,
@@ -102,7 +102,45 @@ export default function MarketplaceSellPage() {
     return data.secure_url;
   }
 
-  async function handleImageUpload(
+  async function handleCoverUpload(
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
+
+    try {
+
+      const file =
+        e.target.files?.[0];
+
+      if (!file)
+        return;
+
+      setLoading(true);
+
+      const imageUrl =
+        await uploadImage(
+          file
+        );
+
+      setCoverImage(
+        imageUrl
+      );
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        "Failed to upload cover image"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  }
+
+  async function handleAdditionalImages(
     e: React.ChangeEvent<HTMLInputElement>
   ) {
 
@@ -136,12 +174,11 @@ export default function MarketplaceSellPage() {
 
       }
 
-      setImages(
-        uploadedImages
-      );
-
-      setCoverImage(
-        uploadedImages[0]
+      setAdditionalImages(
+        (prev) => [
+          ...prev,
+          ...uploadedImages,
+        ]
       );
 
     } catch (err) {
@@ -171,6 +208,11 @@ export default function MarketplaceSellPage() {
 
       setError("");
 
+      const allImages = [
+        coverImage,
+        ...additionalImages,
+      ];
+
       const response =
         await fetch(
           "/api/marketplace-auctions/create",
@@ -186,22 +228,29 @@ export default function MarketplaceSellPage() {
               title,
               description,
               category,
+
               retailPrice:
                 retailPrice
                   ? Number(
                       retailPrice
                     )
                   : null,
+
               coverImage,
-              images,
+
+              images:
+                allImages,
+
               startingBid:
                 Number(
                   startingBid
                 ),
+
               bidIncrement:
                 Number(
                   bidIncrement
                 ),
+
               durationMinutes:
                 Number(
                   durationMinutes
@@ -373,11 +422,39 @@ export default function MarketplaceSellPage() {
 
           </div>
 
-          {/* IMAGES */}
+          {/* COVER IMAGE */}
           <div>
 
             <label className="block text-sm font-medium mb-3">
-              Product Images
+              Cover Image
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={
+                handleCoverUpload
+              }
+              className="w-full border rounded-2xl px-5 py-4"
+            />
+
+            {coverImage && (
+
+              <img
+                src={coverImage}
+                alt="Cover"
+                className="mt-5 rounded-3xl border aspect-square object-cover w-full"
+              />
+
+            )}
+
+          </div>
+
+          {/* ADDITIONAL IMAGES */}
+          <div>
+
+            <label className="block text-sm font-medium mb-3">
+              Additional Images
             </label>
 
             <input
@@ -385,16 +462,16 @@ export default function MarketplaceSellPage() {
               multiple
               accept="image/*"
               onChange={
-                handleImageUpload
+                handleAdditionalImages
               }
               className="w-full border rounded-2xl px-5 py-4"
             />
 
-            {images.length > 0 && (
+            {additionalImages.length > 0 && (
 
               <div className="grid grid-cols-3 gap-4 mt-5">
 
-                {images.map(
+                {additionalImages.map(
                   (
                     image,
                     index
@@ -434,10 +511,6 @@ export default function MarketplaceSellPage() {
               className="w-full border rounded-2xl px-5 py-4"
               placeholder="250"
             />
-
-            <p className="mt-2 text-sm text-gray-500">
-              Show buyers the original retail value to increase bidding excitement.
-            </p>
 
           </div>
 
