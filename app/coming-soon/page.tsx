@@ -1,36 +1,49 @@
 "use client";
 
 import { useState } from "react";
+
 import { signIn } from "next-auth/react";
 
 export default function SellerOnboardingPage() {
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] =
+    useState("");
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] =
+    useState(false);
 
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] =
+    useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
+
     e.preventDefault();
 
     setLoading(true);
+
     setError("");
 
     try {
 
-      const result = await signIn("email", {
-        email,
-        redirect: false,
-        callbackUrl: "/seller/onboarding",
-      });
+      const result =
+        await signIn("email", {
+          email,
+
+          redirect: false,
+
+          callbackUrl:
+            "/sell",
+        });
 
       if (result?.error) {
-        throw new Error(result.error);
+        throw new Error(
+          result.error
+        );
       }
 
       setSuccess(true);
@@ -38,7 +51,8 @@ export default function SellerOnboardingPage() {
     } catch (err: any) {
 
       setError(
-        err.message || "Failed to send login link"
+        err.message ||
+        "Failed to send login link"
       );
 
     } finally {
@@ -88,7 +102,7 @@ export default function SellerOnboardingPage() {
                 </h2>
 
                 <p className="mt-4 text-gray-600">
-                  We sent you a secure Magic Link to continue seller onboarding.
+                  We sent you a secure Magic Link to continue selling on MrBids.
                 </p>
 
               </div>
@@ -111,7 +125,9 @@ export default function SellerOnboardingPage() {
                     required
                     value={email}
                     onChange={(e) =>
-                      setEmail(e.target.value)
+                      setEmail(
+                        e.target.value
+                      )
                     }
                     placeholder="you@example.com"
                     className="w-full border rounded-2xl px-5 py-4 outline-none focus:ring-2 focus:ring-black"
