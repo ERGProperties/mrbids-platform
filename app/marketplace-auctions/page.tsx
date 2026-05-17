@@ -211,9 +211,9 @@ export default async function MarketplaceAuctionsPage() {
                       </div>
 
                       {/* RETAIL PRICE */}
-                      {auction.retailPrice && (
+                      <div className="mt-5 border rounded-2xl p-4 bg-green-50 border-green-200">
 
-                        <div className="mt-5 border rounded-2xl p-4 bg-green-50 border-green-200">
+                        {auction.retailPrice ? (
 
                           <div className="flex items-center justify-between gap-4">
 
@@ -247,9 +247,19 @@ export default async function MarketplaceAuctionsPage() {
 
                           </div>
 
-                        </div>
+                        ) : (
 
-                      )}
+                          <div className="flex items-center justify-center min-h-[72px]">
+
+                            <p className="text-sm text-green-800 font-medium">
+                              Retail price unavailable
+                            </p>
+
+                          </div>
+
+                        )}
+
+                      </div>
 
                     </div>
 
