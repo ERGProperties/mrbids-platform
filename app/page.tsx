@@ -271,14 +271,17 @@ export default async function HomePage() {
       {/* ACTIVITY FEED */}
       <section className="border-y bg-black text-white overflow-hidden">
 
-        <div className="flex gap-12 whitespace-nowrap py-5 px-6 overflow-x-auto">
+        <div className="flex gap-12 whitespace-nowrap py-5 px-6 animate-pulse overflow-hidden">
 
-          {activityFeed.map(
+          {[
+            ...activityFeed,
+            ...activityFeed,
+          ].map(
             (item, index) => (
 
               <div
                 key={index}
-                className="text-sm font-medium flex-shrink-0"
+                className="text-sm font-medium inline-block"
               >
                 🔥 {item}
               </div>

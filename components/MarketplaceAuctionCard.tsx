@@ -18,7 +18,7 @@ export default function MarketplaceAuctionCard({
   return (
     <Link
       href={`/marketplace-auctions/${auction.id}`}
-      className="group border rounded-3xl overflow-hidden hover:shadow-xl transition bg-white"
+      className="group border rounded-3xl overflow-hidden hover:shadow-xl transition bg-white flex flex-col"
     >
 
       {/* IMAGE */}
@@ -70,7 +70,7 @@ export default function MarketplaceAuctionCard({
       </div>
 
       {/* CONTENT */}
-      <div className="p-5 md:p-6">
+      <div className="p-5 md:p-6 flex flex-col flex-1">
 
         {/* CATEGORY */}
         <div className="mb-4">
@@ -82,7 +82,7 @@ export default function MarketplaceAuctionCard({
         </div>
 
         {/* TITLE */}
-        <h2 className="text-xl md:text-2xl font-semibold leading-snug">
+        <h2 className="text-xl md:text-2xl font-semibold leading-snug min-h-[72px]">
           {auction.title}
         </h2>
 
@@ -149,11 +149,11 @@ export default function MarketplaceAuctionCard({
         </div>
 
         {/* RETAIL PRICE */}
-        <div className="mt-5 border rounded-2xl p-4 bg-green-50 border-green-200">
+        <div className="mt-5 border rounded-2xl p-4 bg-green-50 border-green-200 min-h-[102px] flex items-center">
 
           {auction.retailPrice ? (
 
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-4 w-full">
 
               <div>
 
@@ -187,9 +187,9 @@ export default function MarketplaceAuctionCard({
 
           ) : (
 
-            <div className="flex items-center justify-center min-h-[72px]">
+            <div className="w-full flex items-center justify-center">
 
-              <p className="text-sm text-green-700 font-medium">
+              <p className="text-sm text-green-700 font-medium text-center">
                 Retail price unavailable
               </p>
 
