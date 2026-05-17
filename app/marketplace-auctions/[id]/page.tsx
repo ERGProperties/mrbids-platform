@@ -27,7 +27,8 @@ export default async function MarketplaceAuctionPage({
           },
 
           orderBy: {
-            createdAt: "desc",
+            createdAt:
+              "desc",
           },
 
           take: 10,
@@ -44,31 +45,9 @@ export default async function MarketplaceAuctionPage({
 
       <section className="max-w-7xl mx-auto px-6 pt-24 pb-24">
 
-        <div className="grid lg:grid-cols-2 gap-14">
-
-          {/* IMAGE */}
-          <div>
-
-            {auction.coverImage ? (
-
-              <img
-                src={auction.coverImage}
-                alt={auction.title}
-                className="w-full rounded-3xl border"
-              />
-
-            ) : (
-
-              <div className="aspect-square rounded-3xl bg-gray-100" />
-
-            )}
-
-          </div>
-
-          {/* CLIENT COMPONENT */}
-          <AuctionClient initialAuction={auction} />
-
-        </div>
+        <AuctionClient
+          initialAuction={auction}
+        />
 
       </section>
 

@@ -38,6 +38,11 @@ export default function AuctionClient({
   );
 
   const [
+    selectedImage,
+    setSelectedImage,
+  ] = useState(0);
+
+  const [
     amount,
     setAmount,
   ] = useState(
@@ -242,23 +247,25 @@ export default function AuctionClient({
       setLoading(true);
 
       setError("");
+
       setSuccess("");
 
-      const response = await fetch(
-        `/api/marketplace-auctions/${auction.id}/bid`,
-        {
-          method: "POST",
+      const response =
+        await fetch(
+          `/api/marketplace-auctions/${auction.id}/bid`,
+          {
+            method: "POST",
 
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
 
-          body: JSON.stringify({
-            amount,
-          }),
-        }
-      );
+            body: JSON.stringify({
+              amount,
+            }),
+          }
+        );
 
       const data =
         await response.json();
@@ -267,7 +274,7 @@ export default function AuctionClient({
 
         setError(
           data.error ||
-            "Failed to place bid"
+          "Failed to place bid"
         );
 
         return;
@@ -288,65 +295,6 @@ export default function AuctionClient({
     } finally {
 
       setLoading(false);
-
-    }
-  }
-
-  async function updateStatus(
-    status: string
-  ) {
-
-    try {
-
-      setStatusLoading(true);
-
-      setError("");
-
-      const response =
-        await fetch(
-          `/api/marketplace-auctions/${auction.id}/status`,
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              status,
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-
-        setError(
-          data.error ||
-            "Failed to update auction"
-        );
-
-        return;
-      }
-
-      setSuccess(
-        "Updated successfully!"
-      );
-
-    } catch (err) {
-
-      console.error(err);
-
-      setError(
-        "Something went wrong"
-      );
-
-    } finally {
-
-      setStatusLoading(false);
 
     }
   }
@@ -420,6 +368,7 @@ export default function AuctionClient({
   return (
     <>
 
+      {/* FLOATING REACTIONS */}
       <div className="fixed bottom-10 right-10 pointer-events-none z-50 space-y-2">
 
         {reactions.map(
@@ -437,417 +386,300 @@ export default function AuctionClient({
 
       </div>
 
-      <div>
+      <div className="grid lg:grid-cols-2 gap-14">
 
-        <div className="flex items-center gap-4 mb-6">
+        {/* IMAGE GALLERY */}
+        <div>
 
-          <span className="inline-flex px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
-            {auction.category}
-          </span>
+          <div className="relative">
 
-          <span className="inline-flex px-4 py-2 rounded-full bg-red-500 text-white text-sm font-medium">
-            {auction.status}
-          </span>
+            {auction.images?.length > 0 ? (
+
+              <img
+                src={
+                  auction.images[
+                    selectedImage
+                  ]
+                }
+                alt={auction.title}
+                className="w-full rounded-3xl border object-cover aspect-square"
+              />
+
+            ) : (
+
+              <div className="aspect-square rounded-3xl bg-gray-100" />
+
+            )}
+
+            {/* LEFT */}
+            {auction.images?.length > 1 && (
+
+              <button
+                onClick={() =>
+                  setSelectedImage(
+                    (prev) =>
+                      prev === 0
+                        ? auction.images.length - 1
+                        : prev - 1
+                  )
+                }
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/70 text-white text-2xl"
+              >
+                ←
+              </button>
+
+            )}
+
+            {/* RIGHT */}
+            {auction.images?.length > 1 && (
+
+              <button
+                onClick={() =>
+                  setSelectedImage(
+                    (prev) =>
+                      prev ===
+                      auction.images.length - 1
+                        ? 0
+                        : prev + 1
+                  )
+                }
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/70 text-white text-2xl"
+              >
+                →
+              </button>
+
+            )}
+
+          </div>
+
+          {/* THUMBNAILS */}
+          {auction.images?.length > 1 && (
+
+            <div className="flex gap-3 mt-5 overflow-x-auto">
+
+              {auction.images.map(
+                (
+                  image: string,
+                  index: number
+                ) => (
+
+                  <button
+                    key={index}
+                    onClick={() =>
+                      setSelectedImage(
+                        index
+                      )
+                    }
+                    className={`
+                      border rounded-2xl overflow-hidden min-w-[90px]
+                      ${
+                        selectedImage === index
+                          ? "border-black"
+                          : "border-gray-200"
+                      }
+                    `}
+                  >
+
+                    <img
+                      src={image}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-24 h-24 object-cover"
+                    />
+
+                  </button>
+
+                )
+              )}
+
+            </div>
+
+          )}
 
         </div>
 
-        <h1 className="text-5xl font-semibold leading-tight">
-          {auction.title}
-        </h1>
+        {/* RIGHT SIDE */}
+        <div>
 
-        <div className="mt-8 space-y-6">
+          <div className="flex items-center gap-4 mb-6">
 
-          {/* SELLER */}
-          <div>
+            <span className="inline-flex px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
+              {auction.category}
+            </span>
 
-            <p className="text-sm text-gray-500 mb-2">
-              Seller
-            </p>
+            <span className="inline-flex px-4 py-2 rounded-full bg-red-500 text-white text-sm font-medium">
+              {auction.status}
+            </span>
 
-            <div className="flex items-center gap-4">
+          </div>
 
-              {auction.seller.avatarUrl ? (
+          <h1 className="text-5xl font-semibold leading-tight">
+            {auction.title}
+          </h1>
 
-                <img
-                  src={
-                    auction.seller.avatarUrl
-                  }
-                  alt={
-                    auction.seller.name ||
-                    "Seller"
-                  }
-                  className="w-14 h-14 rounded-full object-cover border"
-                />
+          <div className="mt-8 space-y-6">
 
-              ) : (
+            {/* SELLER */}
+            <div>
 
-                <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-500">
-                  {auction.seller.name?.charAt(0) ||
-                    "M"}
-                </div>
+              <p className="text-sm text-gray-500 mb-2">
+                Seller
+              </p>
 
-              )}
+              <div className="flex items-center gap-4">
 
-              <div>
+                {auction.seller.avatarUrl ? (
 
-                <p className="font-semibold text-lg">
-                  {auction.seller.name ||
-                    "Marketplace Seller"}
-                </p>
-
-                {auction.seller
-                  .tiktokUsername && (
-
-                  <p className="text-gray-500">
-                    {
-                      auction.seller
-                        .tiktokUsername
+                  <img
+                    src={
+                      auction.seller.avatarUrl
                     }
-                  </p>
+                    alt={
+                      auction.seller.name ||
+                      "Seller"
+                    }
+                    className="w-14 h-14 rounded-full object-cover border"
+                  />
+
+                ) : (
+
+                  <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-500">
+                    {auction.seller.name?.charAt(0) ||
+                      "M"}
+                  </div>
 
                 )}
+
+                <div>
+
+                  <p className="font-semibold text-lg">
+                    {auction.seller.name ||
+                      "Marketplace Seller"}
+                  </p>
+
+                  {auction.seller
+                    .tiktokUsername && (
+
+                    <p className="text-gray-500">
+                      {
+                        auction.seller
+                          .tiktokUsername
+                      }
+                    </p>
+
+                  )}
+
+                </div>
 
               </div>
 
             </div>
 
-          </div>
-
-          {/* COUNTDOWN TIMER */}
-          <CountdownTimer
-            endAt={auction.endAt}
-            onExpire={endAuction}
-          />
-
-          {/* LIVE VIEWERS */}
-          <div className="border rounded-2xl p-6 bg-black text-white">
-
-            <p className="text-sm text-gray-300 mb-2">
-              LIVE Viewers
-            </p>
-
-            <p className="text-4xl font-semibold">
-              {viewerCount}
-            </p>
-
-          </div>
-
-          {/* LIVE ACTIVITY */}
-          {activityMessage && (
-
-            <div className="border border-green-200 bg-green-50 rounded-2xl p-4 text-green-700 font-medium animate-pulse">
-
-              {activityMessage}
-
-            </div>
-
-          )}
-
-          {/* CURRENT BID */}
-          <div>
-
-            <p className="text-sm text-gray-500 mb-2">
-              Current Bid
-            </p>
-
-            <p className="text-5xl font-semibold">
-              $
-              {auction.currentBid?.toLocaleString()}
-            </p>
-
-            <p className="mt-2 text-sm text-gray-500">
-              {auction.bidCount} bids
-            </p>
-
-          </div>
-
-          {/* MINIMUM BID */}
-          <div className="border rounded-2xl p-6">
-
-            <p className="text-sm text-gray-500 mb-2">
-              Minimum Bid
-            </p>
-
-            <p className="text-3xl font-semibold">
-              $
-              {minimumBid.toLocaleString()}
-            </p>
-
-          </div>
-
-          {/* BID INPUT */}
-          <div>
-
-            <label className="block text-sm text-gray-500 mb-2">
-              Your Bid
-            </label>
-
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) =>
-                setAmount(
-                  Number(
-                    e.target.value
-                  )
-                )
-              }
-              onFocus={() => {
-
-                pusherClient.send_event(
-                  "client-user-bidding",
-                  {
-                    user:
-                      "Someone",
-                  },
-                  `presence-auction-${initialAuction.id}`
-                );
-
-              }}
-              className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold outline-none focus:ring-2 focus:ring-black"
+            {/* COUNTDOWN */}
+            <CountdownTimer
+              endAt={auction.endAt}
+              onExpire={endAuction}
             />
 
-          </div>
+            {/* VIEWERS */}
+            <div className="border rounded-2xl p-6 bg-black text-white">
 
-          {/* ERROR */}
-          {error && (
-
-            <div className="border border-red-200 bg-red-50 text-red-600 rounded-2xl p-4">
-              {error}
-            </div>
-
-          )}
-
-          {/* SUCCESS */}
-          {success && (
-
-            <div className="border border-green-200 bg-green-50 text-green-600 rounded-2xl p-4">
-              {success}
-            </div>
-
-          )}
-
-          {/* BID HISTORY */}
-          <div>
-
-            <div className="flex items-center justify-between mb-4">
-
-              <p className="text-sm text-gray-500">
-                Recent Bids
+              <p className="text-sm text-gray-300 mb-2">
+                LIVE Viewers
               </p>
 
-              <p className="text-sm text-gray-400">
-                Live Activity
+              <p className="text-4xl font-semibold">
+                {viewerCount}
               </p>
 
             </div>
 
-            <div className="border rounded-2xl divide-y overflow-hidden">
+            {/* BID */}
+            <div>
 
-              {auction.bids.length === 0 ? (
+              <p className="text-sm text-gray-500 mb-2">
+                Current Bid
+              </p>
 
-                <div className="p-6 text-gray-500">
-                  No bids yet.
-                </div>
-
-              ) : (
-
-                auction.bids.map(
-                  (bid: any) => (
-
-                    <div
-                      key={bid.id}
-                      className="flex items-center justify-between p-5"
-                    >
-
-                      <div>
-
-                        <p className="font-medium">
-                          {bid.bidder.name ||
-                            "Anonymous Bidder"}
-                        </p>
-
-                        <p className="text-sm text-gray-500">
-                          {new Date(
-                            bid.createdAt
-                          ).toLocaleString()}
-                        </p>
-
-                      </div>
-
-                      <p className="text-xl font-semibold">
-                        $
-                        {bid.amount.toLocaleString()}
-                      </p>
-
-                    </div>
-
-                  )
-                )
-
-              )}
-
-            </div>
-
-          </div>
-
-          {/* LIVE REACTIONS */}
-          <div className="flex gap-3">
-
-            {[
-              "🔥",
-              "💰",
-              "🚀",
-              "😮",
-              "👏",
-            ].map((emoji) => (
-
-              <button
-                key={emoji}
-                onClick={() =>
-                  sendReaction(
-                    emoji
-                  )
-                }
-                className="text-3xl hover:scale-125 transition"
-              >
-                {emoji}
-              </button>
-
-            ))}
-
-          </div>
-
-          {/* LIVE CHAT */}
-          <div className="border rounded-2xl overflow-hidden">
-
-            <div className="p-5 border-b bg-gray-50">
-
-              <p className="font-semibold">
-                LIVE Chat
+              <p className="text-5xl font-semibold">
+                $
+                {auction.currentBid?.toLocaleString()}
               </p>
 
             </div>
 
-            <div className="h-72 overflow-y-auto p-5 space-y-4 bg-white">
+            {/* MINIMUM */}
+            <div className="border rounded-2xl p-6">
 
-              {chatMessages.length === 0 ? (
+              <p className="text-sm text-gray-500 mb-2">
+                Minimum Bid
+              </p>
 
-                <p className="text-gray-500 text-sm">
-                  No messages yet.
-                </p>
-
-              ) : (
-
-                chatMessages.map(
-                  (
-                    message,
-                    index
-                  ) => (
-
-                    <div
-                      key={index}
-                      className="text-sm"
-                    >
-
-                      <span className="font-semibold mr-2">
-                        {message.user}:
-                      </span>
-
-                      <span>
-                        {message.text}
-                      </span>
-
-                    </div>
-
-                  )
-                )
-
-              )}
+              <p className="text-3xl font-semibold">
+                $
+                {minimumBid.toLocaleString()}
+              </p>
 
             </div>
 
-            <div className="border-t p-4 flex gap-3">
+            {/* BID INPUT */}
+            <div>
+
+              <label className="block text-sm text-gray-500 mb-2">
+                Your Bid
+              </label>
 
               <input
-                type="text"
-                value={chatMessage}
+                type="number"
+                value={amount}
                 onChange={(e) =>
-                  setChatMessage(
-                    e.target.value
+                  setAmount(
+                    Number(
+                      e.target.value
+                    )
                   )
                 }
-                placeholder="Send a message..."
-                className="flex-1 border rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-black"
+                className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold"
               />
 
-              <button
-                onClick={sendChatMessage}
-                className="px-6 rounded-full bg-black text-white font-medium hover:opacity-90"
-              >
-                Send
-              </button>
-
             </div>
 
-          </div>
+            {/* ERROR */}
+            {error && (
 
-          {/* DESCRIPTION */}
-          <div>
+              <div className="border border-red-200 bg-red-50 text-red-600 rounded-2xl p-4">
+                {error}
+              </div>
 
-            <p className="text-sm text-gray-500 mb-3">
-              Description
-            </p>
+            )}
 
-            <div className="text-lg text-gray-700 leading-relaxed border rounded-2xl p-6">
-              {auction.description ||
-                "No description provided."}
-            </div>
+            {/* SUCCESS */}
+            {success && (
 
-          </div>
+              <div className="border border-green-200 bg-green-50 text-green-600 rounded-2xl p-4">
+                {success}
+              </div>
 
-          {/* SELLER CONTROLS */}
-          <div className="flex gap-3">
+            )}
 
+            {/* BID BUTTON */}
             <button
-              onClick={() =>
-                updateStatus("LIVE")
+              onClick={handleBid}
+              disabled={
+                loading ||
+                auction.status === "ENDED"
               }
-              disabled={statusLoading}
-              className="flex-1 py-4 rounded-full bg-green-600 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+              className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
             >
-              Start LIVE
-            </button>
 
-            <button
-              onClick={() =>
-                updateStatus("ENDED")
-              }
-              disabled={statusLoading}
-              className="flex-1 py-4 rounded-full bg-gray-900 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
-            >
-              End Auction
+              {auction.status === "ENDED"
+                ? "Auction Ended"
+                : loading
+                ? "Placing Bid..."
+                : "Place Bid"}
+
             </button>
 
           </div>
-
-          {/* BID BUTTON */}
-          <button
-            onClick={handleBid}
-            disabled={
-              loading ||
-              auction.status === "ENDED"
-            }
-            className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
-          >
-
-            {auction.status === "ENDED"
-              ? "Auction Ended"
-              : loading
-              ? "Placing Bid..."
-              : "Place Bid"}
-
-          </button>
 
         </div>
 

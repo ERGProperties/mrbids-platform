@@ -80,8 +80,10 @@ export async function POST(
       description,
       category,
       coverImage,
+      images,
       startingBid,
       bidIncrement,
+      durationMinutes,
     } = body;
 
     // VALIDATION
@@ -117,7 +119,10 @@ export async function POST(
 
           coverImage,
 
-          images: [coverImage],
+          images:
+            images?.length
+              ? images
+              : [coverImage],
 
           startingBid:
             Number(
@@ -143,11 +148,14 @@ export async function POST(
           startAt:
             new Date(),
 
-          // DEFAULT 5-MINUTE AUCTION
           endAt:
             new Date(
               Date.now() +
-              5 * 60 * 1000
+              Number(
+                durationMinutes || 5
+              ) *
+                60 *
+                1000
             ),
 
         },

@@ -25,7 +25,9 @@ export default function MarketplaceSellPage() {
       category: "Jewelry",
       startingBid: 1,
       bidIncrement: 1,
+      durationMinutes: 5,
       coverImage: "",
+      images: [] as string[],
     });
 
   // CLOUDINARY UPLOAD
@@ -90,10 +92,12 @@ export default function MarketplaceSellPage() {
         await res.json();
 
       if (!res.ok) {
+
         throw new Error(
           data.error ||
           "Failed to create auction"
         );
+
       }
 
       router.push(
@@ -217,7 +221,7 @@ export default function MarketplaceSellPage() {
 
           </div>
 
-          {/* IMAGE */}
+          {/* COVER IMAGE */}
           <div>
 
             <label className="block text-sm font-medium mb-3">
@@ -247,6 +251,11 @@ export default function MarketplaceSellPage() {
                     ...form,
                     coverImage:
                       imageUrl,
+
+                    images: [
+                      imageUrl,
+                      ...form.images,
+                    ],
                   });
 
                 } catch (err) {
@@ -265,19 +274,111 @@ export default function MarketplaceSellPage() {
               className="w-full border rounded-2xl px-5 py-4"
             />
 
-            {uploading && (
-              <p className="mt-3 text-sm text-gray-500">
-                Uploading image...
-              </p>
-            )}
-
             {form.coverImage && (
 
               <img
                 src={form.coverImage}
                 alt="Preview"
-                className="mt-6 w-40 h-40 object-cover rounded-2xl border"
+                className="mt-6 w-52 h-52 object-cover rounded-2xl border"
               />
+
+            )}
+
+          </div>
+
+          {/* ADDITIONAL IMAGES */}
+          <div>
+
+            <label className="block text-sm font-medium mb-3">
+              Additional Images
+            </label>
+
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={async (e) => {
+
+                const files =
+                  Array.from(
+                    e.target.files || []
+                  );
+
+                if (
+                  files.length === 0
+                ) return;
+
+                setUploading(true);
+
+                try {
+
+                  const uploadedImages:
+                    string[] = [];
+
+                  for (const file of files) {
+
+                    const imageUrl =
+                      await handleImageUpload(
+                        file
+                      );
+
+                    uploadedImages.push(
+                      imageUrl
+                    );
+
+                  }
+
+                  setForm({
+                    ...form,
+                    images: [
+                      ...form.images,
+                      ...uploadedImages,
+                    ],
+                  });
+
+                } catch (err) {
+
+                  console.error(err);
+
+                  setError(
+                    "Additional image upload failed"
+                  );
+
+                }
+
+                setUploading(false);
+
+              }}
+              className="w-full border rounded-2xl px-5 py-4"
+            />
+
+            {uploading && (
+              <p className="mt-3 text-sm text-gray-500">
+                Uploading images...
+              </p>
+            )}
+
+            {form.images.length > 0 && (
+
+              <div className="mt-6 grid grid-cols-3 gap-4">
+
+                {form.images.map(
+                  (
+                    image,
+                    index
+                  ) => (
+
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`Image ${index + 1}`}
+                      className="aspect-square object-cover rounded-2xl border"
+                    />
+
+                  )
+                )}
+
+              </div>
 
             )}
 
@@ -335,11 +436,61 @@ export default function MarketplaceSellPage() {
 
           </div>
 
+          {/* DURATION */}
+          <div>
+
+            <label className="block text-sm font-medium mb-3">
+              Auction Duration
+            </label>
+
+            <select
+              value={form.durationMinutes}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  durationMinutes:
+                    Number(
+                      e.target.value
+                    ),
+                })
+              }
+              className="w-full border rounded-2xl px-5 py-4"
+            >
+              <option value={1}>
+                1 Minute
+              </option>
+
+              <option value={5}>
+                5 Minutes
+              </option>
+
+              <option value={10}>
+                10 Minutes
+              </option>
+
+              <option value={15}>
+                15 Minutes
+              </option>
+
+              <option value={30}>
+                30 Minutes
+              </option>
+
+              <option value={60}>
+                1 Hour
+              </option>
+
+            </select>
+
+          </div>
+
           {/* ERROR */}
           {error && (
+
             <div className="text-red-600 text-sm">
               {error}
             </div>
+
           )}
 
           {/* SUBMIT */}
@@ -350,9 +501,11 @@ export default function MarketplaceSellPage() {
             }
             className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
           >
+
             {loading
               ? "Creating Auction..."
               : "Create Marketplace Auction"}
+
           </button>
 
         </form>
