@@ -32,10 +32,7 @@ export default async function MarketplaceAuctionsPage({
     await prisma.marketplaceAuction.findMany({
       where: category
         ? {
-            category: {
-              equals: category,
-              mode: "insensitive",
-            },
+            category,
           }
         : undefined,
 
@@ -75,6 +72,67 @@ export default async function MarketplaceAuctionsPage({
                 )} auctions across the MrBids marketplace.`
               : "Browse unique items from sellers across the MrBids marketplace."}
           </p>
+        </div>
+      </section>
+
+      {/* CATEGORY FILTERS */}
+      <section className="pb-10">
+        <div className="max-w-7xl mx-auto px-6 overflow-x-auto">
+          <div className="flex gap-3 min-w-max">
+            <Link
+              href="/marketplace-auctions"
+              className={`px-5 py-2 rounded-full border text-sm font-medium transition ${
+                !category
+                  ? "bg-black text-white border-black"
+                  : "bg-white text-black border-gray-300 hover:border-black"
+              }`}
+            >
+              All
+            </Link>
+
+            {[
+              {
+                label: "Jewelry",
+                slug: "jewelry",
+              },
+              {
+                label: "Electronics",
+                slug: "electronics",
+              },
+              {
+                label: "Sneakers",
+                slug: "sneakers",
+              },
+              {
+                label: "Collectibles",
+                slug: "collectibles",
+              },
+              {
+                label: "Liquidation",
+                slug: "liquidation",
+              },
+              {
+                label: "Luxury Items",
+                slug: "luxury-items",
+              },
+              {
+                label: "Storage Finds",
+                slug: "storage-finds",
+              },
+            ].map((item) => (
+              <Link
+                key={item.slug}
+                href={`/marketplace-auctions?category=${item.slug}`}
+                className={`px-5 py-2 rounded-full border text-sm font-medium transition ${
+                  category === item.slug
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-black border-gray-300 hover:border-black"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
