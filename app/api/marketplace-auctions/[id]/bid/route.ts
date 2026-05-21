@@ -326,6 +326,11 @@ export async function POST(
 
           auctionUrl:
             `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
+
+          coverImage:
+            auction.coverImage ||
+            auction.images?.[0] ||
+            undefined,
         });
 
         // LOG NOTIFICATION

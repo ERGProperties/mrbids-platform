@@ -112,6 +112,14 @@ export async function POST(
         },
       });
 
+    const auctionUrl =
+      `${process.env.NEXTAUTH_URL}/marketplace-auctions/${auction.id}`;
+
+    const coverImage =
+      auction.coverImage ||
+      auction.images?.[0] ||
+      undefined;
+
     // SEND WINNER EMAIL
     if (
       winningBid?.bidder
@@ -135,6 +143,10 @@ export async function POST(
 
         sellerEmail:
           auction.seller.email,
+
+        auctionUrl,
+
+        coverImage,
       });
 
     }
@@ -163,6 +175,10 @@ export async function POST(
         buyerEmail:
           winningBid.bidder
             .email,
+
+        auctionUrl,
+
+        coverImage,
       });
 
     }
