@@ -3,7 +3,11 @@ import {
   AUCTION_EXTENSION_WINDOW_MINUTES,
   AUCTION_EXTENSION_DURATION_MINUTES,
 } from "@/lib/auctionRules"
+
 import { sendOutbidEmail } from "@/lib/email/sendOutbidEmail"
+import { sendHighestBidderEmail } from "@/lib/email/sendHighestBidderEmail"
+
+import { getPrimaryImage } from "@/lib/getPrimaryImage"
 
 export async function placeBid({
   auctionId,
@@ -35,13 +39,14 @@ export async function placeBid({
     }
 
     const now = new Date()
+
     if (auction.endAt <= now) {
       throw new Error("Auction has ended")
     }
 
     const previousBidder = auction.bids[0]?.bidder
 
-    // ✅ FIX: bidderId is REQUIRED
+    // ✅ Create bid
     const bid = await tx.bid.create({
       data: {
         auctionId,
@@ -50,7 +55,10 @@ export async function placeBid({
       },
     })
 
-    // Notify previous highest bidder
+    const auctionUrl = `${process.env.NEXTAUTH_URL}/auctions/${auction.slug}`
+    const coverImage = getPrimaryImage(auction)
+
+    // ✅ Notify previous highest bidder
     if (
       previousBidder &&
       previousBidder.id !== userId &&
@@ -58,12 +66,28 @@ export async function placeBid({
     ) {
       await sendOutbidEmail({
         to: previousBidder.email,
-        address: auction.addressLine,
-        auctionUrl: `${process.env.NEXTAUTH_URL}/auctions/${auction.slug}`,
+        address: auction.addressLine || auction.title,
+        auctionUrl,
+        coverImage,
       })
     }
 
-    // Auto-extend logic
+    // ✅ Notify current highest bidder
+    const currentBidder = await tx.user.findUnique({
+      where: { id: userId },
+    })
+
+    if (currentBidder?.email) {
+      await sendHighestBidderEmail({
+        to: currentBidder.email,
+        address: auction.addressLine || auction.title,
+        bidAmount: amount,
+        auctionUrl,
+        coverImage,
+      })
+    }
+
+    // ✅ Auto-extend logic
     const minutesRemaining =
       (auction.endAt.getTime() - now.getTime()) / 1000 / 60
 

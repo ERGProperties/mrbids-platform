@@ -6,12 +6,16 @@ export async function sendSellerWinnerEmail({
   winningBid,
   buyerName,
   buyerEmail,
+  auctionUrl,
+  coverImage,
 }: {
   to: string;
   address: string;
   winningBid: number;
   buyerName: string;
   buyerEmail: string;
+  auctionUrl: string;
+  coverImage?: string;
 }) {
   const html = `
   <div style="margin:0; padding:0; background:#f4f4f5; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
@@ -25,15 +29,43 @@ export async function sendSellerWinnerEmail({
             <!-- HEADER -->
             <tr>
               <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
-                <img src="https://mrbids.com/logo.png" style="height:60px;" />
+                <img
+                  src="https://mrbids.com/logo.png"
+                  alt="MrBids"
+                  style="height:60px;"
+                />
               </td>
             </tr>
+
+            <!-- COVER IMAGE -->
+            ${
+              coverImage
+                ? `
+            <tr>
+              <td style="padding:0;">
+                <a href="${auctionUrl}">
+                  <img
+                    src="${coverImage}"
+                    alt="${address}"
+                    style="
+                      width:100%;
+                      max-height:320px;
+                      object-fit:cover;
+                      display:block;
+                    "
+                  />
+                </a>
+              </td>
+            </tr>
+            `
+                : ""
+            }
 
             <!-- BODY -->
             <tr>
               <td style="padding:34px 28px;">
 
-                <h1 style="font-size:22px; font-weight:700;">
+                <h1 style="font-size:22px; font-weight:700; margin-top:0;">
                   Your auction has ended
                 </h1>
 
@@ -49,6 +81,24 @@ export async function sendSellerWinnerEmail({
                   Final bid: $${winningBid.toLocaleString()}
                 </p>
 
+                <div style="text-align:center; margin:30px 0;">
+                  <a
+                    href="${auctionUrl}"
+                    style="
+                      display:inline-block;
+                      padding:16px 34px;
+                      background:#000;
+                      color:#fff;
+                      text-decoration:none;
+                      border-radius:10px;
+                      font-weight:700;
+                      font-size:16px;
+                    "
+                  >
+                    View Auction
+                  </a>
+                </div>
+
                 <hr style="margin:30px 0; border:none; border-top:1px solid #eee;" />
 
                 <p style="font-size:15px;">
@@ -56,10 +106,15 @@ export async function sendSellerWinnerEmail({
                 </p>
 
                 <div style="margin:20px 0; padding:16px; background:#f9f9f9; border-radius:8px;">
-                  <p style="margin:0; font-size:14px;"><strong>Name:</strong> ${buyerName}</p>
+                  <p style="margin:0; font-size:14px;">
+                    <strong>Name:</strong> ${buyerName}
+                  </p>
+
                   <p style="margin:6px 0 0; font-size:14px;">
-                    <strong>Email:</strong> 
-                    <a href="mailto:${buyerEmail}">${buyerEmail}</a>
+                    <strong>Email:</strong>
+                    <a href="mailto:${buyerEmail}">
+                      ${buyerEmail}
+                    </a>
                   </p>
                 </div>
 
@@ -76,6 +131,7 @@ export async function sendSellerWinnerEmail({
                 <p style="font-size:13px; color:#555;">
                   MrBids — Real-time real estate auctions
                 </p>
+
                 <p style="font-size:12px; color:#888;">
                   Built for investors, wholesalers, and dealmakers
                 </p>

@@ -5,11 +5,13 @@ export async function sendHighestBidderEmail({
   address,
   bidAmount,
   auctionUrl,
+  coverImage,
 }: {
   to: string;
   address: string;
   bidAmount: number;
   auctionUrl: string;
+  coverImage?: string;
 }) {
   const html = `
   <div style="margin:0; padding:0; background:#f4f4f5; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
@@ -23,9 +25,37 @@ export async function sendHighestBidderEmail({
             <!-- HEADER -->
             <tr>
               <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
-                <img src="https://mrbids.com/logo.png" style="height:60px;" />
+                <img
+                  src="https://mrbids.com/logo.png"
+                  alt="MrBids"
+                  style="height:60px;"
+                />
               </td>
             </tr>
+
+            <!-- COVER IMAGE -->
+            ${
+              coverImage
+                ? `
+            <tr>
+              <td style="padding:0;">
+                <a href="${auctionUrl}">
+                  <img
+                    src="${coverImage}"
+                    alt="${address}"
+                    style="
+                      width:100%;
+                      max-height:320px;
+                      object-fit:cover;
+                      display:block;
+                    "
+                  />
+                </a>
+              </td>
+            </tr>
+            `
+                : ""
+            }
 
             <!-- BODY -->
             <tr>
@@ -52,16 +82,19 @@ export async function sendHighestBidderEmail({
                 </p>
 
                 <div style="text-align:center; margin:30px 0;">
-                  <a href="${auctionUrl}" style="
-                    display:inline-block;
-                    padding:16px 34px;
-                    background:#000;
-                    color:#fff;
-                    text-decoration:none;
-                    border-radius:10px;
-                    font-weight:700;
-                    font-size:16px;
-                  ">
+                  <a
+                    href="${auctionUrl}"
+                    style="
+                      display:inline-block;
+                      padding:16px 34px;
+                      background:#000;
+                      color:#fff;
+                      text-decoration:none;
+                      border-radius:10px;
+                      font-weight:700;
+                      font-size:16px;
+                    "
+                  >
                     View Auction
                   </a>
                 </div>
@@ -75,6 +108,7 @@ export async function sendHighestBidderEmail({
                 <p style="font-size:13px; color:#555;">
                   MrBids — Real-time real estate auctions
                 </p>
+
                 <p style="font-size:12px; color:#888;">
                   Built for investors, wholesalers, and dealmakers
                 </p>

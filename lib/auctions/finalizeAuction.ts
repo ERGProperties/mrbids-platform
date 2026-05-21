@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/db";
 
-// ✅ NEW EMAILS
+// ✅ IMAGE HELPER
+import { getPrimaryImage } from "@/lib/getPrimaryImage";
+
+// ✅ EMAILS
 import { sendAuctionWonEmail } from "@/lib/email/sendAuctionWonEmail";
 import { sendSellerWinnerEmail } from "@/lib/email/sendSellerWinnerEmail";
 
@@ -49,6 +52,9 @@ export async function finalizeAuction(auctionId: string) {
     },
   });
 
+  const auctionUrl = `${process.env.NEXTAUTH_URL}/auctions/${auction.slug}`;
+  const coverImage = getPrimaryImage(auction);
+
   // 🚨 SEND PREMIUM EMAILS
   if (buyer && auction.seller) {
     try {
@@ -60,6 +66,8 @@ export async function finalizeAuction(auctionId: string) {
           winningBid: highestBid.amount,
           buyerName: buyer.name || "Anonymous",
           buyerEmail: buyer.email || "",
+          auctionUrl,
+          coverImage,
         });
       }
 
@@ -71,6 +79,8 @@ export async function finalizeAuction(auctionId: string) {
           winningBid: highestBid.amount,
           sellerName: auction.seller.name || "Anonymous",
           sellerEmail: auction.seller.email || "",
+          auctionUrl,
+          coverImage,
         });
       }
 
