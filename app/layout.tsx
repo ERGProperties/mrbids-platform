@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import Script from "next/script";
 import SessionProvider from "@/components/auth/SessionProvider";
 import LayoutWrapper from "@/components/LayoutWrapper";
 
@@ -38,15 +39,29 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="black" />
         <meta name="apple-mobile-web-app-title" content="MrBids" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+        {/* Google Ads Tag */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18177376162"
+        />
+
+        <Script id="google-ads-tag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'AW-18177376162');
+          `}
+        </Script>
       </head>
 
       <body className="bg-white text-gray-900 antialiased flex flex-col min-h-screen">
         <SessionProvider>
-
           <LayoutWrapper>
             {children}
           </LayoutWrapper>
-
         </SessionProvider>
       </body>
     </html>
