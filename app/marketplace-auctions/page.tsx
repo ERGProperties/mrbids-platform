@@ -34,7 +34,10 @@ export default async function MarketplaceAuctionsPage({
       where: {
         ...(category
           ? {
-              category,
+              category: {
+                equals: category,
+                mode: "insensitive",
+              },
             }
           : {}),
 
@@ -56,7 +59,10 @@ export default async function MarketplaceAuctionsPage({
       where: {
         ...(category
           ? {
-              category,
+              category: {
+                equals: category,
+                mode: "insensitive",
+              },
             }
           : {}),
 
