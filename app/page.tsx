@@ -100,11 +100,16 @@ export default async function HomePage() {
     },
   });
 
-  // MARKETPLACE
+  // MARKETPLACE - LIVE ONLY
   const marketplaceAuctions =
     await prisma.marketplaceAuction.findMany({
+
+      where: {
+        status: "LIVE",
+      },
+
       orderBy: {
-        createdAt: "desc",
+        endAt: "asc",
       },
 
       include: {
@@ -112,6 +117,7 @@ export default async function HomePage() {
       },
 
       take: 6,
+
     });
 
   return (
@@ -336,7 +342,7 @@ export default async function HomePage() {
             {marketplaceAuctions.length === 0 ? (
               <div className="border rounded-3xl p-16 text-center">
                 <h3 className="text-3xl font-semibold">
-                  No Marketplace Auctions Yet
+                  No LIVE Auctions Yet
                 </h3>
 
                 <p className="mt-4 text-gray-600">
