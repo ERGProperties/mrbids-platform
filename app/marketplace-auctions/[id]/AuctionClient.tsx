@@ -101,19 +101,9 @@ export default function AuctionClient({
   ] = useState("");
 
   const [
-    statusLoading,
-    setStatusLoading,
-  ] = useState(false);
-
-  const [
     viewerCount,
     setViewerCount,
   ] = useState(0);
-
-  const [
-    reactions,
-    setReactions,
-  ] = useState<any[]>([]);
 
   const [
     outbidAlert,
@@ -446,6 +436,25 @@ export default function AuctionClient({
     }
   }
 
+  async function endAuction() {
+
+    try {
+
+      await fetch(
+        `/api/marketplace-auctions/${auction.id}/end`,
+        {
+          method: "POST",
+        }
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  }
+
   const minimumBid =
     auction.currentBid > 0
       ? auction.currentBid +
@@ -491,7 +500,6 @@ export default function AuctionClient({
   return (
     <>
 
-      {/* OUTBID ALERT */}
       {outbidAlert && (
 
         <div className="fixed top-6 right-6 z-50 bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl animate-pulse">
@@ -502,27 +510,8 @@ export default function AuctionClient({
 
       )}
 
-      {/* REACTIONS */}
-      <div className="fixed bottom-10 right-6 pointer-events-none z-50 space-y-2">
-
-        {reactions.map(
-          (reaction) => (
-
-            <div
-              key={reaction.id}
-              className="text-4xl animate-bounce"
-            >
-              {reaction.emoji}
-            </div>
-
-          )
-        )}
-
-      </div>
-
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-14">
 
-        {/* LEFT SIDE */}
         <div>
 
           <div className="relative">
@@ -545,7 +534,6 @@ export default function AuctionClient({
 
             )}
 
-            {/* VIEWERS */}
             <div className="absolute top-5 left-5 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur">
 
               👁 {viewerCount} watching
@@ -554,51 +542,8 @@ export default function AuctionClient({
 
           </div>
 
-          {/* THUMBNAILS */}
-          {auction.images?.length >
-            1 && (
-
-            <div className="grid grid-cols-5 gap-3 mt-5">
-
-              {auction.images.map(
-                (
-                  image: string,
-                  index: number
-                ) => (
-
-                  <button
-                    key={index}
-                    onClick={() =>
-                      setSelectedImage(
-                        index
-                      )
-                    }
-                    className={`overflow-hidden rounded-2xl border ${
-                      selectedImage ===
-                      index
-                        ? "border-black"
-                        : "border-gray-200"
-                    }`}
-                  >
-
-                    <img
-                      src={image}
-                      alt=""
-                      className="aspect-square object-cover"
-                    />
-
-                  </button>
-
-                )
-              )}
-
-            </div>
-
-          )}
-
         </div>
 
-        {/* RIGHT SIDE */}
         <div>
 
           <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -635,209 +580,6 @@ export default function AuctionClient({
           <h1 className="text-3xl md:text-5xl font-semibold leading-tight">
             {auction.title}
           </h1>
-
-          {/* CURRENT BID */}
-          <div className="mt-8 border rounded-3xl p-8 bg-gradient-to-br from-black to-gray-900 text-white">
-
-            <p className="text-sm uppercase tracking-wider text-gray-300">
-              Current Bid
-            </p>
-
-            <div className="mt-4 flex items-end justify-between gap-4">
-
-              <div>
-
-                <h2 className="text-5xl font-bold">
-
-                  $
-                  {auction.currentBid?.toLocaleString() ||
-                    auction.startingBid?.toLocaleString()}
-
-                </h2>
-
-                <p className="mt-2 text-sm text-gray-300">
-                  Minimum next bid: $
-                  {minimumBid.toLocaleString()}
-                </p>
-
-              </div>
-
-              {highestBidder && (
-
-                <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/10 border border-white/10">
-
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-white/20 flex items-center justify-center">
-
-                    {highestBidder.image ? (
-
-                      <img
-                        src={
-                          highestBidder.image
-                        }
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-
-                    ) : (
-
-                      <span className="text-lg font-semibold">
-                        {highestBidder.name?.[0] ||
-                          "B"}
-                      </span>
-
-                    )}
-
-                  </div>
-
-                  <div>
-
-                    <p className="text-xs text-gray-300">
-                      Winning Bidder
-                    </p>
-
-                    <p className="font-semibold">
-                      {highestBidder.name
-                        ?.split(
-                          " "
-                        )[0] || "Bidder"}
-                    </p>
-
-                  </div>
-
-                </div>
-
-              )}
-
-            </div>
-
-          </div>
-
-          {/* BID HISTORY */}
-          <div className="mt-8 border rounded-3xl p-6">
-
-            <div className="flex items-center justify-between mb-5">
-
-              <h3 className="text-xl font-semibold">
-                Live Bid Activity
-              </h3>
-
-              <span className="text-sm text-gray-500">
-                {auction.bidCount} bids
-              </span>
-
-            </div>
-
-            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-
-              {formattedBids.length ===
-              0 ? (
-
-                <div className="text-gray-500 text-sm">
-                  No bids yet.
-                </div>
-
-              ) : (
-
-                formattedBids.map(
-                  (
-                    bid: any,
-                    index: number
-                  ) => {
-
-                    const isLeading =
-                      index === 0;
-
-                    return (
-
-                      <div
-                        key={bid.id}
-                        className={`flex items-center justify-between gap-4 p-4 rounded-2xl border transition ${
-                          isLeading
-                            ? "border-green-300 bg-green-50"
-                            : "border-gray-200"
-                        }`}
-                      >
-
-                        <div className="flex items-center gap-3">
-
-                          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-
-                            {bid.bidder
-                              ?.image ? (
-
-                              <img
-                                src={
-                                  bid
-                                    .bidder
-                                    .image
-                                }
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-
-                            ) : (
-
-                              <span className="font-semibold text-gray-700">
-                                {bid.displayName?.[0]}
-                              </span>
-
-                            )}
-
-                          </div>
-
-                          <div>
-
-                            <div className="flex items-center gap-2">
-
-                              <p className="font-semibold text-gray-900">
-                                {bid.displayName}
-                              </p>
-
-                              {isLeading && (
-
-                                <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium animate-pulse">
-                                  Winning
-                                </span>
-
-                              )}
-
-                            </div>
-
-                            <p className="text-xs text-gray-500 mt-1">
-
-                              {new Date(
-                                bid.createdAt
-                              ).toLocaleString()}
-
-                            </p>
-
-                          </div>
-
-                        </div>
-
-                        <div className="text-right">
-
-                          <p className="text-2xl font-semibold text-gray-900">
-
-                            $
-                            {bid.amount.toLocaleString()}
-
-                          </p>
-
-                        </div>
-
-                      </div>
-
-                    );
-
-                  }
-                )
-
-              )}
-
-            </div>
-
-          </div>
 
         </div>
 
