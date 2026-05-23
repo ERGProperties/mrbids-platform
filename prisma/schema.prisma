@@ -121,6 +121,11 @@ model MarketplaceAuction {
 
   status        MarketplaceAuctionStatus @default(DRAFT)
 
+  // PAYMENT
+  paymentStatus String? @default("UNPAID")
+  stripeSessionId String?
+  paidAt DateTime?
+
   // SELLER
   sellerId      String
   seller        User @relation(fields: [sellerId], references: [id])

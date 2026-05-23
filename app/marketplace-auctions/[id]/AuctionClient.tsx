@@ -13,6 +13,8 @@ import CountdownTimer from "@/components/CountdownTimer";
 
 import { pusherClient } from "@/lib/pusher-client";
 
+import { useSession } from "next-auth/react";
+
 const fetcher = (
   url: string
 ) =>
@@ -27,6 +29,9 @@ export default function AuctionClient({
   initialAuction: any;
   isSeller: boolean;
 }) {
+
+  const { data: session } =
+    useSession();
 
   const {
     data: auction,
@@ -57,6 +62,11 @@ export default function AuctionClient({
   const [
     loading,
     setLoading,
+  ] = useState(false);
+
+  const [
+    paymentLoading,
+    setPaymentLoading,
   ] = useState(false);
 
   const [
@@ -252,6 +262,64 @@ export default function AuctionClient({
     }
   }
 
+  async function handleCheckout() {
+
+    try {
+
+      setPaymentLoading(true);
+
+      setError("");
+
+      const response =
+        await fetch(
+          "/api/stripe/create-checkout-session",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              auctionId: auction.id,
+              userId:
+                session?.user?.id,
+            }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+
+        setError(
+          data.error ||
+          "Failed to start checkout"
+        );
+
+        return;
+      }
+
+      window.location.href =
+        data.url;
+
+    } catch (err) {
+
+      console.error(err);
+
+      setError(
+        "Something went wrong"
+      );
+
+    } finally {
+
+      setPaymentLoading(false);
+
+    }
+  }
+
   async function updateStatus(
     status: string
   ) {
@@ -349,6 +417,14 @@ export default function AuctionClient({
         auction.bidIncrement
       : auction.startingBid;
 
+  const highestBidderId =
+    auction.bids?.[0]?.userId;
+
+  const isWinner =
+    auction.status === "ENDED" &&
+    highestBidderId ===
+      session?.user?.id;
+
   return (
     <>
 
@@ -431,7 +507,6 @@ export default function AuctionClient({
                 className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-black/70 text-white text-xl md:text-2xl"
               >
                 →
-
               </button>
 
             )}
@@ -603,6 +678,35 @@ export default function AuctionClient({
                 <p className="text-gray-900">
                   This auction is no longer accepting bids.
                 </p>
+
+              </div>
+
+            )}
+
+            {/* WINNER PAYMENT */}
+            {isWinner && (
+
+              <div className="border rounded-2xl p-6 bg-green-50 border-green-200">
+
+                <p className="text-sm font-medium text-green-700 mb-2">
+                  Congratulations!
+                </p>
+
+                <p className="text-green-900 mb-5">
+                  You won this auction.
+                </p>
+
+                <button
+                  onClick={handleCheckout}
+                  disabled={paymentLoading}
+                  className="w-full py-4 rounded-full bg-green-600 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+                >
+
+                  {paymentLoading
+                    ? "Redirecting..."
+                    : "Pay Now"}
+
+                </button>
 
               </div>
 
