@@ -17,6 +17,7 @@ export async function sendAuctionWonEmail({
   auctionUrl: string;
   coverImage?: string;
 }) {
+
   const html = `
   <div style="margin:0; padding:0; background:#f4f4f5; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
 
@@ -81,18 +82,43 @@ export async function sendAuctionWonEmail({
                   Winning bid: $${winningBid.toLocaleString()}
                 </p>
 
-                <div style="text-align:center; margin:30px 0;">
+                <!-- PAYMENT CTA -->
+                <div style="margin:34px 0; padding:24px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; text-align:center;">
+
+                  <p style="font-size:16px; color:#111827; margin-top:0; margin-bottom:18px; font-weight:600;">
+                    Complete your payment to finalize this purchase.
+                  </p>
+
                   <a
                     href="${auctionUrl}"
                     style="
                       display:inline-block;
                       padding:16px 34px;
+                      background:#16a34a;
+                      color:#ffffff;
+                      text-decoration:none;
+                      border-radius:10px;
+                      font-weight:700;
+                      font-size:16px;
+                    "
+                  >
+                    Complete Payment
+                  </a>
+
+                </div>
+
+                <div style="text-align:center; margin:26px 0;">
+                  <a
+                    href="${auctionUrl}"
+                    style="
+                      display:inline-block;
+                      padding:14px 28px;
                       background:#000;
                       color:#fff;
                       text-decoration:none;
                       border-radius:10px;
                       font-weight:700;
-                      font-size:16px;
+                      font-size:15px;
                     "
                   >
                     View Auction
@@ -102,8 +128,7 @@ export async function sendAuctionWonEmail({
                 <hr style="margin:30px 0; border:none; border-top:1px solid #eee;" />
 
                 <p style="font-size:15px; color:#444;">
-                  <strong>Next Step:</strong><br/>
-                  Reach out to the seller to move forward with the deal.
+                  <strong>Seller Information</strong>
                 </p>
 
                 <div style="margin:20px 0; padding:16px; background:#f9f9f9; border-radius:8px;">
@@ -120,7 +145,7 @@ export async function sendAuctionWonEmail({
                 </div>
 
                 <p style="font-size:13px; color:#777;">
-                  We recommend reaching out as soon as possible to finalize the transaction.
+                  Once payment is completed, coordinate directly with the seller regarding delivery, pickup, or transaction details.
                 </p>
 
               </td>
@@ -129,13 +154,15 @@ export async function sendAuctionWonEmail({
             <!-- FOOTER -->
             <tr>
               <td style="padding:22px; text-align:center; border-top:1px solid #f1f1f1;">
+
                 <p style="font-size:13px; color:#555;">
-                  MrBids — Real-time real estate auctions
+                  MrBids — Live marketplace auctions
                 </p>
 
                 <p style="font-size:12px; color:#888;">
-                  Built for investors, wholesalers, and dealmakers
+                  Secure real-time bidding powered by MrBids
                 </p>
+
               </td>
             </tr>
 
@@ -151,7 +178,8 @@ export async function sendAuctionWonEmail({
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject: "🎉 You won the auction",
+    subject: "🎉 You won the auction — Complete Payment",
     html,
   });
+
 }
