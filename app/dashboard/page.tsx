@@ -10,6 +10,8 @@ import { prisma } from "@/lib/prisma";
 
 import FulfillmentControls from "@/components/dashboard/FulfillmentControls";
 
+import StripeConnectStatus from "@/components/dashboard/StripeConnectStatus";
+
 export const metadata: Metadata = {
   title: "Dashboard | MrBids",
   description:
@@ -111,8 +113,35 @@ export default async function DashboardPage() {
           </h1>
 
           <p className="mt-4 text-lg text-gray-600">
-            Manage your purchases, auctions, payments, shipping, and fulfillment.
+            Manage your purchases, auctions, payments, shipping, fulfillment, and seller payouts.
           </p>
+
+        </div>
+
+        {/* STRIPE CONNECT STATUS */}
+        <div className="mb-10 bg-white border border-gray-200 rounded-2xl p-8">
+
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+
+            <div>
+
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Seller Payouts
+              </h2>
+
+              <p className="mt-2 text-gray-600">
+                Connect Stripe to receive automatic marketplace payouts.
+              </p>
+
+            </div>
+
+            <div>
+
+              <StripeConnectStatus />
+
+            </div>
+
+          </div>
 
         </div>
 
@@ -471,30 +500,6 @@ export default async function DashboardPage() {
             )}
 
           </div>
-
-        </div>
-
-        {/* CTA */}
-        <div className="mt-12 bg-white border border-gray-200 rounded-2xl p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-
-          <div>
-
-            <h2 className="text-2xl font-semibold text-gray-900">
-              Ready to launch another auction?
-            </h2>
-
-            <p className="mt-2 text-gray-600">
-              Create new marketplace listings and start receiving bids in real time.
-            </p>
-
-          </div>
-
-          <a
-            href="/sell"
-            className="inline-flex items-center justify-center px-8 py-4 bg-black text-white rounded-full font-medium hover:bg-gray-900 transition"
-          >
-            Create Auction
-          </a>
 
         </div>
 

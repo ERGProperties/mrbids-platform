@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { prisma } from "@/lib/prisma";
+
 import { stripe } from "@/lib/stripe";
 
-export async function POST(req: NextRequest) {
+export async function POST(
+  req: NextRequest
+) {
 
   try {
 
@@ -47,6 +50,8 @@ export async function POST(req: NextRequest) {
 
             take: 1,
           },
+
+          seller: true,
         },
       });
 
@@ -135,9 +140,39 @@ export async function POST(req: NextRequest) {
 
     }
 
+    // REQUIRE STRIPE CONNECT
+    if (
+      !auction.seller
+        .stripeAccountId ||
+      !auction.seller
+        .stripeOnboardingComplete
+    ) {
+
+      return NextResponse.json(
+        {
+          error:
+            "Seller is not eligible to receive payouts yet",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
     const totalAmount =
       highestBid.amount +
       auction.shippingCost;
+
+    // 5% MARKETPLACE FEE
+    const marketplaceFee =
+      Math.round(
+        totalAmount * 0.05
+      );
+
+    const sellerPayout =
+      totalAmount -
+      marketplaceFee;
 
     const session =
       await stripe.checkout.sessions.create({
@@ -184,6 +219,7 @@ export async function POST(req: NextRequest) {
               product_data: {
                 name:
                   "Shipping",
+
                 description:
                   auction.shippingCarrier
                     ? `Shipping via ${auction.shippingCarrier}`
@@ -209,12 +245,27 @@ export async function POST(req: NextRequest) {
         cancel_url:
           `${process.env.NEXT_PUBLIC_APP_URL}/payment-cancelled`,
 
+        payment_intent_data: {
+
+          application_fee_amount:
+            marketplaceFee * 100,
+
+          transfer_data: {
+            destination:
+              auction.seller
+                .stripeAccountId,
+          },
+        },
+
         metadata: {
           auctionId:
             auction.id,
 
           buyerId:
             userId,
+
+          sellerId:
+            auction.sellerId,
 
           winningBid:
             highestBid.amount.toString(),
@@ -224,8 +275,32 @@ export async function POST(req: NextRequest) {
 
           totalAmount:
             totalAmount.toString(),
+
+          marketplaceFee:
+            marketplaceFee.toString(),
+
+          sellerPayout:
+            sellerPayout.toString(),
         },
       });
+
+    // STORE PAYMENT INFO
+    await prisma.marketplaceAuction.update({
+      where: {
+        id: auction.id,
+      },
+
+      data: {
+        stripeSessionId:
+          session.id,
+
+        sellerPayoutAmount:
+          sellerPayout,
+
+        marketplaceFeeAmount:
+          marketplaceFee,
+      },
+    });
 
     return NextResponse.json({
       url:

@@ -22,7 +22,7 @@ enum MarketplaceAuctionStatus {
   DRAFT
   SCHEDULED
   LIVE
- ENDED
+  ENDED
 }
 
 enum ServiceFeeStatus {
@@ -103,17 +103,14 @@ model MarketplaceAuction {
   images        Json?
   coverImage    String?
 
-  // RETAIL VALUE
   retailPrice   Int?
 
-  // BIDDING
   startingBid   Int
   bidIncrement  Int @default(1)
 
   currentBid    Int @default(0)
   bidCount      Int @default(0)
 
-  // TIMING
   durationMinutes Int @default(5)
 
   startAt       DateTime?
@@ -121,17 +118,16 @@ model MarketplaceAuction {
 
   status        MarketplaceAuctionStatus @default(DRAFT)
 
-  // PAYMENT
   paymentStatus String? @default("UNPAID")
   stripeSessionId String?
+  stripePaymentIntentId String?
+
   paidAt DateTime?
 
-  // SHIPPING
   shippingCost Int?
   shippingCarrier String?
   shippingPaid Boolean @default(false)
 
-  // FULFILLMENT
   fulfillmentStatus String? @default("PENDING")
 
   trackingNumber String?
@@ -142,15 +138,17 @@ model MarketplaceAuction {
 
   fulfillmentNotes String?
 
-  // SELLER
+  sellerPayoutAmount Int?
+  marketplaceFeeAmount Int?
+
+  payoutSentAt DateTime?
+
   sellerId      String
   seller        User @relation(fields: [sellerId], references: [id])
 
-  // WINNER
   winnerId      String?
   winner        User? @relation("MarketplaceAuctionWinner", fields: [winnerId], references: [id])
 
-  // BIDS
   bids          MarketplaceBid[]
 
   endingSoonSent Boolean @default(false)
@@ -270,6 +268,10 @@ model User {
   sellerCategory      String?
   tiktokUsername      String?
   sellerBio           String?
+
+  // STRIPE CONNECT
+  stripeAccountId String?
+  stripeOnboardingComplete Boolean @default(false)
 
   createdAt DateTime @default(now())
 
