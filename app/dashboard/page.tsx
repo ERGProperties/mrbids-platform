@@ -52,12 +52,16 @@ export default async function DashboardPage() {
           userId,
       },
 
+      include: {
+        winner: true,
+      },
+
       orderBy: {
         updatedAt:
           "desc",
       },
 
-      take: 10,
+      take: 20,
     });
 
   // STATS
@@ -86,6 +90,15 @@ export default async function DashboardPage() {
         0
       );
 
+  const unpaidSales =
+    sellerAuctions.filter(
+      (auction) =>
+        auction.status ===
+          "ENDED" &&
+        auction.paymentStatus !==
+          "PAID"
+    ).length;
+
   return (
     <main className="bg-gray-50 min-h-screen">
 
@@ -99,13 +112,13 @@ export default async function DashboardPage() {
           </h1>
 
           <p className="mt-4 text-lg text-gray-600">
-            Manage your purchases, auctions, and marketplace activity.
+            Manage your purchases, auctions, payments, and marketplace activity.
           </p>
 
         </div>
 
         {/* STATS */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-4 gap-6 mb-12">
 
           <div className="bg-white border border-gray-200 rounded-2xl p-6">
 
@@ -140,6 +153,18 @@ export default async function DashboardPage() {
             <p className="text-4xl font-semibold text-gray-900">
               $
               {totalRevenue.toLocaleString()}
+            </p>
+
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-6">
+
+            <p className="text-sm text-gray-500 mb-2">
+              Awaiting Payment
+            </p>
+
+            <p className="text-4xl font-semibold text-yellow-600">
+              {unpaidSales}
             </p>
 
           </div>
@@ -243,13 +268,13 @@ export default async function DashboardPage() {
 
           </div>
 
-          {/* SELLER AUCTIONS */}
+          {/* SELLER TRANSACTIONS */}
           <div className="bg-white border border-gray-200 rounded-2xl p-8">
 
             <div className="flex items-center justify-between mb-8">
 
               <h2 className="text-2xl font-semibold text-gray-900">
-                My Auctions
+                Seller Transactions
               </h2>
 
             </div>
@@ -266,60 +291,32 @@ export default async function DashboardPage() {
 
             ) : (
 
-              <div className="space-y-4">
+              <div className="space-y-5">
 
                 {sellerAuctions.map(
                   (auction) => (
 
-                    <a
+                    <div
                       key={auction.id}
-                      href={`/marketplace-auctions/${auction.id}`}
-                      className="block border border-gray-200 rounded-2xl p-5 hover:border-black transition"
+                      className="border border-gray-200 rounded-2xl p-5"
                     >
 
                       <div className="flex items-start justify-between gap-4">
 
                         <div>
 
-                          <p className="font-semibold text-gray-900">
+                          <a
+                            href={`/marketplace-auctions/${auction.id}`}
+                            className="font-semibold text-gray-900 hover:underline"
+                          >
                             {auction.title}
-                          </p>
+                          </a>
 
                           <p className="text-sm text-gray-500 mt-1">
                             {auction.category}
                           </p>
 
                         </div>
-
-                        <div
-                          className={`
-                            px-3 py-1 rounded-full text-xs font-medium
-                            ${
-                              auction.status ===
-                              "LIVE"
-                                ? "bg-red-100 text-red-700"
-                                : auction.status ===
-                                  "ENDED"
-                                ? "bg-gray-200 text-gray-700"
-                                : "bg-yellow-100 text-yellow-700"
-                            }
-                          `}
-                        >
-
-                          {auction.status}
-
-                        </div>
-
-                      </div>
-
-                      <div className="mt-5 flex items-center justify-between">
-
-                        <p className="text-2xl font-semibold text-gray-900">
-
-                          $
-                          {auction.currentBid.toLocaleString()}
-
-                        </p>
 
                         <div
                           className={`
@@ -342,7 +339,78 @@ export default async function DashboardPage() {
 
                       </div>
 
-                    </a>
+                      <div className="mt-5 grid sm:grid-cols-2 gap-5">
+
+                        <div>
+
+                          <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+                            Final Bid
+                          </p>
+
+                          <p className="text-2xl font-semibold text-gray-900">
+
+                            $
+                            {auction.currentBid.toLocaleString()}
+
+                          </p>
+
+                        </div>
+
+                        <div>
+
+                          <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+                            Auction Status
+                          </p>
+
+                          <p className="font-medium text-gray-900">
+                            {auction.status}
+                          </p>
+
+                        </div>
+
+                      </div>
+
+                      {auction.winner && (
+
+                        <div className="mt-6 border-t border-gray-100 pt-5">
+
+                          <p className="text-xs uppercase tracking-wider text-gray-500 mb-3">
+                            Winning Buyer
+                          </p>
+
+                          <div className="space-y-2">
+
+                            <p className="text-sm text-gray-900">
+                              <strong>Name:</strong>{" "}
+                              {auction.winner.name ||
+                                "Marketplace Buyer"}
+                            </p>
+
+                            <p className="text-sm text-gray-900">
+                              <strong>Email:</strong>{" "}
+                              {auction.winner.email}
+                            </p>
+
+                            {auction.paidAt && (
+
+                              <p className="text-sm text-green-700 font-medium">
+
+                                Paid on{" "}
+                                {new Date(
+                                  auction.paidAt
+                                ).toLocaleDateString()}
+
+                              </p>
+
+                            )}
+
+                          </div>
+
+                        </div>
+
+                      )}
+
+                    </div>
 
                   )
                 )}
