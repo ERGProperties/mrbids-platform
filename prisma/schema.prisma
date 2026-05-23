@@ -22,7 +22,7 @@ enum MarketplaceAuctionStatus {
   DRAFT
   SCHEDULED
   LIVE
-  ENDED
+ ENDED
 }
 
 enum ServiceFeeStatus {
@@ -126,6 +126,22 @@ model MarketplaceAuction {
   stripeSessionId String?
   paidAt DateTime?
 
+  // SHIPPING
+  shippingCost Int?
+  shippingCarrier String?
+  shippingPaid Boolean @default(false)
+
+  // FULFILLMENT
+  fulfillmentStatus String? @default("PENDING")
+
+  trackingNumber String?
+
+  shippedAt DateTime?
+  deliveredAt DateTime?
+  completedAt DateTime?
+
+  fulfillmentNotes String?
+
   // SELLER
   sellerId      String
   seller        User @relation(fields: [sellerId], references: [id])
@@ -141,6 +157,8 @@ model MarketplaceAuction {
 
   @@index([sellerId])
   @@index([status])
+  @@index([paymentStatus])
+  @@index([fulfillmentStatus])
 }
 
 model MarketplaceBid {

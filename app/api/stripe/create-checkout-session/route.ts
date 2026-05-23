@@ -117,6 +117,28 @@ export async function POST(req: NextRequest) {
 
     }
 
+    // REQUIRE SHIPPING COST
+    if (
+      !auction.shippingCost ||
+      auction.shippingCost <= 0
+    ) {
+
+      return NextResponse.json(
+        {
+          error:
+            "Seller has not configured shipping yet",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+    const totalAmount =
+      highestBid.amount +
+      auction.shippingCost;
+
     const session =
       await stripe.checkout.sessions.create({
         payment_method_types: [
@@ -124,6 +146,8 @@ export async function POST(req: NextRequest) {
         ],
 
         line_items: [
+
+          // WINNING BID
           {
             price_data: {
               currency:
@@ -150,6 +174,31 @@ export async function POST(req: NextRequest) {
 
             quantity: 1,
           },
+
+          // SHIPPING
+          {
+            price_data: {
+              currency:
+                "usd",
+
+              product_data: {
+                name:
+                  "Shipping",
+                description:
+                  auction.shippingCarrier
+                    ? `Shipping via ${auction.shippingCarrier}`
+                    : "Marketplace shipping charge",
+              },
+
+              unit_amount:
+                Math.round(
+                  auction.shippingCost *
+                    100
+                ),
+            },
+
+            quantity: 1,
+          },
         ],
 
         mode: "payment",
@@ -166,6 +215,15 @@ export async function POST(req: NextRequest) {
 
           buyerId:
             userId,
+
+          winningBid:
+            highestBid.amount.toString(),
+
+          shippingCost:
+            auction.shippingCost.toString(),
+
+          totalAmount:
+            totalAmount.toString(),
         },
       });
 
