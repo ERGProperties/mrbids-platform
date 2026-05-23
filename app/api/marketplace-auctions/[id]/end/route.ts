@@ -59,17 +59,9 @@ export async function POST(
 
     }
 
-    // ALREADY ENDED
-    if (
+    const alreadyEnded =
       auction.status ===
-      "ENDED"
-    ) {
-
-      return NextResponse.json({
-        success: true,
-      });
-
-    }
+      "ENDED";
 
     const winningBid =
       auction.bids[0];
@@ -120,78 +112,82 @@ export async function POST(
       auction.images?.[0] ||
       undefined;
 
-    // SEND WINNER EMAIL
-    if (
-      winningBid?.bidder
-        ?.email
-    ) {
+    // ONLY SEND EMAILS FIRST TIME
+    if (!alreadyEnded) {
 
-      await sendAuctionWonEmail({
-        to:
-          winningBid
-            .bidder.email,
+      // SEND WINNER EMAIL
+      if (
+        winningBid?.bidder
+          ?.email
+      ) {
 
-        address:
-          auction.title,
+        await sendAuctionWonEmail({
+          to:
+            winningBid
+              .bidder.email,
 
-        winningBid:
-          winningBid.amount,
+          address:
+            auction.title,
 
-        sellerName:
-          auction.seller.name ||
-          "Seller",
+          winningBid:
+            winningBid.amount,
 
-        sellerEmail:
-          auction.seller.email,
+          sellerName:
+            auction.seller.name ||
+            "Seller",
 
-        auctionUrl,
+          sellerEmail:
+            auction.seller.email,
 
-        coverImage,
-      });
+          auctionUrl,
 
-    }
+          coverImage,
+        });
 
-    // SEND SELLER EMAIL
-    if (
-      auction.seller?.email &&
-      winningBid?.bidder
-    ) {
+      }
 
-      await sendSellerWinnerEmail({
-        to:
-          auction.seller.email,
+      // SEND SELLER EMAIL
+      if (
+        auction.seller?.email &&
+        winningBid?.bidder
+      ) {
 
-        address:
-          auction.title,
+        await sendSellerWinnerEmail({
+          to:
+            auction.seller.email,
 
-        winningBid:
-          winningBid.amount,
+          address:
+            auction.title,
 
-        buyerName:
-          winningBid.bidder
-            .name ||
-          "Winner",
+          winningBid:
+            winningBid.amount,
 
-        buyerEmail:
-          winningBid.bidder
-            .email,
+          buyerName:
+            winningBid.bidder
+              .name ||
+            "Winner",
 
-        auctionUrl,
+          buyerEmail:
+            winningBid.bidder
+              .email,
 
-        coverImage,
-      });
+          auctionUrl,
+
+          coverImage,
+        });
+
+      }
 
     }
 
     // REALTIME BROADCAST
-    // FIXED CHANNEL NAME
     await pusherServer.trigger(
       `presence-auction-${auction.id}`,
       "auction-ended",
       updatedAuction
     );
 
-    // ALSO BROADCAST GENERAL UPDATE
+    // GENERAL UPDATE
     await pusherServer.trigger(
       `presence-auction-${auction.id}`,
       "auction-updated",
