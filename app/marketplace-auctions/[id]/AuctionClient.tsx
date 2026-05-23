@@ -418,7 +418,7 @@ export default function AuctionClient({
       : auction.startingBid;
 
   const highestBidderId =
-    auction.bids?.[0]?.userId;
+    auction.bids?.[0]?.bidderId;
 
   const isWinner =
     auction.status === "ENDED" &&
