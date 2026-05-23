@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (highestBid.userId !== userId) {
+    if (highestBid.bidderId !== userId) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 403 }
