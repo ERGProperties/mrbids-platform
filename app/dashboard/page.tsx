@@ -8,6 +8,8 @@ import { authOptions } from "@/lib/authOptions";
 
 import { prisma } from "@/lib/prisma";
 
+import FulfillmentControls from "@/components/dashboard/FulfillmentControls";
+
 export const metadata: Metadata = {
   title: "Dashboard | MrBids",
   description:
@@ -28,7 +30,6 @@ export default async function DashboardPage() {
   const userId =
     session.user.id;
 
-  // PURCHASES
   const purchases =
     await prisma.marketplaceAuction.findMany({
       where: {
@@ -44,7 +45,6 @@ export default async function DashboardPage() {
       take: 10,
     });
 
-  // SELLER AUCTIONS
   const sellerAuctions =
     await prisma.marketplaceAuction.findMany({
       where: {
@@ -64,7 +64,6 @@ export default async function DashboardPage() {
       take: 20,
     });
 
-  // STATS
   const totalPurchases =
     purchases.length;
 
@@ -112,7 +111,7 @@ export default async function DashboardPage() {
           </h1>
 
           <p className="mt-4 text-lg text-gray-600">
-            Manage your purchases, auctions, payments, and marketplace activity.
+            Manage your purchases, auctions, payments, shipping, and fulfillment.
           </p>
 
         </div>
@@ -176,13 +175,9 @@ export default async function DashboardPage() {
           {/* PURCHASES */}
           <div className="bg-white border border-gray-200 rounded-2xl p-8">
 
-            <div className="flex items-center justify-between mb-8">
-
-              <h2 className="text-2xl font-semibold text-gray-900">
-                My Purchases
-              </h2>
-
-            </div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-8">
+              My Purchases
+            </h2>
 
             {purchases.length === 0 ? (
 
@@ -251,9 +246,21 @@ export default async function DashboardPage() {
 
                         </p>
 
-                        <p className="text-sm text-gray-500">
-                          {auction.status}
-                        </p>
+                        <div className="text-right">
+
+                          <p className="text-sm text-gray-500">
+                            {auction.fulfillmentStatus || "PENDING"}
+                          </p>
+
+                          {auction.trackingNumber && (
+
+                            <p className="text-xs text-gray-500 mt-1">
+                              Tracking: {auction.trackingNumber}
+                            </p>
+
+                          )}
+
+                        </div>
 
                       </div>
 
@@ -271,13 +278,9 @@ export default async function DashboardPage() {
           {/* SELLER TRANSACTIONS */}
           <div className="bg-white border border-gray-200 rounded-2xl p-8">
 
-            <div className="flex items-center justify-between mb-8">
-
-              <h2 className="text-2xl font-semibold text-gray-900">
-                Seller Transactions
-              </h2>
-
-            </div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-8">
+              Seller Transactions
+            </h2>
 
             {sellerAuctions.length === 0 ? (
 
@@ -359,16 +362,49 @@ export default async function DashboardPage() {
                         <div>
 
                           <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
-                            Auction Status
+                            Fulfillment Status
                           </p>
 
                           <p className="font-medium text-gray-900">
-                            {auction.status}
+                            {auction.fulfillmentStatus || "PENDING"}
                           </p>
 
                         </div>
 
                       </div>
+
+                      {auction.shippingCost && (
+
+                        <div className="mt-5">
+
+                          <p className="text-sm text-gray-600">
+                            Shipping Charge:
+                            <span className="ml-2 font-semibold text-gray-900">
+
+                              $
+                              {auction.shippingCost.toLocaleString()}
+
+                            </span>
+                          </p>
+
+                        </div>
+
+                      )}
+
+                      {auction.trackingNumber && (
+
+                        <div className="mt-3">
+
+                          <p className="text-sm text-gray-600">
+                            Tracking Number:
+                            <span className="ml-2 font-semibold text-gray-900">
+                              {auction.trackingNumber}
+                            </span>
+                          </p>
+
+                        </div>
+
+                      )}
 
                       {auction.winner && (
 
@@ -407,6 +443,21 @@ export default async function DashboardPage() {
                           </div>
 
                         </div>
+
+                      )}
+
+                      {auction.paymentStatus ===
+                        "PAID" && (
+
+                        <FulfillmentControls
+                          auctionId={auction.id}
+                          currentStatus={
+                            auction.fulfillmentStatus
+                          }
+                          currentTrackingNumber={
+                            auction.trackingNumber
+                          }
+                        />
 
                       )}
 
