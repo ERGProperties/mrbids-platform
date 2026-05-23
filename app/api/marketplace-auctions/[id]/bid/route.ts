@@ -20,21 +20,26 @@ export async function POST(
     };
   }
 ) {
+
   try {
+
     const session =
       await getServerSession(
         authOptions
       );
 
     if (!session?.user?.email) {
+
       return NextResponse.json(
         {
-          error: "Unauthorized",
+          error:
+            "Unauthorized",
         },
         {
           status: 401,
         }
       );
+
     }
 
     const body =
@@ -47,6 +52,7 @@ export async function POST(
       !amount ||
       amount <= 0
     ) {
+
       return NextResponse.json(
         {
           error:
@@ -56,6 +62,7 @@ export async function POST(
           status: 400,
         }
       );
+
     }
 
     // GET USER
@@ -68,6 +75,7 @@ export async function POST(
       });
 
     if (!user) {
+
       return NextResponse.json(
         {
           error:
@@ -77,6 +85,7 @@ export async function POST(
           status: 404,
         }
       );
+
     }
 
     // GET AUCTION
@@ -88,6 +97,7 @@ export async function POST(
       });
 
     if (!auction) {
+
       return NextResponse.json(
         {
           error:
@@ -97,6 +107,7 @@ export async function POST(
           status: 404,
         }
       );
+
     }
 
     // AUCTION MUST BE LIVE
@@ -104,6 +115,7 @@ export async function POST(
       auction.status !==
       "LIVE"
     ) {
+
       return NextResponse.json(
         {
           error:
@@ -113,6 +125,7 @@ export async function POST(
           status: 400,
         }
       );
+
     }
 
     // AUCTION MUST NOT BE ENDED
@@ -121,6 +134,7 @@ export async function POST(
       new Date() >
         auction.endAt
     ) {
+
       return NextResponse.json(
         {
           error:
@@ -130,6 +144,7 @@ export async function POST(
           status: 400,
         }
       );
+
     }
 
     // SELLER CANNOT BID
@@ -137,6 +152,7 @@ export async function POST(
       auction.sellerId ===
       user.id
     ) {
+
       return NextResponse.json(
         {
           error:
@@ -146,6 +162,7 @@ export async function POST(
           status: 400,
         }
       );
+
     }
 
     // CALCULATE MINIMUM BID
@@ -162,25 +179,30 @@ export async function POST(
     if (
       amount < minimumBid
     ) {
+
       return NextResponse.json(
         {
-          error: `Minimum bid is ${minimumBid}`,
+          error:
+            `Minimum bid is ${minimumBid}`,
         },
         {
           status: 400,
         }
       );
+
     }
 
     // PREVIOUS HIGHEST BIDDER
     const previousHighestBid =
       await prisma.marketplaceBid.findFirst({
         where: {
-          auctionId: auction.id,
+          auctionId:
+            auction.id,
         },
 
         orderBy: {
-          amount: "desc",
+          amount:
+            "desc",
         },
 
         include: {
@@ -207,6 +229,7 @@ export async function POST(
       auction.endAt;
 
     if (auction.endAt) {
+
       const now =
         Date.now();
 
@@ -226,18 +249,22 @@ export async function POST(
         secondsRemaining <=
         15
       ) {
+
         updatedEndAt =
           new Date(
             endTime +
               15 * 1000
           );
+
       }
+
     }
 
     // UPDATE AUCTION
     await prisma.marketplaceAuction.update({
       where: {
-        id: auction.id,
+        id:
+          auction.id,
       },
 
       data: {
@@ -257,7 +284,8 @@ export async function POST(
     const updatedAuction =
       await prisma.marketplaceAuction.findUnique({
         where: {
-          id: auction.id,
+          id:
+            auction.id,
         },
 
         include: {
@@ -353,12 +381,20 @@ export async function POST(
         });
 
       }
+
     }
 
     // REALTIME BROADCAST
     await pusherServer.trigger(
-      `auction-${auction.id}`,
+      `presence-auction-${auction.id}`,
       "new-bid",
+      updatedAuction
+    );
+
+    // ALSO SEND GENERAL UPDATE
+    await pusherServer.trigger(
+      `presence-auction-${auction.id}`,
+      "auction-updated",
       updatedAuction
     );
 
@@ -366,7 +402,9 @@ export async function POST(
       success: true,
       bid,
     });
+
   } catch (error) {
+
     console.error(error);
 
     return NextResponse.json(
@@ -378,5 +416,7 @@ export async function POST(
         status: 500,
       }
     );
+
   }
+
 }
