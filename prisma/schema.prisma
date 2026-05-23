@@ -151,6 +151,8 @@ model MarketplaceAuction {
 
   bids          MarketplaceBid[]
 
+  watchlistedBy Watchlist[]
+
   endingSoonSent Boolean @default(false)
 
   @@index([sellerId])
@@ -174,6 +176,24 @@ model MarketplaceBid {
 
   @@index([auctionId, createdAt])
   @@index([bidderId])
+}
+
+model Watchlist {
+  id        String   @id @default(cuid())
+
+  createdAt DateTime @default(now())
+
+  userId    String
+  auctionId String
+
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  auction   MarketplaceAuction @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, auctionId])
+
+  @@index([userId])
+  @@index([auctionId])
 }
 
 model Bid {
@@ -269,7 +289,6 @@ model User {
   tiktokUsername      String?
   sellerBio           String?
 
-  // STRIPE CONNECT
   stripeAccountId String?
   stripeOnboardingComplete Boolean @default(false)
 
@@ -284,6 +303,8 @@ model User {
   marketplaceAuctions MarketplaceAuction[]
 
   marketplaceBids MarketplaceBid[]
+
+  watchlist Watchlist[]
 
   wonAuctions Auction[] @relation("AuctionWinner")
 

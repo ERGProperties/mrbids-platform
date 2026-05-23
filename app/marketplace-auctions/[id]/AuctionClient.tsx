@@ -91,6 +91,16 @@ export default function AuctionClient({
   ] = useState(false);
 
   const [
+    watchlistLoading,
+    setWatchlistLoading,
+  ] = useState(false);
+
+  const [
+    isSaved,
+    setIsSaved,
+  ] = useState(false);
+
+  const [
     error,
     setError,
   ] = useState("");
@@ -115,6 +125,50 @@ export default function AuctionClient({
 
   useEffect(() => {
 
+    async function fetchWatchlist() {
+
+      if (!session?.user) return;
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/watchlist"
+          );
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data =
+          await response.json();
+
+        const exists =
+          data.some(
+            (item: any) =>
+              item.auctionId ===
+              auction.id
+          );
+
+        setIsSaved(exists);
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+    }
+
+    fetchWatchlist();
+
+  }, [
+    session?.user,
+    auction.id,
+  ]);
+
+  useEffect(() => {
+
     const channel =
       pusherClient.subscribe(
         `presence-auction-${initialAuction.id}`
@@ -129,7 +183,6 @@ export default function AuctionClient({
             ?.bids?.[0]
             ?.bidderId;
 
-        // OUTBID DETECTION
         if (
           previousHighestBidder
             .current ===
@@ -254,6 +307,67 @@ export default function AuctionClient({
     auction.startingBid,
     auction.bids,
   ]);
+
+  async function toggleWatchlist() {
+
+    if (!session?.user) {
+
+      window.location.href =
+        "/signin";
+
+      return;
+
+    }
+
+    try {
+
+      setWatchlistLoading(true);
+
+      if (isSaved) {
+
+        await fetch(
+          `/api/watchlist/${auction.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        setIsSaved(false);
+
+      } else {
+
+        await fetch(
+          "/api/watchlist",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify({
+              auctionId:
+                auction.id,
+            }),
+          }
+        );
+
+        setIsSaved(true);
+
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+    } finally {
+
+      setWatchlistLoading(false);
+
+    }
+
+  }
 
   async function handleBid() {
 
@@ -539,6 +653,22 @@ export default function AuctionClient({
               👁 {viewerCount} watching
 
             </div>
+
+            <button
+              onClick={
+                toggleWatchlist
+              }
+              disabled={
+                watchlistLoading
+              }
+              className="absolute top-5 right-5 bg-white/90 hover:bg-white transition px-5 py-3 rounded-full shadow-xl text-sm font-semibold"
+            >
+
+              {isSaved
+                ? "❤️ Saved"
+                : "🤍 Save"}
+
+            </button>
 
           </div>
 
