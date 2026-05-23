@@ -683,8 +683,55 @@ export default function AuctionClient({
 
             )}
 
+            {/* PAYMENT STATUS */}
+            {auction.status === "ENDED" && (
+
+              <div
+                className={`
+                  border rounded-2xl p-5 md:p-6
+                  ${
+                    auction.paymentStatus === "PAID"
+                      ? "bg-green-50 border-green-200"
+                      : "bg-yellow-50 border-yellow-200"
+                  }
+                `}
+              >
+
+                <p
+                  className={`
+                    text-sm font-medium mb-2
+                    ${
+                      auction.paymentStatus === "PAID"
+                        ? "text-green-700"
+                        : "text-yellow-700"
+                    }
+                  `}
+                >
+                  Payment Status
+                </p>
+
+                <p
+                  className={
+                    auction.paymentStatus === "PAID"
+                      ? "text-green-900"
+                      : "text-yellow-900"
+                  }
+                >
+
+                  {auction.paymentStatus === "PAID"
+                    ? "Payment completed successfully."
+                    : "Awaiting winner payment."}
+
+                </p>
+
+              </div>
+
+            )}
+
             {/* WINNER PAYMENT */}
-            {isWinner && (
+            {isWinner &&
+              auction.paymentStatus !==
+                "PAID" && (
 
               <div className="border rounded-2xl p-6 bg-green-50 border-green-200">
 
