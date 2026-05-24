@@ -164,6 +164,12 @@ export default function LayoutWrapper({
               </li>
 
               <li>
+                <Link href="/refund-policy" className="hover:underline">
+                  Refund Policy
+                </Link>
+              </li>
+
+              <li>
                 <Link href="/disclosures" className="hover:underline">
                   Disclosures
                 </Link>
