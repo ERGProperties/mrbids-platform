@@ -32,7 +32,7 @@ export default function AuctionClient({
   isSeller: boolean;
 }) {
 
-  const { data: session } =
+  const { data: session, update } =
     useSession();
 
   const {
@@ -1041,36 +1041,53 @@ export default function AuctionClient({
 
             )}
 
-            {isSeller && (
+{isSeller && (
 
-              <div className="mt-8 space-y-4">
+  <div className="mt-8 space-y-4">
 
-                {auction.status ===
-                  "SCHEDULED" && (
+    {auction.status ===
+      "SCHEDULED" && (
 
-                  <button
-                    onClick={
-                      startAuction
-                    }
-                    className="w-full bg-green-600 text-white rounded-2xl py-5 text-lg font-semibold hover:bg-green-700 transition"
-                  >
+      session?.user?.stripeOnboardingComplete ? (
 
-                    Go LIVE
+        <button
+          onClick={
+            startAuction
+          }
+          className="w-full bg-green-600 text-white rounded-2xl py-5 text-lg font-semibold hover:bg-green-700 transition"
+        >
 
-                  </button>
+          Go LIVE
 
-                )}
+        </button>
 
-                <div className="bg-blue-500/20 border border-blue-400/30 rounded-2xl px-5 py-4">
+      ) : (
 
-                  You are the seller of this auction.
+        <button
+          onClick={() => {
+            window.location.href =
+              "/dashboard";
+          }}
+          className="w-full bg-yellow-500 text-black rounded-2xl py-5 text-lg font-semibold hover:bg-yellow-400 transition"
+        >
 
-                </div>
+          Connect Stripe To Launch Auction
 
-              </div>
+        </button>
 
-            )}
+      )
 
+    )}
+
+    <div className="bg-blue-500/20 border border-blue-400/30 rounded-2xl px-5 py-4">
+
+      You are the seller of this auction.
+
+    </div>
+
+  </div>
+
+)}
           </div>
 
           {error && (
