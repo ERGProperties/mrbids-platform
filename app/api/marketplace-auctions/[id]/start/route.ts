@@ -8,6 +8,8 @@ import { prisma } from "@/lib/prisma";
 
 import { pusherServer } from "@/lib/pusher";
 
+import { stripe } from "@/lib/stripe";
+
 export async function POST(
   req: Request,
   {
@@ -62,6 +64,67 @@ export async function POST(
 
     }
 
+    // VERIFY STRIPE CONNECT
+    if (
+      !user.stripeAccountId
+    ) {
+
+      return NextResponse.json(
+        {
+          error:
+            "Connect Stripe before launching your auction.",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+    const account =
+      await stripe.accounts.retrieve(
+        user.stripeAccountId
+      );
+
+    const onboardingComplete =
+      !!account.details_submitted &&
+      !!account.charges_enabled &&
+      !!account.payouts_enabled;
+
+    if (
+      !onboardingComplete
+    ) {
+
+      return NextResponse.json(
+        {
+          error:
+            "Complete Stripe onboarding before launching your auction.",
+        },
+        {
+          status: 400,
+        }
+      );
+
+    }
+
+    // UPDATE USER STATUS
+    if (
+      !user.stripeOnboardingComplete
+    ) {
+
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+
+        data: {
+          stripeOnboardingComplete:
+            true,
+        },
+      });
+
+    }
+
     const auction =
       await prisma.marketplaceAuction.findUnique({
         where: {
@@ -95,6 +158,23 @@ export async function POST(
         },
         {
           status: 401,
+        }
+      );
+
+    }
+
+    if (
+      auction.status ===
+      "LIVE"
+    ) {
+
+      return NextResponse.json(
+        {
+          error:
+            "Auction already live",
+        },
+        {
+          status: 400,
         }
       );
 
