@@ -158,6 +158,12 @@ export default function LayoutWrapper({
               </li>
 
               <li>
+                <Link href="/seller-policy" className="hover:underline">
+                  Seller Policy
+                </Link>
+              </li>
+
+              <li>
                 <Link href="/disclosures" className="hover:underline">
                   Disclosures
                 </Link>
