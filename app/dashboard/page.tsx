@@ -543,37 +543,66 @@ export default async function DashboardPage() {
 
                       </div>
 
-                      <div className="mt-5 grid sm:grid-cols-2 gap-5">
+<div className="mt-5 grid sm:grid-cols-2 xl:grid-cols-4 gap-5">
 
-                        <div>
+  <div>
 
-                          <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
-                            Final Bid
-                          </p>
+    <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+      Final Bid
+    </p>
 
-                          <p className="text-2xl font-semibold text-gray-900">
+    <p className="text-2xl font-semibold text-gray-900">
 
-                            $
-                            {auction.currentBid.toLocaleString()}
+      $
+      {auction.currentBid.toLocaleString()}
 
-                          </p>
+    </p>
 
-                        </div>
+  </div>
 
-                        <div>
+  <div>
 
-                          <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
-                            Fulfillment Status
-                          </p>
+    <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+      MrBids Fee
+    </p>
 
-                          <p className="font-medium text-gray-900">
-                            {auction.fulfillmentStatus || "PENDING"}
-                          </p>
+    <p className="text-2xl font-semibold text-red-600">
 
-                        </div>
+      $
+      {(auction.marketplaceFeeAmount || 0).toLocaleString()}
 
-                      </div>
+    </p>
 
+  </div>
+
+  <div>
+
+    <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+      Seller Payout
+    </p>
+
+    <p className="text-2xl font-semibold text-green-700">
+
+      $
+      {(auction.sellerPayoutAmount || 0).toLocaleString()}
+
+    </p>
+
+  </div>
+
+  <div>
+
+    <p className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+      Fulfillment Status
+    </p>
+
+    <p className="font-medium text-gray-900">
+      {auction.fulfillmentStatus || "PENDING"}
+    </p>
+
+  </div>
+
+</div>
                       {auction.shippingCost && (
 
                         <div className="mt-5">
