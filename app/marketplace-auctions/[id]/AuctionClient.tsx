@@ -872,9 +872,30 @@ export default function AuctionClient({
 
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-semibold leading-tight">
-            {auction.title}
-          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+
+  <h1 className="text-3xl md:text-5xl font-semibold leading-tight">
+    {auction.title}
+  </h1>
+
+  {auction.seller
+    ?.stripeOnboardingComplete && (
+
+    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-semibold border border-green-200">
+
+      <span>
+        ✓
+      </span>
+
+      <span>
+        Verified Seller
+      </span>
+
+    </div>
+
+  )}
+
+</div>
 
           <div className="mt-6 grid grid-cols-2 gap-4">
 
@@ -1081,9 +1102,12 @@ export default function AuctionClient({
 
     <div className="bg-blue-500/20 border border-blue-400/30 rounded-2xl px-5 py-4">
 
-      You are the seller of this auction.
+  {auction.seller
+    ?.stripeOnboardingComplete
+      ? "You are the verified seller of this auction."
+      : "You are the seller of this auction."}
 
-    </div>
+</div>
 
   </div>
 
