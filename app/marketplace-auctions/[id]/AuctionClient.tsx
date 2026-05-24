@@ -313,6 +313,80 @@ export default function AuctionClient({
     auction.bids,
   ]);
 
+  function nextImage() {
+
+    if (!auction.images?.length) {
+      return;
+    }
+
+    setSelectedImage(
+      (prev) =>
+        prev ===
+        auction.images.length - 1
+          ? 0
+          : prev + 1
+    );
+
+  }
+
+  function previousImage() {
+
+    if (!auction.images?.length) {
+      return;
+    }
+
+    setSelectedImage(
+      (prev) =>
+        prev === 0
+          ? auction.images.length - 1
+          : prev - 1
+    );
+
+  }
+
+  async function startAuction() {
+
+    try {
+
+      setError("");
+
+      const response =
+        await fetch(
+          `/api/marketplace-auctions/${auction.id}/start`,
+          {
+            method: "POST",
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+
+        setError(
+          data.error ||
+          "Failed to start auction"
+        );
+
+        return;
+      }
+
+      mutate(
+        `/api/marketplace-auctions/${initialAuction.id}/live`
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      setError(
+        "Failed to start auction"
+      );
+
+    }
+
+  }
+
   async function toggleWatchlist() {
 
     if (!session?.user) {
@@ -671,6 +745,32 @@ export default function AuctionClient({
 
             )}
 
+            {auction.images?.length > 1 && (
+
+              <>
+
+                <button
+                  onClick={previousImage}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl transition"
+                >
+
+                  ←
+
+                </button>
+
+                <button
+                  onClick={nextImage}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl transition"
+                >
+
+                  →
+
+                </button>
+
+              </>
+
+            )}
+
             <div className="absolute top-5 left-5 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur">
 
               👁 {viewerCount} watching
@@ -776,7 +876,6 @@ export default function AuctionClient({
             {auction.title}
           </h1>
 
-          {/* RETAIL + DETAILS */}
           <div className="mt-6 grid grid-cols-2 gap-4">
 
             {auction.retailPrice && (
@@ -815,7 +914,6 @@ export default function AuctionClient({
 
           </div>
 
-          {/* DESCRIPTION */}
           {auction.description && (
 
             <div className="mt-8">
@@ -832,7 +930,6 @@ export default function AuctionClient({
 
           )}
 
-          {/* CURRENT BID */}
           <div className="mt-8 border rounded-3xl p-8 bg-gradient-to-br from-black to-gray-900 text-white">
 
             <p className="text-sm uppercase tracking-wider text-gray-300">
@@ -906,7 +1003,6 @@ export default function AuctionClient({
 
             </div>
 
-            {/* BID ACTIONS */}
             {auction.status ===
               "LIVE" &&
               !isSeller && (
@@ -947,9 +1043,29 @@ export default function AuctionClient({
 
             {isSeller && (
 
-              <div className="mt-8 bg-blue-500/20 border border-blue-400/30 rounded-2xl px-5 py-4">
+              <div className="mt-8 space-y-4">
 
-                You are the seller of this auction.
+                {auction.status ===
+                  "SCHEDULED" && (
+
+                  <button
+                    onClick={
+                      startAuction
+                    }
+                    className="w-full bg-green-600 text-white rounded-2xl py-5 text-lg font-semibold hover:bg-green-700 transition"
+                  >
+
+                    Go LIVE
+
+                  </button>
+
+                )}
+
+                <div className="bg-blue-500/20 border border-blue-400/30 rounded-2xl px-5 py-4">
+
+                  You are the seller of this auction.
+
+                </div>
 
               </div>
 
@@ -957,7 +1073,6 @@ export default function AuctionClient({
 
           </div>
 
-          {/* ERRORS */}
           {error && (
 
             <div className="mt-6 bg-red-100 border border-red-200 text-red-700 px-5 py-4 rounded-2xl">
@@ -968,7 +1083,6 @@ export default function AuctionClient({
 
           )}
 
-          {/* SUCCESS */}
           {success && (
 
             <div className="mt-6 bg-green-100 border border-green-200 text-green-700 px-5 py-4 rounded-2xl">
@@ -979,7 +1093,6 @@ export default function AuctionClient({
 
           )}
 
-          {/* WINNER CHECKOUT */}
           {auction.status ===
             "ENDED" &&
             isWinner && (
@@ -1072,7 +1185,6 @@ export default function AuctionClient({
 
           )}
 
-          {/* SHIPPING */}
           {isSeller &&
             auction.status ===
               "ENDED" && (
@@ -1137,7 +1249,6 @@ export default function AuctionClient({
 
           )}
 
-          {/* BID HISTORY */}
           <div className="mt-8 border rounded-3xl p-6">
 
             <div className="flex items-center justify-between mb-5">
