@@ -626,6 +626,7 @@ export default function AuctionClient({
 
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-14">
 
+        {/* LEFT SIDE */}
         <div>
 
           <div className="relative">
@@ -672,8 +673,49 @@ export default function AuctionClient({
 
           </div>
 
+          {auction.images?.length > 1 && (
+
+            <div className="grid grid-cols-5 gap-3 mt-4">
+
+              {auction.images.map(
+                (
+                  image: string,
+                  index: number
+                ) => (
+
+                  <button
+                    key={index}
+                    onClick={() =>
+                      setSelectedImage(
+                        index
+                      )
+                    }
+                    className={`border rounded-xl overflow-hidden ${
+                      selectedImage ===
+                      index
+                        ? "border-black"
+                        : "border-gray-200"
+                    }`}
+                  >
+
+                    <img
+                      src={image}
+                      alt={`Preview ${index}`}
+                      className="aspect-square object-cover"
+                    />
+
+                  </button>
+
+                )
+              )}
+
+            </div>
+
+          )}
+
         </div>
 
+        {/* RIGHT SIDE */}
         <div>
 
           <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -707,9 +749,353 @@ export default function AuctionClient({
 
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-semibold leading-tight">
+          <h1 className="text-3xl md:text-5xl font-semibold leading-tight mb-6">
             {auction.title}
           </h1>
+
+          {auction.description && (
+
+            <div className="mb-8">
+
+              <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                Description
+              </h2>
+
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                {auction.description}
+              </p>
+
+            </div>
+
+          )}
+
+          <div className="bg-gray-50 border border-gray-200 rounded-3xl p-8 mb-8">
+
+            <div className="flex items-end justify-between mb-6">
+
+              <div>
+
+                <p className="text-sm text-gray-500 mb-2">
+                  Current Bid
+                </p>
+
+                <h2 className="text-5xl font-bold text-gray-900">
+
+                  $
+                  {(auction.currentBid > 0
+                    ? auction.currentBid
+                    : auction.startingBid
+                  ).toLocaleString()}
+
+                </h2>
+
+              </div>
+
+              <div className="text-right">
+
+                <p className="text-sm text-gray-500 mb-2">
+                  Total Bids
+                </p>
+
+                <p className="text-3xl font-semibold text-gray-900">
+                  {auction.bidCount}
+                </p>
+
+              </div>
+
+            </div>
+
+            {auction.status ===
+              "LIVE" &&
+              !isSeller && (
+
+              <div className="space-y-5">
+
+                <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Your Bid
+                  </label>
+
+                  <input
+                    type="number"
+                    min={minimumBid}
+                    value={amount}
+                    onChange={(e) =>
+                      setAmount(
+                        Number(
+                          e.target.value
+                        )
+                      )
+                    }
+                    className="w-full border border-gray-300 rounded-2xl px-5 py-4 text-xl font-semibold"
+                  />
+
+                  <p className="text-sm text-gray-500 mt-2">
+                    Minimum bid: $
+                    {minimumBid.toLocaleString()}
+                  </p>
+
+                </div>
+
+                <button
+                  onClick={
+                    handleBid
+                  }
+                  disabled={loading}
+                  className="w-full bg-black text-white rounded-2xl py-5 text-lg font-semibold hover:opacity-90 transition"
+                >
+
+                  {loading
+                    ? "Placing Bid..."
+                    : "Place Bid"}
+
+                </button>
+
+              </div>
+
+            )}
+
+            {isSeller && (
+
+              <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded-2xl p-5 text-sm">
+
+                You are the seller of this auction.
+
+              </div>
+
+            )}
+
+          </div>
+
+          {error && (
+
+            <div className="mb-6 bg-red-100 border border-red-200 text-red-700 px-5 py-4 rounded-2xl">
+
+              {error}
+
+            </div>
+
+          )}
+
+          {success && (
+
+            <div className="mb-6 bg-green-100 border border-green-200 text-green-700 px-5 py-4 rounded-2xl">
+
+              {success}
+
+            </div>
+
+          )}
+
+          {auction.status ===
+            "ENDED" &&
+            isWinner && (
+
+            <div className="bg-green-50 border border-green-200 rounded-3xl p-8 mb-8">
+
+              <h2 className="text-2xl font-semibold text-green-700 mb-4">
+                You Won This Auction
+              </h2>
+
+              <div className="space-y-3 mb-6">
+
+                <p className="text-gray-700">
+                  Winning Bid:
+                  <span className="ml-2 font-semibold">
+
+                    $
+                    {auction.currentBid.toLocaleString()}
+
+                  </span>
+                </p>
+
+                <p className="text-gray-700">
+                  Shipping:
+                  <span className="ml-2 font-semibold">
+
+                    $
+                    {(auction.shippingCost || 0).toLocaleString()}
+
+                  </span>
+                </p>
+
+                <p className="text-2xl font-bold text-gray-900">
+
+                  Total Due: $
+                  {totalDue.toLocaleString()}
+
+                </p>
+
+              </div>
+
+              {auction.paymentStatus !==
+                "PAID" ? (
+
+                <button
+                  onClick={
+                    handleCheckout
+                  }
+                  disabled={
+                    paymentLoading
+                  }
+                  className="w-full bg-green-600 text-white rounded-2xl py-5 text-lg font-semibold hover:bg-green-700 transition"
+                >
+
+                  {paymentLoading
+                    ? "Redirecting..."
+                    : "Pay Now"}
+
+                </button>
+
+              ) : (
+
+                <div className="bg-green-100 text-green-700 rounded-2xl px-5 py-4 font-semibold">
+
+                  Payment Completed
+
+                </div>
+
+              )}
+
+            </div>
+
+          )}
+
+          {isSeller &&
+            auction.status ===
+              "ENDED" && (
+
+            <div className="bg-white border border-gray-200 rounded-3xl p-8 mb-8">
+
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+                Shipping Settings
+              </h2>
+
+              <div className="space-y-5">
+
+                <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Shipping Cost
+                  </label>
+
+                  <input
+                    type="number"
+                    value={
+                      shippingCost
+                    }
+                    onChange={(e) =>
+                      setShippingCost(
+                        Number(
+                          e.target.value
+                        )
+                      )
+                    }
+                    className="w-full border border-gray-300 rounded-2xl px-5 py-4"
+                  />
+
+                </div>
+
+                <div>
+
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Shipping Carrier
+                  </label>
+
+                  <input
+                    type="text"
+                    value={
+                      shippingCarrier
+                    }
+                    onChange={(e) =>
+                      setShippingCarrier(
+                        e.target.value
+                      )
+                    }
+                    className="w-full border border-gray-300 rounded-2xl px-5 py-4"
+                  />
+
+                </div>
+
+                <button
+                  onClick={
+                    saveShipping
+                  }
+                  disabled={
+                    shippingLoading
+                  }
+                  className="w-full bg-black text-white rounded-2xl py-4 font-semibold hover:opacity-90 transition"
+                >
+
+                  {shippingLoading
+                    ? "Saving..."
+                    : "Save Shipping"}
+
+                </button>
+
+              </div>
+
+            </div>
+
+          )}
+
+          <div className="bg-white border border-gray-200 rounded-3xl p-8">
+
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+              Recent Bids
+            </h2>
+
+            {formattedBids.length ===
+            0 ? (
+
+              <p className="text-gray-500">
+                No bids yet.
+              </p>
+
+            ) : (
+
+              <div className="space-y-4">
+
+                {formattedBids.map(
+                  (bid: any) => (
+
+                    <div
+                      key={bid.id}
+                      className="flex items-center justify-between border-b border-gray-100 pb-4"
+                    >
+
+                      <div>
+
+                        <p className="font-semibold text-gray-900">
+                          {bid.displayName}
+                        </p>
+
+                        <p className="text-sm text-gray-500">
+                          {new Date(
+                            bid.createdAt
+                          ).toLocaleString()}
+                        </p>
+
+                      </div>
+
+                      <p className="text-xl font-bold text-gray-900">
+
+                        $
+                        {bid.amount.toLocaleString()}
+
+                      </p>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+          </div>
 
         </div>
 
