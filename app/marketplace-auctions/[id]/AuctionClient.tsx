@@ -32,7 +32,7 @@ export default function AuctionClient({
   isSeller: boolean;
 }) {
 
-  const { data: session, update } =
+  const { data: session } =
     useSession();
 
   const {
@@ -1048,7 +1048,7 @@ export default function AuctionClient({
     {auction.status ===
       "SCHEDULED" && (
 
-      session?.user?.stripeOnboardingComplete ? (
+      auction.seller?.stripeOnboardingComplete ? (
 
         <button
           onClick={
