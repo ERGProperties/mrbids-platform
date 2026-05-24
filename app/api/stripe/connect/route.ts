@@ -124,7 +124,7 @@ export async function POST() {
 
     console.error(
       "[STRIPE_CONNECT_ERROR]",
-      error
+      JSON.stringify(error, null, 2)
     );
 
     return NextResponse.json(
