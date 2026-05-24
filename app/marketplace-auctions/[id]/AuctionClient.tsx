@@ -872,16 +872,20 @@ export default function AuctionClient({
 
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-3">
+<div className="mt-2 flex flex-wrap items-center gap-3">
 
   <h1 className="text-3xl md:text-5xl font-semibold leading-tight">
     {auction.title}
   </h1>
 
+</div>
+
+<div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
+
   {auction.seller
     ?.stripeOnboardingComplete && (
 
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-semibold border border-green-200">
+    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200 text-green-700 font-medium">
 
       <span>
         ✓
@@ -895,7 +899,109 @@ export default function AuctionClient({
 
   )}
 
+  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium">
+
+    <span>
+      Successful Sales:
+    </span>
+
+    <span className="font-semibold">
+
+      {
+        auction.seller
+          ?.marketplaceAuctions
+          ?.filter(
+            (
+              item: any
+            ) =>
+              item.paymentStatus ===
+              "PAID"
+          ).length
+      }
+
+    </span>
+
+  </div>
+
+  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium">
+
+    <span>
+      Active Auctions:
+    </span>
+
+    <span className="font-semibold">
+
+      {
+        auction.seller
+          ?.marketplaceAuctions
+          ?.filter(
+            (
+              item: any
+            ) =>
+              item.status ===
+              "LIVE"
+          ).length
+      }
+
+    </span>
+
+  </div>
+
 </div>
+
+<div className="mt-6 grid grid-cols-2 gap-4">
+
+            {auction.retailPrice && (
+
+              <div className="border rounded-2xl p-5 bg-gray-50">
+
+                <p className="text-sm text-gray-500 mb-2">
+                  Retail Value
+                </p>
+
+                <p className="text-2xl font-bold text-gray-900">
+
+                  $
+                  {auction.retailPrice.toLocaleString()}
+
+                </p>
+
+              </div>
+
+            )}
+
+            <div className="border rounded-2xl p-5 bg-gray-50">
+
+              <p className="text-sm text-gray-500 mb-2">
+                Bid Increment
+              </p>
+
+              <p className="text-2xl font-bold text-gray-900">
+
+                $
+                {auction.bidIncrement.toLocaleString()}
+
+              </p>
+
+            </div>
+
+          </div>
+
+          {auction.description && (
+
+            <div className="mt-8">
+
+              <h2 className="text-xl font-semibold mb-3">
+                Description
+              </h2>
+
+              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                {auction.description}
+              </p>
+
+            </div>
+
+          )}
 
           <div className="mt-6 grid grid-cols-2 gap-4">
 

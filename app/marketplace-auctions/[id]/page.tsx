@@ -27,12 +27,22 @@ export default async function MarketplaceAuctionPage({
         id: params.id,
       },
 
-      include: {
-        seller: true,
+include: {
+  seller: {
+    include: {
+      marketplaceAuctions: {
+        select: {
+          id: true,
+          status: true,
+          paymentStatus: true,
+        },
+      },
+    },
+  },
 
-        winner: true,
+  winner: true,
 
-        bids: {
+  bids: {
           include: {
             bidder: true,
           },
