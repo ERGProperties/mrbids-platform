@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import { redirect } from "next/navigation";
 
+import Link from "next/link";
+
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/authOptions";
@@ -60,6 +62,24 @@ export default async function DashboardPage() {
 
       orderBy: {
         updatedAt:
+          "desc",
+      },
+
+      take: 20,
+    });
+
+  const watchlist =
+    await prisma.watchlist.findMany({
+      where: {
+        userId,
+      },
+
+      include: {
+        auction: true,
+      },
+
+      orderBy: {
+        createdAt:
           "desc",
       },
 
@@ -196,6 +216,158 @@ export default async function DashboardPage() {
             </p>
 
           </div>
+
+        </div>
+
+        {/* WATCHLIST */}
+        <div className="mb-12 bg-white border border-gray-200 rounded-2xl p-8">
+
+          <div className="flex items-center justify-between mb-8">
+
+            <div>
+
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Saved Auctions
+              </h2>
+
+              <p className="mt-2 text-gray-600">
+                Auctions you're watching and tracking.
+              </p>
+
+            </div>
+
+          </div>
+
+          {watchlist.length === 0 ? (
+
+            <div className="border border-dashed border-gray-300 rounded-2xl p-10 text-center">
+
+              <p className="text-gray-500">
+                No saved auctions yet.
+              </p>
+
+            </div>
+
+          ) : (
+
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+              {watchlist.map(
+                (item) => {
+
+                  const auction =
+                    item.auction;
+
+                  return (
+
+                    <Link
+                      key={item.id}
+                      href={`/marketplace-auctions/${auction.id}`}
+                      className="group border border-gray-200 rounded-2xl overflow-hidden bg-white hover:border-black transition"
+                    >
+
+                      <div className="aspect-square bg-gray-100 overflow-hidden">
+
+                        {auction.images?.[0] ? (
+
+                          <img
+                            src={
+                              auction.images[0]
+                            }
+                            alt={
+                              auction.title
+                            }
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          />
+
+                        ) : (
+
+                          <div className="w-full h-full bg-gray-100" />
+
+                        )}
+
+                      </div>
+
+                      <div className="p-5">
+
+                        <div className="flex items-center justify-between gap-3 mb-3">
+
+                          <span className="inline-flex px-3 py-1 rounded-full bg-black text-white text-xs font-medium">
+                            {auction.category}
+                          </span>
+
+                          <span
+                            className={`
+                              inline-flex px-3 py-1 rounded-full text-xs font-medium
+                              ${
+                                auction.status ===
+                                "LIVE"
+                                  ? "bg-green-100 text-green-700"
+                                  : auction.status ===
+                                    "ENDED"
+                                  ? "bg-gray-200 text-gray-700"
+                                  : "bg-yellow-100 text-yellow-700"
+                              }
+                            `}
+                          >
+
+                            {auction.status}
+
+                          </span>
+
+                        </div>
+
+                        <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
+
+                          {auction.title}
+
+                        </h3>
+
+                        <div className="mt-5 flex items-end justify-between">
+
+                          <div>
+
+                            <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">
+                              Current Bid
+                            </p>
+
+                            <p className="text-2xl font-semibold text-gray-900">
+
+                              $
+                              {auction.currentBid > 0
+                                ? auction.currentBid.toLocaleString()
+                                : auction.startingBid.toLocaleString()}
+
+                            </p>
+
+                          </div>
+
+                          <div className="text-right">
+
+                            <p className="text-xs uppercase tracking-wider text-gray-500 mb-1">
+                              Bids
+                            </p>
+
+                            <p className="font-semibold text-gray-900">
+                              {auction.bidCount}
+                            </p>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    </Link>
+
+                  );
+
+                }
+              )}
+
+            </div>
+
+          )}
 
         </div>
 
