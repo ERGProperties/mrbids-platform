@@ -10,6 +10,8 @@ import { authOptions } from "@/lib/authOptions";
 
 import { prisma } from "@/lib/prisma";
 
+import GoogleRegistrationConversion from "@/components/GoogleRegistrationConversion";
+
 import FulfillmentControls from "@/components/dashboard/FulfillmentControls";
 
 import StripeConnectStatus from "@/components/dashboard/StripeConnectStatus";
@@ -120,7 +122,10 @@ export default async function DashboardPage() {
           "PAID"
     ).length;
 
-  return (
+return (
+  <>
+    <GoogleRegistrationConversion />
+
     <main className="bg-gray-50 min-h-screen">
 
       <div className="max-w-7xl mx-auto px-6 py-24">
@@ -707,6 +712,7 @@ export default async function DashboardPage() {
       </div>
 
     </main>
+  </>
   );
 
 }
