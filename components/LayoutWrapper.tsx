@@ -55,7 +55,7 @@ export default function LayoutWrapper({
               href="/coming-soon"
               className="px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
             >
-              Become a Seller
+              Create an Auction
             </Link>
 
           </nav>
@@ -106,7 +106,7 @@ export default function LayoutWrapper({
 
               <li>
                 <Link href="/coming-soon" className="hover:underline">
-                  Become a Seller
+                  Create an Auction
                 </Link>
               </li>
 
