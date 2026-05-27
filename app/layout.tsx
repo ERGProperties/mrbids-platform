@@ -1,12 +1,17 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Script from "next/script";
+
 import SessionProvider from "@/components/auth/SessionProvider";
 import LayoutWrapper from "@/components/LayoutWrapper";
 
 export const metadata: Metadata = {
   title: "MrBids",
-  description: "Seller-Direct Real Estate Auctions",
+  description:
+    "LIVE marketplace auctions starting at $1.",
+
+  manifest: "/manifest.json",
+
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -15,11 +20,14 @@ export const metadata: Metadata = {
         sizes: "96x96",
         type: "image/png",
       },
-      { url: "/favicon.svg", type: "image/svg+xml" },
+      {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      },
     ],
+
     apple: "/apple-touch-icon.png",
   },
-  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -27,43 +35,91 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
+
     <html lang="en">
+
       <head>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#000000" />
 
-        <meta name="mobile-web-app-capable" content="yes" />
+        <link
+          rel="manifest"
+          href="/manifest.json"
+        />
 
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-        <meta name="apple-mobile-web-app-title" content="MrBids" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <meta
+          name="theme-color"
+          content="#000000"
+        />
+
+        <meta
+          name="mobile-web-app-capable"
+          content="yes"
+        />
+
+        <meta
+          name="apple-mobile-web-app-capable"
+          content="yes"
+        />
+
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black"
+        />
+
+        <meta
+          name="apple-mobile-web-app-title"
+          content="MrBids"
+        />
+
+        <link
+          rel="apple-touch-icon"
+          href="/icon-192.png"
+        />
 
         {/* Google Ads Tag */}
+
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=AW-18177376162"
         />
 
-        <Script id="google-ads-tag" strategy="afterInteractive">
+        <Script
+          id="google-ads-tag"
+          strategy="afterInteractive"
+        >
+
           {`
             window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
+
+            function gtag(){
+              dataLayer.push(arguments);
+            }
+
             gtag('js', new Date());
 
             gtag('config', 'AW-18177376162');
           `}
+
         </Script>
+
       </head>
 
       <body className="bg-white text-gray-900 antialiased flex flex-col min-h-screen">
+
         <SessionProvider>
+
           <LayoutWrapper>
+
             {children}
+
           </LayoutWrapper>
+
         </SessionProvider>
+
       </body>
+
     </html>
+
   );
 }
