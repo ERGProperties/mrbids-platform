@@ -8,9 +8,11 @@ import {
 export default function CountdownTimer({
   endAt,
   onExpire,
+  compact = false,
 }: {
   endAt: string;
   onExpire?: () => void;
+  compact?: boolean;
 }) {
 
   const [
@@ -96,7 +98,22 @@ export default function CountdownTimer({
 
   }, [endAt, onExpire]);
 
+  if (compact) {
+
+    return (
+
+      <span className="text-xs font-medium text-red-500 leading-none">
+
+        {timeLeft}
+
+      </span>
+
+    );
+
+  }
+
   return (
+
     <div className="border rounded-2xl p-6">
 
       <p className="text-sm text-gray-500 mb-2">
@@ -108,5 +125,7 @@ export default function CountdownTimer({
       </p>
 
     </div>
+
   );
+
 }
