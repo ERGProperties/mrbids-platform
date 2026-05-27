@@ -1489,25 +1489,45 @@ const displayName =
 
     <div className="flex items-center justify-between gap-3 px-4 py-2.5">
 
-      <div className="min-w-0">
+<div className="min-w-0">
 
-        <p className="text-[11px] uppercase tracking-wide text-gray-500">
-          Current Bid
-        </p>
+  <p className="text-[10px] uppercase tracking-wide text-gray-500">
+    Current Bid
+  </p>
 
-        <div className="flex items-center gap-2">
+  <div className="flex items-center gap-2">
 
-          <p className="text-2xl font-bold leading-none text-black">
+    <p className="text-2xl font-bold leading-none text-black">
 
-            $
-            {auction.currentBid?.toLocaleString() ||
-              auction.startingBid?.toLocaleString()}
+      $
+      {auction.currentBid?.toLocaleString() ||
+        auction.startingBid?.toLocaleString()}
 
-          </p>
+    </p>
 
-          <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+    <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
 
-        </div>
+  </div>
+
+  {auction.endAt && (
+
+    <div className="mt-1">
+
+      <span className="text-[11px] text-red-500 font-medium">
+        Ends in{" "}
+      </span>
+
+      <CountdownTimer
+        endAt={auction.endAt}
+        onExpire={endAuction}
+        compact
+      />
+
+    </div>
+
+  )}
+
+</div>
 
         {auction.endAt && (
 
