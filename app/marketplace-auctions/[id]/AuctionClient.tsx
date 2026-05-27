@@ -1540,15 +1540,12 @@ const displayName =
 {/* MOBILE STICKY BID BAR */}
 {auction.status === "LIVE" && !isSeller && (
 
-  <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/20 bg-white/80 backdrop-blur-xl md:hidden">
+  <div className="fixed bottom-[82px] left-3 right-3 z-50 md:hidden">
 
-    <div className="flex items-center justify-between gap-3 px-4 py-2.5">
+    <div className="flex items-center justify-between rounded-2xl border border-white/20 bg-white/90 px-4 py-3 shadow-2xl backdrop-blur-xl">
 
+      {/* LEFT */}
       <div className="min-w-0">
-
-        <p className="text-[10px] uppercase tracking-wide text-gray-500">
-          Current Bid
-        </p>
 
         <div className="flex items-center gap-2">
 
@@ -1566,9 +1563,9 @@ const displayName =
 
         {auction.endAt && (
 
-          <div className="mt-1 flex items-center gap-1">
+          <div className="mt-1 text-sm font-medium text-red-500">
 
-            <span className="text-[11px] text-red-500 font-medium">
+            <span className="mr-1">
               Ends in
             </span>
 
@@ -1584,10 +1581,11 @@ const displayName =
 
       </div>
 
+      {/* RIGHT */}
       <button
         onClick={handleBid}
         disabled={loading}
-        className="shrink-0 rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white shadow-xl transition active:scale-[0.98]"
+        className="shrink-0 rounded-full bg-black px-5 py-3 text-sm font-semibold text-white shadow-lg transition active:scale-[0.98]"
       >
 
         {loading
@@ -1601,6 +1599,7 @@ const displayName =
   </div>
 
 )}
+
     </>
   );
 }
