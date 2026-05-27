@@ -11,7 +11,7 @@ type Auction = {
   title: string;
   currentBid: number | null;
   startingBid: number;
-  images?: string[];
+  images?: any;
   endAt?: string;
   seller?: any;
   category?: string;
