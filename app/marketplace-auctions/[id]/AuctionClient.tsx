@@ -731,7 +731,7 @@ const displayName =
 
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-8 lg:gap-14">
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-14 pb-32">
 
         {/* LEFT */}
         <div>
@@ -1482,7 +1482,46 @@ const displayName =
         </div>
 
       </div>
+{/* MOBILE STICKY BID BAR */}
+{auction.status === "LIVE" && !isSeller && (
 
+  <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur md:hidden">
+
+    <div className="flex items-center justify-between gap-4 px-4 py-4">
+
+      <div>
+
+        <p className="text-xs text-gray-500">
+          Current Bid
+        </p>
+
+        <p className="text-2xl font-bold text-black">
+
+          $
+          {auction.currentBid?.toLocaleString() ||
+            auction.startingBid?.toLocaleString()}
+
+        </p>
+
+      </div>
+
+      <button
+        onClick={handleBid}
+        disabled={loading}
+        className="rounded-full bg-black px-6 py-4 text-sm font-semibold text-white shadow-lg active:scale-[0.98] transition"
+      >
+
+        {loading
+          ? "Placing..."
+          : `Bid $${minimumBid.toLocaleString()}`}
+
+      </button>
+
+    </div>
+
+  </div>
+
+)}
     </>
   );
 }
