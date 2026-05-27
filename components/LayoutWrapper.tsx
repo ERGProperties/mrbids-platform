@@ -13,7 +13,7 @@ export default function LayoutWrapper({
       {/* ================= HEADER ================= */}
       <header className="fixed top-0 inset-x-0 z-50 bg-white border-b border-gray-100">
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
 
           {/* LOGO */}
           <Link href="/" className="flex items-center">
@@ -23,12 +23,12 @@ export default function LayoutWrapper({
               width={160}
               height={40}
               priority
-              className="h-8 w-auto"
+              className="h-6 sm:h-8 w-auto"
             />
           </Link>
 
           {/* NAV */}
-          <nav className="flex items-center gap-4 sm:gap-8">
+          <nav className="flex items-center gap-3 sm:gap-8">
 
             <Link
               href="/live"
@@ -52,11 +52,17 @@ export default function LayoutWrapper({
             </Link>
 
             <Link
-              href="/coming-soon"
-              className="px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
-            >
-              Create an Auction
-            </Link>
+  href="/coming-soon"
+  className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
+>
+  <span className="sm:hidden">
+    Sell
+  </span>
+
+  <span className="hidden sm:inline">
+    Create an Auction
+  </span>
+</Link>
 
           </nav>
 
@@ -65,7 +71,7 @@ export default function LayoutWrapper({
       </header>
 
       {/* ================= MAIN ================= */}
-      <main className="flex-grow pt-[80px]">
+      <main className="flex-grow pt-[64px] sm:pt-[80px]">
         {children}
       </main>
 

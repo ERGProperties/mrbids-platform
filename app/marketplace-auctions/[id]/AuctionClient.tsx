@@ -1485,30 +1485,49 @@ const displayName =
 {/* MOBILE STICKY BID BAR */}
 {auction.status === "LIVE" && !isSeller && (
 
-  <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur md:hidden">
+  <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/20 bg-white/80 backdrop-blur-xl md:hidden">
 
-    <div className="flex items-center justify-between gap-4 px-4 py-4">
+    <div className="flex items-center justify-between gap-4 px-4 py-3">
 
-      <div>
+      <div className="min-w-0">
 
-        <p className="text-xs text-gray-500">
+        <p className="text-[11px] uppercase tracking-wide text-gray-500">
           Current Bid
         </p>
 
-        <p className="text-2xl font-bold text-black">
+        <div className="flex items-center gap-2">
 
-          $
-          {auction.currentBid?.toLocaleString() ||
-            auction.startingBid?.toLocaleString()}
+          <p className="text-2xl font-bold leading-none text-black">
 
-        </p>
+            $
+            {auction.currentBid?.toLocaleString() ||
+              auction.startingBid?.toLocaleString()}
+
+          </p>
+
+          <div className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+
+        </div>
+
+        {auction.endAt && (
+
+          <div className="mt-1 text-xs font-medium text-red-500">
+
+            <CountdownTimer
+              endAt={auction.endAt}
+              onExpire={endAuction}
+            />
+
+          </div>
+
+        )}
 
       </div>
 
       <button
         onClick={handleBid}
         disabled={loading}
-        className="rounded-full bg-black px-6 py-4 text-sm font-semibold text-white shadow-lg active:scale-[0.98] transition"
+        className="shrink-0 rounded-full bg-black px-5 py-3 text-sm font-semibold text-white shadow-xl transition active:scale-[0.98]"
       >
 
         {loading
