@@ -51,6 +51,18 @@ export default function AuctionClient({
     setSelectedImage,
   ] = useState(0);
 
+const [
+  touchStart,
+  setTouchStart,
+] = useState<number | null>(null);
+
+const [
+  touchEnd,
+  setTouchEnd,
+] = useState<number | null>(null);
+
+const minSwipeDistance = 50;
+
   const [
     amount,
     setAmount,
@@ -736,117 +748,160 @@ const displayName =
         {/* LEFT */}
         <div>
 
-          <div className="relative">
+          <div
+  className="relative"
 
-            {auction.images?.length > 0 ? (
+  onTouchStart={(e) =>
+    setTouchStart(
+      e.targetTouches[0].clientX
+    )
+  }
 
-              <img
-                src={
-                  auction.images[
-                    selectedImage
-                  ]
-                }
-                alt={auction.title}
-                className="w-full rounded-3xl border object-cover aspect-square max-h-[70vh]"
-              />
+  onTouchMove={(e) =>
+    setTouchEnd(
+      e.targetTouches[0].clientX
+    )
+  }
 
-            ) : (
+  onTouchEnd={() => {
 
-              <div className="aspect-square rounded-3xl bg-gray-100" />
+    if (
+      !touchStart ||
+      !touchEnd
+    ) return;
 
-            )}
+    const distance =
+      touchStart - touchEnd;
 
-            {auction.images?.length > 1 && (
+    const isLeftSwipe =
+      distance >
+      minSwipeDistance;
 
-              <>
+    const isRightSwipe =
+      distance <
+      -minSwipeDistance;
 
-                <button
-                  onClick={previousImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl transition"
-                >
+    if (isLeftSwipe) {
+      nextImage();
+    }
 
-                  ←
+    if (isRightSwipe) {
+      previousImage();
+    }
 
-                </button>
+  }}
+>
 
-                <button
-                  onClick={nextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl transition"
-                >
+  {auction.images?.length > 0 ? (
 
-                  →
+    <img
+      src={
+        auction.images[
+          selectedImage
+        ]
+      }
+      alt={auction.title}
+      className="w-full rounded-3xl border object-cover aspect-square max-h-[70vh] transition-all duration-300 select-none"
+      draggable={false}
+    />
 
-                </button>
+  ) : (
 
-              </>
+    <div className="aspect-square rounded-3xl bg-gray-100" />
 
-            )}
+  )}
 
-            <div className="absolute top-5 left-5 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur">
+  {auction.images?.length > 1 && (
 
-              👁 {viewerCount} watching
+    <>
 
-            </div>
+      <button
+        onClick={previousImage}
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl transition"
+      >
 
-            <button
-              onClick={
-                toggleWatchlist
-              }
-              disabled={
-                watchlistLoading
-              }
-              className="absolute top-5 right-5 bg-white/90 hover:bg-white transition px-5 py-3 rounded-full shadow-xl text-sm font-semibold"
-            >
+        ←
 
-              {isSaved
-                ? "❤️ Saved"
-                : "🤍 Save"}
+      </button>
 
-            </button>
+      <button
+        onClick={nextImage}
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl transition"
+      >
 
-          </div>
+        →
 
-          {auction.images?.length >
-            1 && (
+      </button>
 
-            <div className="grid grid-cols-5 gap-3 mt-5">
+    </>
 
-              {auction.images.map(
-                (
-                  image: string,
-                  index: number
-                ) => (
+  )}
 
-                  <button
-                    key={index}
-                    onClick={() =>
-                      setSelectedImage(
-                        index
-                      )
-                    }
-                    className={`overflow-hidden rounded-2xl border ${
-                      selectedImage ===
-                      index
-                        ? "border-black"
-                        : "border-gray-200"
-                    }`}
-                  >
+  <div className="absolute top-5 left-5 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur">
 
-                    <img
-                      src={image}
-                      alt=""
-                      className="aspect-square object-cover"
-                    />
+    👁 {viewerCount} watching
 
-                  </button>
+  </div>
 
-                )
-              )}
+  <button
+    onClick={
+      toggleWatchlist
+    }
+    disabled={
+      watchlistLoading
+    }
+    className="absolute top-5 right-5 bg-white/90 hover:bg-white transition px-5 py-3 rounded-full shadow-xl text-sm font-semibold"
+  >
 
-            </div>
+    {isSaved
+      ? "❤️ Saved"
+      : "🤍 Save"}
 
-          )}
+  </button>
 
+</div>
+
+{auction.images?.length >
+  1 && (
+
+  <div className="grid grid-cols-5 gap-3 mt-5">
+
+    {auction.images.map(
+      (
+        image: string,
+        index: number
+      ) => (
+
+        <button
+          key={index}
+          onClick={() =>
+            setSelectedImage(
+              index
+            )
+          }
+          className={`overflow-hidden rounded-2xl border transition ${
+            selectedImage ===
+            index
+              ? "border-black scale-[1.02]"
+              : "border-gray-200"
+          }`}
+        >
+
+          <img
+            src={image}
+            alt=""
+            className="aspect-square object-cover"
+            draggable={false}
+          />
+
+        </button>
+
+      )
+    )}
+
+  </div>
+
+)}
         </div>
 
         {/* RIGHT */}
