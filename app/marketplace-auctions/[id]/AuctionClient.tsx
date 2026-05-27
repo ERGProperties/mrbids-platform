@@ -676,10 +676,21 @@ export default function AuctionClient({
         auction.bids || []
       ).map((bid: any) => {
 
-        const displayName =
-          bid.bidder?.name
-            ?.split(" ")[0] ||
-          "Bidder";
+        const fullName =
+  bid.bidder?.name || "";
+
+const firstName =
+  fullName.split(" ")[0] || "";
+
+const lastInitial =
+  fullName.split(" ")[1]
+    ? `${fullName.split(" ")[1][0]}.`
+    : "";
+
+const displayName =
+  firstName
+    ? `${firstName} ${lastInitial}`.trim()
+    : "Bidder";
 
         return {
           ...bid,
@@ -948,60 +959,6 @@ export default function AuctionClient({
   </div>
 
 </div>
-
-<div className="mt-6 grid grid-cols-2 gap-4">
-
-            {auction.retailPrice && (
-
-              <div className="border rounded-2xl p-5 bg-gray-50">
-
-                <p className="text-sm text-gray-500 mb-2">
-                  Retail Value
-                </p>
-
-                <p className="text-2xl font-bold text-gray-900">
-
-                  $
-                  {auction.retailPrice.toLocaleString()}
-
-                </p>
-
-              </div>
-
-            )}
-
-            <div className="border rounded-2xl p-5 bg-gray-50">
-
-              <p className="text-sm text-gray-500 mb-2">
-                Bid Increment
-              </p>
-
-              <p className="text-2xl font-bold text-gray-900">
-
-                $
-                {auction.bidIncrement.toLocaleString()}
-
-              </p>
-
-            </div>
-
-          </div>
-
-          {auction.description && (
-
-            <div className="mt-8">
-
-              <h2 className="text-xl font-semibold mb-3">
-                Description
-              </h2>
-
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                {auction.description}
-              </p>
-
-            </div>
-
-          )}
 
           <div className="mt-6 grid grid-cols-2 gap-4">
 
