@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import MobileBottomNav from "./MobileBottomNav";
 
 export default function LayoutWrapper({
   children,
@@ -191,6 +192,9 @@ export default function LayoutWrapper({
         </div>
 
       </footer>
+
+      <MobileBottomNav />
+
     </>
   )
 }
