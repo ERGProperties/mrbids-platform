@@ -8,6 +8,8 @@ import { getAllAuctions } from "@/lib/repositories/auctionRepository";
 
 import MarketplaceAuctionCard from "@/components/MarketplaceAuctionCard";
 
+import LiveMarketplaceGrid from "@/components/LiveMarketplaceGrid";
+
 import GoogleAdsConversion from "@/components/GoogleAdsConversion";
 
 const activityFeed = [
@@ -339,28 +341,10 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            {marketplaceAuctions.length === 0 ? (
-              <div className="border rounded-3xl p-16 text-center">
-                <h3 className="text-3xl font-semibold">
-                  No LIVE Auctions Yet
-                </h3>
+            <LiveMarketplaceGrid
+  initialAuctions={marketplaceAuctions}
+/>
 
-                <p className="mt-4 text-gray-600">
-                  Be the first seller to launch a LIVE auction.
-                </p>
-              </div>
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {marketplaceAuctions.map(
-                  (auction) => (
-                    <MarketplaceAuctionCard
-                      key={auction.id}
-                      auction={auction}
-                    />
-                  )
-                )}
-              </div>
-            )}
           </div>
         </section>
 
