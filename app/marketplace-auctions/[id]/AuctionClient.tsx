@@ -1487,7 +1487,7 @@ const displayName =
 
   <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/20 bg-white/80 backdrop-blur-xl md:hidden">
 
-    <div className="flex items-center justify-between gap-4 px-4 py-3">
+    <div className="flex items-center justify-between gap-3 px-4 py-2.5">
 
       <div className="min-w-0">
 
@@ -1511,23 +1511,27 @@ const displayName =
 
         {auction.endAt && (
 
-          <div className="mt-1 text-xs font-medium text-red-500">
+  <div className="mt-1 text-xs font-medium text-red-500 leading-none">
 
-            <CountdownTimer
-              endAt={auction.endAt}
-              onExpire={endAuction}
-            />
+    <span className="opacity-80">
+      Ends in
+    </span>{" "}
 
-          </div>
+    <CountdownTimer
+      endAt={auction.endAt}
+      onExpire={endAuction}
+    />
 
-        )}
+  </div>
+
+)}
 
       </div>
 
       <button
         onClick={handleBid}
         disabled={loading}
-        className="shrink-0 rounded-full bg-black px-5 py-3 text-sm font-semibold text-white shadow-xl transition active:scale-[0.98]"
+        className="shrink-0 rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white shadow-xl transition active:scale-[0.98]"
       >
 
         {loading
