@@ -11,7 +11,7 @@ export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const callbackUrl = searchParams.get("callbackUrl") || "/coming-soon";
+  const callbackUrl = searchParams.get("callbackUrl") || "/auctions";
 
   useEffect(() => {
     if (status === "authenticated") {

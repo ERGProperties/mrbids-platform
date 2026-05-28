@@ -168,7 +168,7 @@ export const authOptions: NextAuthOptions = {
         return url;
       }
 
-      return `${baseUrl}/coming-soon`;
+      return `${baseUrl}/auctions`;
     },
   },
 };
