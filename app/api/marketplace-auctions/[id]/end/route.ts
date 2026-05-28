@@ -21,6 +21,11 @@ export async function POST(
 
   try {
 
+    console.log(
+      "[AUCTION_END_ROUTE_STARTED]",
+      params.id
+    );
+
     const auction =
       await prisma.marketplaceAuction.findUnique({
         where: {
@@ -47,6 +52,11 @@ export async function POST(
 
     if (!auction) {
 
+      console.log(
+        "[AUCTION_NOT_FOUND]",
+        params.id
+      );
+
       return NextResponse.json(
         {
           error:
@@ -65,6 +75,36 @@ export async function POST(
 
     const winningBid =
       auction.bids[0];
+
+    console.log(
+      "[AUCTION_END_DEBUG]",
+      {
+        auctionId:
+          auction.id,
+
+        currentStatus:
+          auction.status,
+
+        alreadyEnded,
+
+        winningBidExists:
+          !!winningBid,
+
+        winningBidAmount:
+          winningBid?.amount,
+
+        bidderId:
+          winningBid?.bidderId,
+
+        bidderEmail:
+          winningBid?.bidder
+            ?.email,
+
+        sellerEmail:
+          auction.seller
+            ?.email,
+      }
+    );
 
     // UPDATE DATABASE
     const updatedAuction =
@@ -115,34 +155,64 @@ export async function POST(
     // ONLY SEND EMAILS FIRST TIME
     if (!alreadyEnded) {
 
+      console.log(
+        "[EMAIL_BLOCK_ENTERED]"
+      );
+
       // SEND WINNER EMAIL
       if (
         winningBid?.bidder
           ?.email
       ) {
 
-        await sendAuctionWonEmail({
-          to:
-            winningBid
-              .bidder.email,
+        console.log(
+          "[SENDING_WINNER_EMAIL]",
+          winningBid.bidder.email
+        );
 
-          address:
-            auction.title,
+        try {
 
-          winningBid:
-            winningBid.amount,
+          await sendAuctionWonEmail({
+            to:
+              winningBid
+                .bidder.email,
 
-          sellerName:
-            auction.seller.name ||
-            "Seller",
+            address:
+              auction.title,
 
-          sellerEmail:
-            auction.seller.email,
+            winningBid:
+              winningBid.amount,
 
-          auctionUrl,
+            sellerName:
+              auction.seller.name ||
+              "Seller",
 
-          coverImage,
-        });
+            sellerEmail:
+              auction.seller.email,
+
+            auctionUrl,
+
+            coverImage,
+          });
+
+          console.log(
+            "[WINNER_EMAIL_SENT]"
+          );
+
+        } catch (emailError) {
+
+          console.error(
+            "[WINNER_EMAIL_ERROR]",
+            emailError
+          );
+
+        }
+
+      } else {
+
+        console.log(
+          "[WINNER_EMAIL_SKIPPED_NO_EMAIL]"
+        );
 
       }
 
@@ -152,31 +222,72 @@ export async function POST(
         winningBid?.bidder
       ) {
 
-        await sendSellerWinnerEmail({
-          to:
-            auction.seller.email,
+        console.log(
+          "[SENDING_SELLER_EMAIL]",
+          auction.seller.email
+        );
 
-          address:
-            auction.title,
+        try {
 
-          winningBid:
-            winningBid.amount,
+          await sendSellerWinnerEmail({
+            to:
+              auction.seller.email,
 
-          buyerName:
-            winningBid.bidder
-              .name ||
-            "Winner",
+            address:
+              auction.title,
 
-          buyerEmail:
-            winningBid.bidder
-              .email,
+            winningBid:
+              winningBid.amount,
 
-          auctionUrl,
+            buyerName:
+              winningBid.bidder
+                .name ||
+              "Winner",
 
-          coverImage,
-        });
+            buyerEmail:
+              winningBid.bidder
+                .email,
+
+            auctionUrl,
+
+            coverImage,
+          });
+
+          console.log(
+            "[SELLER_EMAIL_SENT]"
+          );
+
+        } catch (emailError) {
+
+          console.error(
+            "[SELLER_EMAIL_ERROR]",
+            emailError
+          );
+
+        }
+
+      } else {
+
+        console.log(
+          "[SELLER_EMAIL_SKIPPED]",
+          {
+            sellerEmail:
+              auction.seller
+                ?.email,
+
+            bidderExists:
+              !!winningBid
+                ?.bidder,
+          }
+        );
 
       }
+
+    } else {
+
+      console.log(
+        "[EMAILS_SKIPPED_ALREADY_ENDED]"
+      );
 
     }
 
@@ -194,6 +305,11 @@ export async function POST(
       updatedAuction
     );
 
+    console.log(
+      "[AUCTION_END_COMPLETED]",
+      auction.id
+    );
+
     return NextResponse.json({
       success: true,
       auction:
@@ -202,7 +318,10 @@ export async function POST(
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "[AUCTION_END_ROUTE_ERROR]",
+      error
+    );
 
     return NextResponse.json(
       {
