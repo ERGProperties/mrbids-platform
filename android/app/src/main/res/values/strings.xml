@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MrBids</string>
+    <string name="title_activity_main">MrBids</string>
+    <string name="package_name">com.mrbids.app</string>
+    <string name="custom_url_scheme">com.mrbids.app</string>
+</resources>
