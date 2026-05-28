@@ -183,6 +183,12 @@ export default function LayoutWrapper({
                 </Link>
               </li>
 
+              <li>
+                <Link href="/delete-account" className="hover:underline">
+                  Delete Account
+                </Link>
+              </li>
+
             </ul>
           </div>
 
