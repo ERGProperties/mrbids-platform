@@ -1491,10 +1491,12 @@ const displayName =
                               {isLeading && (
 
                                 <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium animate-pulse">
-                                  Winning
+                                  {auction.status === "ENDED"
+                                    ? "Winner"
+                                    : "Winning"}
                                 </span>
 
-                              )}
+                               )}
 
                             </div>
 
