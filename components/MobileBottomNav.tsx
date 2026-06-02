@@ -27,13 +27,13 @@ export default function MobileBottomNav() {
       icon: Radio,
     },
     {
-      href: "/create-auction",
+      href: "/coming-soon",
       label: "Sell",
       icon: PlusSquare,
       primary: true,
     },
     {
-      href: "/watchlist",
+      href: "/marketplace-auctions",
       label: "Saved",
       icon: Heart,
     },
@@ -54,6 +54,7 @@ export default function MobileBottomNav() {
         right-0
         z-50
         border-t
+        border-gray-200
         bg-white/95
         backdrop-blur-xl
         px-2
@@ -62,7 +63,7 @@ export default function MobileBottomNav() {
       "
     >
 
-      <div className="mx-auto flex max-w-md items-center justify-between py-2">
+      <div className="mx-auto flex max-w-md items-center justify-between py-1.5">
 
         {navItems.map((item) => {
 
@@ -82,9 +83,10 @@ export default function MobileBottomNav() {
                 items-center
                 justify-center
                 gap-1
-                text-xs
+                text-[11px]
                 font-medium
                 transition
+                min-w-[56px]
               "
             >
 
@@ -93,18 +95,20 @@ export default function MobileBottomNav() {
                 <div
                   className="
                     flex
-                    h-14
-                    w-14
+                    h-11
+                    w-11
                     items-center
                     justify-center
-                    rounded-2xl
+                    rounded-xl
                     bg-black
                     text-white
-                    shadow-lg
+                    shadow-md
+                    transition
+                    active:scale-95
                   "
                 >
 
-                  <Icon size={26} />
+                  <Icon size={20} />
 
                 </div>
 
@@ -113,11 +117,11 @@ export default function MobileBottomNav() {
                 <div
                   className={`
                     flex
-                    h-10
-                    w-10
+                    h-9
+                    w-9
                     items-center
                     justify-center
-                    rounded-xl
+                    rounded-lg
                     transition
                     ${
                       isActive
@@ -127,7 +131,7 @@ export default function MobileBottomNav() {
                   `}
                 >
 
-                  <Icon size={22} />
+                  <Icon size={20} />
 
                 </div>
 
