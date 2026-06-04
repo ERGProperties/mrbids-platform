@@ -274,6 +274,7 @@ export default async function HomePage() {
         whitespace-nowrap
         py-5
         px-6
+        animate-pulse
       "
     >
 
