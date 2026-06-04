@@ -260,24 +260,44 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* ACTIVITY FEED */}
-        <section className="border-y bg-black text-white overflow-hidden">
-          <div className="flex gap-12 whitespace-nowrap py-5 px-6 animate-pulse overflow-hidden">
-            {[
-              ...activityFeed,
-              ...activityFeed,
-            ].map(
-              (item, index) => (
-                <div
-                  key={index}
-                  className="text-sm font-medium inline-block"
-                >
-                  🔥 {item}
-                </div>
-              )
-            )}
+{/* ACTIVITY FEED */}
+<section className="border-y bg-black text-white">
+
+  <div className="w-full overflow-x-auto scrollbar-hide">
+
+    <div
+      className="
+        flex
+        min-w-max
+        items-center
+        gap-12
+        whitespace-nowrap
+        py-5
+        px-6
+      "
+    >
+
+      {[
+        ...activityFeed,
+        ...activityFeed,
+      ].map(
+        (item, index) => (
+
+          <div
+            key={index}
+            className="text-sm font-medium inline-block"
+          >
+            🔥 {item}
           </div>
-        </section>
+
+        )
+      )}
+
+    </div>
+
+  </div>
+
+</section>
 
         {/* CATEGORIES */}
         <section className="bg-gray-50 border-b">
