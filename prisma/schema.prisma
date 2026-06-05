@@ -124,8 +124,18 @@ model MarketplaceAuction {
 
   paidAt DateTime?
 
-  shippingCost Int?
-  shippingCarrier String?
+  shippingType String? @default("preset")
+
+  shippingPreset String?
+
+  shippingLabel String?
+
+  shippingCost Int? @default(0)
+
+  localPickup Boolean @default(false)
+
+  freeShipping Boolean @default(false)
+
   shippingPaid Boolean @default(false)
 
   fulfillmentStatus String? @default("PENDING")

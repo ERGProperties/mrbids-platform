@@ -1,3 +1,4 @@
+```ts
 import { NextResponse } from "next/server";
 
 import { getServerSession } from "next-auth";
@@ -10,12 +11,14 @@ export async function POST(
   req: Request
 ) {
   try {
+
     const session =
       await getServerSession(
         authOptions
       );
 
     if (!session?.user?.email) {
+
       return NextResponse.json(
         {
           error:
@@ -25,6 +28,7 @@ export async function POST(
           status: 401,
         }
       );
+
     }
 
     let user =
@@ -36,6 +40,7 @@ export async function POST(
       });
 
     if (!user) {
+
       return NextResponse.json(
         {
           error:
@@ -45,12 +50,14 @@ export async function POST(
           status: 404,
         }
       );
+
     }
 
     // AUTO-CONVERT USER TO MARKETPLACE SELLER
     if (
       !user.isMarketplaceSeller
     ) {
+
       user =
         await prisma.user.update({
           where: {
@@ -62,14 +69,18 @@ export async function POST(
               true,
           },
         });
+
     }
 
     const body =
       await req.json();
 
     const {
+
       title,
+
       description,
+
       category,
 
       retailPrice,
@@ -83,6 +94,20 @@ export async function POST(
       bidIncrement,
 
       durationMinutes,
+
+      // SHIPPING
+      shippingType,
+
+      shippingPreset,
+
+      shippingLabel,
+
+      shippingCost,
+
+      freeShipping,
+
+      localPickup,
+
     } = body;
 
     // VALIDATION
@@ -91,6 +116,7 @@ export async function POST(
       !category ||
       !coverImage
     ) {
+
       return NextResponse.json(
         {
           error:
@@ -100,6 +126,7 @@ export async function POST(
           status: 400,
         }
       );
+
     }
 
     // CREATE AUCTION
@@ -147,7 +174,7 @@ export async function POST(
           sellerId:
             user.id,
 
-          // AUCTION STARTS AS SCHEDULED
+          // AUCTION STATUS
           status:
             "SCHEDULED",
 
@@ -163,6 +190,31 @@ export async function POST(
           durationMinutes:
             Number(
               durationMinutes || 5
+            ),
+
+          // SHIPPING
+          shippingType:
+            shippingType || "preset",
+
+          shippingPreset:
+            shippingPreset || null,
+
+          shippingLabel:
+            shippingLabel || null,
+
+          shippingCost:
+            Number(
+              shippingCost || 0
+            ),
+
+          freeShipping:
+            Boolean(
+              freeShipping
+            ),
+
+          localPickup:
+            Boolean(
+              localPickup
             ),
 
         },
@@ -193,3 +245,4 @@ export async function POST(
 
   }
 }
+```

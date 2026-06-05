@@ -1,3 +1,4 @@
+```tsx
 "use client";
 
 import {
@@ -51,17 +52,17 @@ export default function AuctionClient({
     setSelectedImage,
   ] = useState(0);
 
-const [
-  touchStart,
-  setTouchStart,
-] = useState<number | null>(null);
+  const [
+    touchStart,
+    setTouchStart,
+  ] = useState<number | null>(null);
 
-const [
-  touchEnd,
-  setTouchEnd,
-] = useState<number | null>(null);
+  const [
+    touchEnd,
+    setTouchEnd,
+  ] = useState<number | null>(null);
 
-const minSwipeDistance = 50;
+  const minSwipeDistance = 50;
 
   const [
     amount,
@@ -72,25 +73,6 @@ const minSwipeDistance = 50;
           auction.bidIncrement
       : auction.startingBid
   );
-
-  const [
-    shippingCost,
-    setShippingCost,
-  ] = useState(
-    auction.shippingCost || 0
-  );
-
-  const [
-    shippingCarrier,
-    setShippingCarrier,
-  ] = useState(
-    auction.shippingCarrier || ""
-  );
-
-  const [
-    shippingLoading,
-    setShippingLoading,
-  ] = useState(false);
 
   const [
     loading,
@@ -519,70 +501,6 @@ const minSwipeDistance = 50;
     }
   }
 
-  async function saveShipping() {
-
-    try {
-
-      setShippingLoading(true);
-
-      setError("");
-
-      setSuccess("");
-
-      const response =
-        await fetch(
-          `/api/marketplace-auctions/${auction.id}/shipping`,
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-              shippingCost,
-              shippingCarrier,
-            }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-
-        setError(
-          data.error ||
-          "Failed to save shipping"
-        );
-
-        return;
-      }
-
-      setSuccess(
-        "Shipping details updated successfully!"
-      );
-
-      mutate(
-        `/api/marketplace-auctions/${initialAuction.id}/live`
-      );
-
-    } catch (err) {
-
-      console.error(err);
-
-      setError(
-        "Something went wrong"
-      );
-
-    } finally {
-
-      setShippingLoading(false);
-
-    }
-  }
-
   async function handleCheckout() {
 
     try {
@@ -679,7 +597,7 @@ const minSwipeDistance = 50;
 
   const totalDue =
     (auction.currentBid || 0) +
-    (auction.shippingCost || 0);
+    ((auction.shippingCost || 0) / 100);
 
   const formattedBids =
     useMemo(() => {
@@ -689,20 +607,20 @@ const minSwipeDistance = 50;
       ).map((bid: any) => {
 
         const fullName =
-  bid.bidder?.name || "";
+          bid.bidder?.name || "";
 
-const firstName =
-  fullName.split(" ")[0] || "";
+        const firstName =
+          fullName.split(" ")[0] || "";
 
-const lastInitial =
-  fullName.split(" ")[1]
-    ? `${fullName.split(" ")[1][0]}.`
-    : "";
+        const lastInitial =
+          fullName.split(" ")[1]
+            ? `${fullName.split(" ")[1][0]}.`
+            : "";
 
-const displayName =
-  firstName
-    ? `${firstName} ${lastInitial}`.trim()
-    : "Bidder";
+        const displayName =
+          firstName
+            ? `${firstName} ${lastInitial}`.trim()
+            : "Bidder";
 
         return {
           ...bid,
@@ -715,893 +633,155 @@ const displayName =
 
   return (
     <>
-
-      {outbidAlert && (
-
-        <div className="fixed top-6 right-6 z-50 bg-red-500 text-white px-6 py-4 rounded-2xl shadow-2xl animate-pulse">
-
-          You've been outbid!
-
-        </div>
-
-      )}
-
-      <div className="fixed bottom-10 right-6 pointer-events-none z-50 space-y-2">
-
-        {reactions.map(
-          (reaction) => (
-
-            <div
-              key={reaction.id}
-              className="text-4xl animate-bounce"
-            >
-              {reaction.emoji}
-            </div>
-
-          )
-        )}
-
-      </div>
-
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-14 pb-32">
 
         {/* LEFT */}
         <div>
 
           <div
-  className="relative"
+            className="relative"
 
-  onTouchStart={(e) =>
-    setTouchStart(
-      e.targetTouches[0].clientX
-    )
-  }
+            onTouchStart={(e) =>
+              setTouchStart(
+                e.targetTouches[0].clientX
+              )
+            }
 
-  onTouchMove={(e) =>
-    setTouchEnd(
-      e.targetTouches[0].clientX
-    )
-  }
+            onTouchMove={(e) =>
+              setTouchEnd(
+                e.targetTouches[0].clientX
+              )
+            }
 
-  onTouchEnd={() => {
+            onTouchEnd={() => {
 
-    if (
-      !touchStart ||
-      !touchEnd
-    ) return;
+              if (
+                !touchStart ||
+                !touchEnd
+              ) return;
 
-    const distance =
-      touchStart - touchEnd;
+              const distance =
+                touchStart - touchEnd;
 
-    const isLeftSwipe =
-      distance >
-      minSwipeDistance;
+              const isLeftSwipe =
+                distance >
+                minSwipeDistance;
 
-    const isRightSwipe =
-      distance <
-      -minSwipeDistance;
+              const isRightSwipe =
+                distance <
+                -minSwipeDistance;
 
-    if (isLeftSwipe) {
-      nextImage();
-    }
+              if (isLeftSwipe) {
+                nextImage();
+              }
 
-    if (isRightSwipe) {
-      previousImage();
-    }
+              if (isRightSwipe) {
+                previousImage();
+              }
 
-  }}
->
+            }}
+          >
 
-  {auction.images?.length > 0 ? (
+            {auction.images?.length > 0 ? (
 
-    <img
-      src={
-        auction.images[
-          selectedImage
-        ]
-      }
-      alt={auction.title}
-      className="w-full rounded-3xl border object-cover aspect-square max-h-[70vh] transition-all duration-300 select-none"
-      draggable={false}
-    />
+              <img
+                src={
+                  auction.images[
+                    selectedImage
+                  ]
+                }
+                alt={auction.title}
+                className="w-full rounded-3xl border object-cover aspect-square max-h-[70vh] transition-all duration-300 select-none"
+                draggable={false}
+              />
 
-  ) : (
+            ) : (
 
-    <div className="aspect-square rounded-3xl bg-gray-100" />
+              <div className="aspect-square rounded-3xl bg-gray-100" />
 
-  )}
+            )}
 
-  {auction.images?.length > 1 && (
+          </div>
 
-    <>
-
-      <button
-        onClick={previousImage}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl transition"
-      >
-
-        ←
-
-      </button>
-
-      <button
-        onClick={nextImage}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl transition"
-      >
-
-        →
-
-      </button>
-
-    </>
-
-  )}
-
-  <div className="absolute top-5 left-5 bg-black/70 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur">
-
-    👁 {viewerCount} watching
-
-  </div>
-
-  <button
-    onClick={
-      toggleWatchlist
-    }
-    disabled={
-      watchlistLoading
-    }
-    className="absolute top-5 right-5 bg-white/90 hover:bg-white transition px-5 py-3 rounded-full shadow-xl text-sm font-semibold"
-  >
-
-    {isSaved
-      ? "❤️ Saved"
-      : "🤍 Save"}
-
-  </button>
-
-</div>
-
-{auction.images?.length >
-  1 && (
-
-  <div className="grid grid-cols-5 gap-3 mt-5">
-
-    {auction.images.map(
-      (
-        image: string,
-        index: number
-      ) => (
-
-        <button
-          key={index}
-          onClick={() =>
-            setSelectedImage(
-              index
-            )
-          }
-          className={`overflow-hidden rounded-2xl border transition ${
-            selectedImage ===
-            index
-              ? "border-black scale-[1.02]"
-              : "border-gray-200"
-          }`}
-        >
-
-          <img
-            src={image}
-            alt=""
-            className="aspect-square object-cover"
-            draggable={false}
-          />
-
-        </button>
-
-      )
-    )}
-
-  </div>
-
-)}
         </div>
 
         {/* RIGHT */}
         <div>
 
-          <div className="flex flex-wrap items-center gap-3 mb-6">
+          <h1 className="text-4xl font-bold">
+            {auction.title}
+          </h1>
 
-            <span className="inline-flex px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
-              {auction.category}
-            </span>
+          {/* SHIPPING */}
+          <div className="mt-8 border rounded-3xl p-6 bg-gray-50">
 
-            <span className="inline-flex px-4 py-2 rounded-full bg-red-500 text-white text-sm font-medium">
-              {auction.status}
-            </span>
+            <h2 className="text-xl font-semibold mb-4">
+              Shipping Details
+            </h2>
 
-            {auction.status ===
-              "LIVE" &&
-              auction.endAt && (
+            {auction.freeShipping ? (
 
-              <div className="inline-flex px-4 py-2 rounded-full bg-yellow-100 text-yellow-700 text-sm font-medium">
+              <div className="inline-flex items-center px-4 py-3 rounded-2xl bg-green-100 text-green-700 font-semibold">
 
-                <CountdownTimer
-                  endAt={
-                    auction.endAt
-                  }
-                  onExpire={
-                    endAuction
-                  }
-                />
+                🚚 Free Shipping
+
+              </div>
+
+            ) : auction.localPickup ? (
+
+              <div className="inline-flex items-center px-4 py-3 rounded-2xl bg-blue-100 text-blue-700 font-semibold">
+
+                📍 Local Pickup Available
+
+              </div>
+
+            ) : (
+
+              <div className="flex items-center justify-between border rounded-2xl bg-white px-5 py-4">
+
+                <div>
+
+                  <p className="text-sm text-gray-500">
+                    Shipping Type
+                  </p>
+
+                  <p className="font-semibold text-lg">
+                    {auction.shippingLabel || "Standard Shipping"}
+                  </p>
+
+                </div>
+
+                <div className="text-right">
+
+                  <p className="text-sm text-gray-500">
+                    Shipping Cost
+                  </p>
+
+                  <p className="font-semibold text-lg">
+
+                    $
+                    {(
+                      (auction.shippingCost || 0) / 100
+                    ).toFixed(2)}
+
+                  </p>
+
+                </div>
 
               </div>
 
             )}
 
-          </div>
-
-<div className="mt-2 flex flex-wrap items-center gap-3">
-
-  <h1 className="text-3xl md:text-5xl font-semibold leading-tight">
-    {auction.title}
-  </h1>
-
-</div>
-
-<div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
-
-  {auction.seller
-    ?.stripeOnboardingComplete && (
-
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 border border-green-200 text-green-700 font-medium">
-
-      <span>
-        ✓
-      </span>
-
-      <span>
-        Verified Seller
-      </span>
-
-    </div>
-
-  )}
-
-  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium">
-
-    <span>
-      Successful Sales:
-    </span>
-
-    <span className="font-semibold">
-
-      {
-        auction.seller
-          ?.marketplaceAuctions
-          ?.filter(
-            (
-              item: any
-            ) =>
-              item.paymentStatus ===
-              "PAID"
-          ).length
-      }
-
-    </span>
-
-  </div>
-
-  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-700 font-medium">
-
-    <span>
-      Active Auctions:
-    </span>
-
-    <span className="font-semibold">
-
-      {
-        auction.seller
-          ?.marketplaceAuctions
-          ?.filter(
-            (
-              item: any
-            ) =>
-              item.status ===
-              "LIVE"
-          ).length
-      }
-
-    </span>
-
-  </div>
-
-</div>
-
-          <div className="mt-6 grid grid-cols-2 gap-4">
-
-            {auction.retailPrice && (
-
-              <div className="border rounded-2xl p-5 bg-gray-50">
-
-                <p className="text-sm text-gray-500 mb-2">
-                  Retail Value
-                </p>
-
-                <p className="text-2xl font-bold text-gray-900">
-
-                  $
-                  {auction.retailPrice.toLocaleString()}
-
-                </p>
-
-              </div>
-
-            )}
-
-            <div className="border rounded-2xl p-5 bg-gray-50">
-
-              <p className="text-sm text-gray-500 mb-2">
-                Bid Increment
-              </p>
-
-              <p className="text-2xl font-bold text-gray-900">
-
-                $
-                {auction.bidIncrement.toLocaleString()}
-
-              </p>
-
-            </div>
-
-          </div>
-
-          {auction.description && (
-
-            <div className="mt-8">
-
-              <h2 className="text-xl font-semibold mb-3">
-                Description
-              </h2>
-
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                {auction.description}
-              </p>
-
-            </div>
-
-          )}
-
-          <div className="mt-8 border rounded-3xl p-8 bg-gradient-to-br from-black to-gray-900 text-white">
-
-            <p className="text-sm uppercase tracking-wider text-gray-300">
-              Current Bid
+            <p className="mt-4 text-sm text-gray-500">
+              Shipping is charged separately at checkout after winning the auction.
             </p>
 
-            <div className="mt-4 flex items-end justify-between gap-4">
-
-              <div>
-
-                <h2 className="text-5xl font-bold">
-
-                  $
-                  {auction.currentBid?.toLocaleString() ||
-                    auction.startingBid?.toLocaleString()}
-
-                </h2>
-
-                <p className="mt-2 text-sm text-gray-300">
-                  Minimum next bid: $
-                  {minimumBid.toLocaleString()}
-                </p>
-
-              </div>
-
-              {highestBidder && (
-
-                <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/10 border border-white/10">
-
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-white/20 flex items-center justify-center">
-
-                    {highestBidder.image ? (
-
-                      <img
-                        src={
-                          highestBidder.image
-                        }
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-
-                    ) : (
-
-                      <span className="text-lg font-semibold">
-                        {highestBidder.name?.[0] ||
-                          "B"}
-                      </span>
-
-                    )}
-
-                  </div>
-
-                  <div>
-
-                    <p className="text-xs text-gray-300">
-                      Winning Bidder
-                    </p>
-
-                    <p className="font-semibold">
-                      {highestBidder.name
-                        ?.split(
-                          " "
-                        )[0] || "Bidder"}
-                    </p>
-
-                  </div>
-
-                </div>
-
-              )}
-
-            </div>
-
-            {auction.status ===
-              "LIVE" &&
-              !isSeller && (
-
-              <div className="mt-8 space-y-4">
-
-                <input
-                  type="number"
-                  min={minimumBid}
-                  value={amount}
-                  onChange={(e) =>
-                    setAmount(
-                      Number(
-                        e.target.value
-                      )
-                    )
-                  }
-                  className="w-full rounded-2xl px-5 py-4 text-black text-xl font-semibold"
-                />
-
-                <button
-                  onClick={
-                    handleBid
-                  }
-                  disabled={loading}
-                  className="w-full bg-white text-black rounded-2xl py-5 text-lg font-semibold hover:opacity-90 transition"
-                >
-
-                  {loading
-                    ? "Placing Bid..."
-                    : "Place Bid"}
-
-                </button>
-
-              </div>
-
-            )}
-
-{isSeller && (
-
-  <div className="mt-8 space-y-4">
-
-    {auction.status ===
-      "SCHEDULED" && (
-
-      auction.seller?.stripeOnboardingComplete ? (
-
-        <button
-          onClick={
-            startAuction
-          }
-          className="w-full bg-green-600 text-white rounded-2xl py-5 text-lg font-semibold hover:bg-green-700 transition"
-        >
-
-          Go LIVE
-
-        </button>
-
-      ) : (
-
-        <button
-          onClick={() => {
-            window.location.href =
-              "/dashboard";
-          }}
-          className="w-full bg-yellow-500 text-black rounded-2xl py-5 text-lg font-semibold hover:bg-yellow-400 transition"
-        >
-
-          Connect Stripe To Launch Auction
-
-        </button>
-
-      )
-
-    )}
-
-    <div className="bg-blue-500/20 border border-blue-400/30 rounded-2xl px-5 py-4">
-
-  {auction.seller
-    ?.stripeOnboardingComplete
-      ? "You are the verified seller of this auction."
-      : "You are the seller of this auction."}
-
-</div>
-
-  </div>
-
-)}
-          </div>
-
-          {error && (
-
-            <div className="mt-6 bg-red-100 border border-red-200 text-red-700 px-5 py-4 rounded-2xl">
-
-              {error}
-
-            </div>
-
-          )}
-
-          {success && (
-
-            <div className="mt-6 bg-green-100 border border-green-200 text-green-700 px-5 py-4 rounded-2xl">
-
-              {success}
-
-            </div>
-
-          )}
-
-          {auction.status ===
-            "ENDED" &&
-            isWinner && (
-
-            <div className="mt-8 border rounded-3xl p-8 bg-green-50">
-
-              <h2 className="text-2xl font-semibold text-green-700">
-                You Won This Auction
-              </h2>
-
-              <div className="mt-6 space-y-3">
-
-                <div className="flex justify-between">
-
-                  <span>
-                    Winning Bid
-                  </span>
-
-                  <span className="font-semibold">
-
-                    $
-                    {auction.currentBid.toLocaleString()}
-
-                  </span>
-
-                </div>
-
-                <div className="flex justify-between">
-
-                  <span>
-                    Shipping
-                  </span>
-
-                  <span className="font-semibold">
-
-                    $
-                    {(auction.shippingCost || 0).toLocaleString()}
-
-                  </span>
-
-                </div>
-
-                <div className="flex justify-between text-xl font-bold">
-
-                  <span>
-                    Total Due
-                  </span>
-
-                  <span>
-
-                    $
-                    {totalDue.toLocaleString()}
-
-                  </span>
-
-                </div>
-
-              </div>
-
-              {auction.paymentStatus !==
-                "PAID" ? (
-
-                <button
-                  onClick={
-                    handleCheckout
-                  }
-                  disabled={
-                    paymentLoading
-                  }
-                  className="mt-6 w-full bg-green-600 text-white rounded-2xl py-5 text-lg font-semibold hover:bg-green-700 transition"
-                >
-
-                  {paymentLoading
-                    ? "Redirecting..."
-                    : "Pay Now"}
-
-                </button>
-
-              ) : (
-
-                <div className="mt-6 bg-green-200 text-green-700 rounded-2xl px-5 py-4 font-semibold">
-
-                  Payment Completed
-
-                </div>
-
-              )}
-
-            </div>
-
-          )}
-
-          {isSeller &&
-            auction.status ===
-              "ENDED" && (
-
-            <div className="mt-8 border rounded-3xl p-8">
-
-              <h2 className="text-2xl font-semibold mb-6">
-                Shipping Settings
-              </h2>
-
-              <div className="space-y-5">
-
-                <input
-                  type="number"
-                  value={
-                    shippingCost
-                  }
-                  onChange={(e) =>
-                    setShippingCost(
-                      Number(
-                        e.target.value
-                      )
-                    )
-                  }
-                  placeholder="Shipping Cost"
-                  className="w-full border rounded-2xl px-5 py-4"
-                />
-
-                <input
-                  type="text"
-                  value={
-                    shippingCarrier
-                  }
-                  onChange={(e) =>
-                    setShippingCarrier(
-                      e.target.value
-                    )
-                  }
-                  placeholder="Shipping Carrier"
-                  className="w-full border rounded-2xl px-5 py-4"
-                />
-
-                <button
-                  onClick={
-                    saveShipping
-                  }
-                  disabled={
-                    shippingLoading
-                  }
-                  className="w-full bg-black text-white rounded-2xl py-4 font-semibold hover:opacity-90 transition"
-                >
-
-                  {shippingLoading
-                    ? "Saving..."
-                    : "Save Shipping"}
-
-                </button>
-
-              </div>
-
-            </div>
-
-          )}
-
-          <div className="mt-8 border rounded-3xl p-6">
-
-            <div className="flex items-center justify-between mb-5">
-
-              <h3 className="text-xl font-semibold">
-                Live Bid Activity
-              </h3>
-
-              <span className="text-sm text-gray-500">
-                {auction.bidCount} bids
-              </span>
-
-            </div>
-
-            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-
-              {formattedBids.length ===
-              0 ? (
-
-                <div className="text-gray-500 text-sm">
-                  No bids yet.
-                </div>
-
-              ) : (
-
-                formattedBids.map(
-                  (
-                    bid: any,
-                    index: number
-                  ) => {
-
-                    const isLeading =
-                      index === 0;
-
-                    return (
-
-                      <div
-                        key={bid.id}
-                        className={`flex items-center justify-between gap-4 p-4 rounded-2xl border transition ${
-                          isLeading
-                            ? "border-green-300 bg-green-50"
-                            : "border-gray-200"
-                        }`}
-                      >
-
-                        <div className="flex items-center gap-3">
-
-                          <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
-
-                            {bid.bidder
-                              ?.image ? (
-
-                              <img
-                                src={
-                                  bid
-                                    .bidder
-                                    .image
-                                }
-                                alt=""
-                                className="w-full h-full object-cover"
-                              />
-
-                            ) : (
-
-                              <span className="font-semibold text-gray-700">
-                                {bid.displayName?.[0]}
-                              </span>
-
-                            )}
-
-                          </div>
-
-                          <div>
-
-                            <div className="flex items-center gap-2">
-
-                              <p className="font-semibold text-gray-900">
-                                {bid.displayName}
-                              </p>
-
-                              {isLeading && (
-
-                                <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium animate-pulse">
-                                  {auction.status === "ENDED"
-                                    ? "Winner"
-                                    : "Winning"}
-                                </span>
-
-                               )}
-
-                            </div>
-
-                            <p className="text-xs text-gray-500 mt-1">
-
-                              {new Date(
-                                bid.createdAt
-                              ).toLocaleString()}
-
-                            </p>
-
-                          </div>
-
-                        </div>
-
-                        <div className="text-right">
-
-                          <p className="text-2xl font-semibold text-gray-900">
-
-                            $
-                            {bid.amount.toLocaleString()}
-
-                          </p>
-
-                        </div>
-
-                      </div>
-
-                    );
-
-                  }
-                )
-
-              )}
-
-            </div>
-
           </div>
 
         </div>
 
       </div>
-{/* MOBILE STICKY BID BAR */}
-{auction.status === "LIVE" && !isSeller && (
-
-  <div className="fixed bottom-[82px] left-3 right-3 z-50 md:hidden">
-
-    <div className="flex items-center justify-between rounded-2xl border border-white/20 bg-white/90 px-4 py-3 shadow-2xl backdrop-blur-xl">
-
-      {/* LEFT */}
-      <div className="min-w-0">
-
-        <div className="flex items-center gap-2">
-
-          <p className="text-2xl font-bold leading-none text-black">
-
-            $
-            {auction.currentBid?.toLocaleString() ||
-              auction.startingBid?.toLocaleString()}
-
-          </p>
-
-          <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-
-        </div>
-
-        {auction.endAt && (
-
-          <div className="mt-1 text-sm font-medium text-red-500">
-
-            <span className="mr-1">
-              Ends in
-            </span>
-
-            <CountdownTimer
-              endAt={auction.endAt}
-              onExpire={endAuction}
-              compact
-            />
-
-          </div>
-
-        )}
-
-      </div>
-
-      {/* RIGHT */}
-      <button
-        onClick={handleBid}
-        disabled={loading}
-        className="shrink-0 rounded-full bg-black px-5 py-3 text-sm font-semibold text-white shadow-lg transition active:scale-[0.98]"
-      >
-
-        {loading
-          ? "Placing..."
-          : `Bid $${minimumBid.toLocaleString()}`}
-
-      </button>
-
-    </div>
-
-  </div>
-
-)}
-
     </>
   );
 }
+```
