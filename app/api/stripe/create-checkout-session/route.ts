@@ -221,8 +221,8 @@ export async function POST(
                   "Shipping",
 
                 description:
-                  auction.shippingCarrier
-                    ? `Shipping via ${auction.shippingCarrier}`
+                  auction.shippingLabel 
+                    ? `${auction.shippingLabel} shipping` 
                     : "Marketplace shipping charge",
               },
 
