@@ -114,10 +114,6 @@ export async function POST(
             Number(
               shippingCost
             ),
-
-          shippingCarrier:
-            shippingCarrier ||
-            null,
         },
       });
 
