@@ -4,6 +4,28 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+const SHIPPING_PRESETS = {
+  small: {
+    label: "Small Item",
+    cost: 699,
+  },
+
+  medium: {
+    label: "Medium Item",
+    cost: 1299,
+  },
+
+  large: {
+    label: "Large Item",
+    cost: 2499,
+  },
+
+  xl: {
+    label: "XL Item",
+    cost: 4999,
+  },
+};
+
 export default function MarketplaceSellPage() {
 
   const router =
@@ -35,6 +57,18 @@ export default function MarketplaceSellPage() {
       coverImage: "",
 
       images: [] as string[],
+
+      shippingType: "preset",
+
+      shippingPreset: "small",
+
+      shippingLabel: "Small Item",
+
+      shippingCost: 699,
+
+      freeShipping: false,
+
+      localPickup: false,
     });
 
   // CLOUDINARY UPLOAD
@@ -50,14 +84,12 @@ export default function MarketplaceSellPage() {
       file
     );
 
-    // RESTORED WORKING PRESET
     formData.append(
       "upload_preset",
       "mrbids_upload"
     );
 
     const res = await fetch(
-      // RESTORED WORKING CLOUD NAME
       "https://api.cloudinary.com/v1_1/dx1okt4vf/image/upload",
       {
         method: "POST",
@@ -483,6 +515,145 @@ export default function MarketplaceSellPage() {
               }
               className="w-full border rounded-2xl px-5 py-4"
             />
+
+          </div>
+
+          {/* SHIPPING */}
+          <div>
+
+            <label className="block text-sm font-medium mb-3">
+              Shipping Option
+            </label>
+
+            <select
+              value={
+                form.freeShipping
+                  ? "free"
+                  : form.localPickup
+                  ? "pickup"
+                  : form.shippingPreset
+              }
+              onChange={(e) => {
+
+                const value =
+                  e.target.value;
+
+                if (
+                  value === "free"
+                ) {
+
+                  setForm({
+                    ...form,
+
+                    freeShipping:
+                      true,
+
+                    localPickup:
+                      false,
+
+                    shippingType:
+                      "free",
+
+                    shippingPreset:
+                      null,
+
+                    shippingLabel:
+                      "Free Shipping",
+
+                    shippingCost: 0,
+                  });
+
+                  return;
+                }
+
+                if (
+                  value === "pickup"
+                ) {
+
+                  setForm({
+                    ...form,
+
+                    freeShipping:
+                      false,
+
+                    localPickup:
+                      true,
+
+                    shippingType:
+                      "pickup",
+
+                    shippingPreset:
+                      null,
+
+                    shippingLabel:
+                      "Local Pickup",
+
+                    shippingCost: 0,
+                  });
+
+                  return;
+                }
+
+                const preset =
+                  SHIPPING_PRESETS[
+                    value as keyof typeof SHIPPING_PRESETS
+                  ];
+
+                setForm({
+                  ...form,
+
+                  freeShipping:
+                    false,
+
+                  localPickup:
+                    false,
+
+                  shippingType:
+                    "preset",
+
+                  shippingPreset:
+                    value,
+
+                  shippingLabel:
+                    preset.label,
+
+                  shippingCost:
+                    preset.cost,
+                });
+
+              }}
+              className="w-full border rounded-2xl px-5 py-4"
+            >
+
+              <option value="small">
+                Small Item ($6.99)
+              </option>
+
+              <option value="medium">
+                Medium Item ($12.99)
+              </option>
+
+              <option value="large">
+                Large Item ($24.99)
+              </option>
+
+              <option value="xl">
+                XL Item ($49.99)
+              </option>
+
+              <option value="free">
+                Free Shipping
+              </option>
+
+              <option value="pickup">
+                Local Pickup
+              </option>
+
+            </select>
+
+            <p className="mt-3 text-sm text-gray-500">
+              Shipping will be shown to buyers before bidding.
+            </p>
 
           </div>
 
