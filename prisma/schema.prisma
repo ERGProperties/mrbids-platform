@@ -23,6 +23,7 @@ enum MarketplaceAuctionStatus {
   SCHEDULED
   LIVE
   ENDED
+  RESERVE_NOT_MET
 }
 
 enum ServiceFeeStatus {
@@ -107,6 +108,8 @@ model MarketplaceAuction {
 
   startingBid   Int
   bidIncrement  Int @default(1)
+
+  reservePrice  Int?
 
   currentBid    Int @default(0)
   bidCount      Int @default(0)

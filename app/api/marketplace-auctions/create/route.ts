@@ -90,6 +90,8 @@ export async function POST(
 
       startingBid,
 
+      reservePrice,
+
       bidIncrement,
 
       durationMinutes,
@@ -159,6 +161,13 @@ export async function POST(
             Number(
               startingBid
             ),
+
+          reservePrice:
+            reservePrice
+              ? Number(
+                  reservePrice
+                )
+              : null,
 
           bidIncrement:
             Number(

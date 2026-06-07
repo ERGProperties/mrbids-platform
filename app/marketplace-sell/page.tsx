@@ -50,6 +50,8 @@ export default function MarketplaceSellPage() {
 
       startingBid: 1,
 
+      reservePrice: "",
+
       bidIncrement: 1,
 
       durationMinutes: 5,
@@ -143,6 +145,14 @@ export default function MarketplaceSellPage() {
                     form.retailPrice
                   )
                 : null,
+
+            reservePrice:
+              form.reservePrice
+                ? Number(
+                    form.reservePrice
+                  )
+                : null,
+
           }),
         }
       );
@@ -489,6 +499,34 @@ export default function MarketplaceSellPage() {
               }
               className="w-full border rounded-2xl px-5 py-4"
             />
+
+          </div>
+
+          {/* RESERVE PRICE */}
+          <div>
+
+            <label className="block text-sm font-medium mb-3">
+              Reserve Price (Optional)
+            </label>
+
+            <input
+              type="number"
+              min={1}
+              value={form.reservePrice}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  reservePrice:
+                    e.target.value,
+                })
+              }
+              className="w-full border rounded-2xl px-5 py-4"
+              placeholder="Hidden minimum selling price"
+            />
+
+            <p className="mt-2 text-sm text-gray-500">
+              If bidding does not reach this amount, the item will not sell.
+            </p>
 
           </div>
 
