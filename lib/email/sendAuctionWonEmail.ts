@@ -4,19 +4,46 @@ export async function sendAuctionWonEmail({
   to,
   address,
   winningBid,
+
   sellerName,
   sellerEmail,
+
   auctionUrl,
+
   coverImage,
+
+  shippingCost,
+  shippingLabel,
+
+  freeShipping,
+  localPickup,
+
 }: {
   to: string;
+
   address: string;
+
   winningBid: number;
+
   sellerName: string;
   sellerEmail: string;
+
   auctionUrl: string;
+
   coverImage?: string;
+
+  shippingCost?: number;
+  shippingLabel?: string;
+
+  freeShipping?: boolean;
+  localPickup?: boolean;
 }) {
+
+  const shippingAmount =
+    (shippingCost || 0) / 100;
+
+  const totalDue =
+    winningBid + shippingAmount;
 
   const html = `
   <div style="margin:0; padding:0; background:#f4f4f5; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
@@ -78,9 +105,77 @@ export async function sendAuctionWonEmail({
                   ${address}
                 </p>
 
-                <p style="font-size:16px; font-weight:600;">
-                  Winning bid: $${winningBid.toLocaleString()}
-                </p>
+                <!-- PAYMENT SUMMARY -->
+                <div style="margin:28px 0; padding:22px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px;">
+
+                  <p style="margin:0 0 14px; font-size:18px; font-weight:700;">
+                    Payment Summary
+                  </p>
+
+                  <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-size:15px; color:#555;">
+                      Winning Bid
+                    </span>
+
+                    <span style="font-size:15px; font-weight:600;">
+                      $${winningBid.toLocaleString()}
+                    </span>
+                  </div>
+
+                  ${
+                    freeShipping
+                      ? `
+                  <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-size:15px; color:#555;">
+                      Shipping
+                    </span>
+
+                    <span style="font-size:15px; font-weight:600; color:#16a34a;">
+                      Free
+                    </span>
+                  </div>
+                  `
+                      : localPickup
+                      ? `
+                  <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-size:15px; color:#555;">
+                      Delivery
+                    </span>
+
+                    <span style="font-size:15px; font-weight:600; color:#2563eb;">
+                      Local Pickup
+                    </span>
+                  </div>
+                  `
+                      : `
+                  <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span style="font-size:15px; color:#555;">
+                      ${
+                        shippingLabel ||
+                        "Shipping"
+                      }
+                    </span>
+
+                    <span style="font-size:15px; font-weight:600;">
+                      $${shippingAmount.toFixed(2)}
+                    </span>
+                  </div>
+                  `
+                  }
+
+                  <hr style="margin:18px 0; border:none; border-top:1px solid #e5e7eb;" />
+
+                  <div style="display:flex; justify-content:space-between;">
+                    <span style="font-size:18px; font-weight:700;">
+                      Total Due
+                    </span>
+
+                    <span style="font-size:18px; font-weight:700;">
+                      $${totalDue.toLocaleString()}
+                    </span>
+                  </div>
+
+                </div>
 
                 <!-- PAYMENT CTA -->
                 <div style="margin:34px 0; padding:24px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:12px; text-align:center;">
@@ -132,20 +227,23 @@ export async function sendAuctionWonEmail({
                 </p>
 
                 <div style="margin:20px 0; padding:16px; background:#f9f9f9; border-radius:8px;">
+
                   <p style="margin:0; font-size:14px;">
                     <strong>Seller:</strong> ${sellerName}
                   </p>
 
                   <p style="margin:6px 0 0; font-size:14px;">
                     <strong>Email:</strong>
+
                     <a href="mailto:${sellerEmail}">
                       ${sellerEmail}
                     </a>
                   </p>
+
                 </div>
 
                 <p style="font-size:13px; color:#777;">
-                  Once payment is completed, coordinate directly with the seller regarding delivery, pickup, or transaction details.
+                  Once payment is completed, coordinate directly with the seller regarding shipping, delivery, pickup, or transaction details.
                 </p>
 
               </td>
@@ -177,8 +275,12 @@ export async function sendAuctionWonEmail({
 
   await resend.emails.send({
     from: EMAIL_FROM,
+
     to,
-    subject: "🎉 You won the auction — Complete Payment",
+
+    subject:
+      "🎉 You won the auction — Complete Payment",
+
     html,
   });
 
