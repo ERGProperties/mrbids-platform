@@ -114,6 +114,12 @@ export default async function MarketplaceAuctionsPage({
           </div>
         </div>
 
+            {auction.status === "RESERVE_NOT_MET" && (
+              <span className="px-3 py-1 rounded-full bg-orange-500 text-white text-xs font-semibold">
+                RESERVE NOT MET
+              </span>
+            )}
+
         {/* CONTENT */}
         <div className="p-5 md:p-6">
           {/* CATEGORY */}
