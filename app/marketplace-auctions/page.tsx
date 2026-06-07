@@ -13,21 +13,6 @@ export default async function MarketplaceAuctionsPage({
 }) {
   const category = searchParams.category;
 
-  // AUTO-END EXPIRED LIVE AUCTIONS
-  await prisma.marketplaceAuction.updateMany({
-    where: {
-      status: "LIVE",
-
-      endAt: {
-        lte: new Date(),
-      },
-    },
-
-    data: {
-      status: "ENDED",
-    },
-  });
-
   // LIVE AUCTIONS
   const liveAuctions =
     await prisma.marketplaceAuction.findMany({
