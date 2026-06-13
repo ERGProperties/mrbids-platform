@@ -1,3 +1,4 @@
+```ts id="njp1kp"
 import { NextResponse } from "next/server";
 
 import { getServerSession } from "next-auth";
@@ -130,6 +131,22 @@ export async function POST(
 
     }
 
+    const duration =
+      Number(
+        durationMinutes || 5
+      );
+
+    const now =
+      new Date();
+
+    const endDate =
+      new Date(
+        Date.now() +
+        duration *
+          60 *
+          1000
+      );
+
     // CREATE AUCTION
     const auction =
       await prisma.marketplaceAuction.create({
@@ -182,23 +199,19 @@ export async function POST(
           sellerId:
             user.id,
 
-          // AUCTION STATUS
+          // AUTO-START LIVE
           status:
-            "SCHEDULED",
+            "LIVE",
 
-          // STARTS WHEN SELLER CLICKS LIVE
           startAt:
-            null,
+            now,
 
-          // SET WHEN LIVE STARTS
           endAt:
-            null,
+            endDate,
 
           // STORE DURATION
           durationMinutes:
-            Number(
-              durationMinutes || 5
-            ),
+            duration,
 
           // SHIPPING
           shippingType:
@@ -253,3 +266,4 @@ export async function POST(
 
   }
 }
+```
