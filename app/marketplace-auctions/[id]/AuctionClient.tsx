@@ -52,18 +52,6 @@ export default function AuctionClient({
   ] = useState(0);
 
   const [
-    touchStart,
-    setTouchStart,
-  ] = useState<number | null>(null);
-
-  const [
-    touchEnd,
-    setTouchEnd,
-  ] = useState<number | null>(null);
-
-  const minSwipeDistance = 50;
-
-  const [
     amount,
     setAmount,
   ] = useState(
@@ -102,21 +90,6 @@ export default function AuctionClient({
     success,
     setSuccess,
   ] = useState("");
-
-  const [
-    viewerCount,
-    setViewerCount,
-  ] = useState(0);
-
-  const [
-    reactions,
-    setReactions,
-  ] = useState<any[]>([]);
-
-  const [
-    outbidAlert,
-    setOutbidAlert,
-  ] = useState(false);
 
   const previousHighestBidder =
     useRef<string | null>(null);
@@ -176,29 +149,10 @@ export default function AuctionClient({
       "new-bid",
       (updatedAuction: any) => {
 
-        const newHighestBidder =
+        previousHighestBidder.current =
           updatedAuction
             ?.bids?.[0]
-            ?.bidderId;
-
-        if (
-          previousHighestBidder
-            .current ===
-            session?.user?.id &&
-          newHighestBidder !==
-            session?.user?.id
-        ) {
-
-          setOutbidAlert(true);
-
-          setTimeout(() => {
-            setOutbidAlert(false);
-          }, 5000);
-
-        }
-
-        previousHighestBidder.current =
-          newHighestBidder;
+            ?.bidderId || null;
 
         mutate(
           `/api/marketplace-auctions/${initialAuction.id}/live`,
@@ -222,53 +176,6 @@ export default function AuctionClient({
       }
     );
 
-    channel.bind(
-      "auction-updated",
-      (updatedAuction: any) => {
-
-        mutate(
-          `/api/marketplace-auctions/${initialAuction.id}/live`,
-          updatedAuction,
-          false
-        );
-
-      }
-    );
-
-    channel.bind(
-      "pusher:subscription_succeeded",
-      (members: any) => {
-
-        setViewerCount(
-          members.count
-        );
-
-      }
-    );
-
-    channel.bind(
-      "pusher:member_added",
-      () => {
-
-        setViewerCount(
-          (prev) => prev + 1
-        );
-
-      }
-    );
-
-    channel.bind(
-      "pusher:member_removed",
-      () => {
-
-        setViewerCount(
-          (prev) =>
-            Math.max(prev - 1, 0)
-        );
-
-      }
-    );
-
     return () => {
 
       channel.unbind_all();
@@ -281,7 +188,6 @@ export default function AuctionClient({
 
   }, [
     initialAuction.id,
-    session?.user?.id,
   ]);
 
   useEffect(() => {
@@ -295,90 +201,11 @@ export default function AuctionClient({
         : auction.startingBid
     );
 
-    previousHighestBidder.current =
-      auction.bids?.[0]
-        ?.bidderId || null;
-
   }, [
     auction.currentBid,
     auction.bidIncrement,
     auction.startingBid,
-    auction.bids,
   ]);
-
-  function nextImage() {
-
-    if (!auction.images?.length) {
-      return;
-    }
-
-    setSelectedImage(
-      (prev) =>
-        prev ===
-        auction.images.length - 1
-          ? 0
-          : prev + 1
-    );
-
-  }
-
-  function previousImage() {
-
-    if (!auction.images?.length) {
-      return;
-    }
-
-    setSelectedImage(
-      (prev) =>
-        prev === 0
-          ? auction.images.length - 1
-          : prev - 1
-    );
-
-  }
-
-  async function startAuction() {
-
-    try {
-
-      setError("");
-
-      const response =
-        await fetch(
-          `/api/marketplace-auctions/${auction.id}/start`,
-          {
-            method: "POST",
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-
-        setError(
-          data.error ||
-          "Failed to start auction"
-        );
-
-        return;
-      }
-
-      mutate(
-        `/api/marketplace-auctions/${initialAuction.id}/live`
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      setError(
-        "Failed to start auction"
-      );
-
-    }
-
-  }
 
   async function toggleWatchlist() {
 
@@ -558,25 +385,6 @@ export default function AuctionClient({
     }
   }
 
-  async function endAuction() {
-
-    try {
-
-      await fetch(
-        `/api/marketplace-auctions/${auction.id}/end`,
-        {
-          method: "POST",
-        }
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-    }
-
-  }
-
   const minimumBid =
     auction.currentBid > 0
       ? auction.currentBid +
@@ -585,9 +393,6 @@ export default function AuctionClient({
 
   const highestBidderId =
     auction.bids?.[0]?.bidderId;
-
-  const highestBidder =
-    auction.bids?.[0]?.bidder;
 
   const isWinner =
     auction.status === "ENDED" &&
@@ -631,155 +436,459 @@ export default function AuctionClient({
     }, [auction.bids]);
 
   return (
-    <>
-      <div className="grid lg:grid-cols-2 gap-8 lg:gap-14 pb-32">
+    <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 pb-32">
 
-        {/* LEFT */}
-        <div>
+      {/* LEFT */}
+      <div>
 
-          <div
-            className="relative"
+        {auction.images?.length > 0 ? (
 
-            onTouchStart={(e) =>
-              setTouchStart(
-                e.targetTouches[0].clientX
-              )
-            }
+          <div>
 
-            onTouchMove={(e) =>
-              setTouchEnd(
-                e.targetTouches[0].clientX
-              )
-            }
-
-            onTouchEnd={() => {
-
-              if (
-                !touchStart ||
-                !touchEnd
-              ) return;
-
-              const distance =
-                touchStart - touchEnd;
-
-              const isLeftSwipe =
-                distance >
-                minSwipeDistance;
-
-              const isRightSwipe =
-                distance <
-                -minSwipeDistance;
-
-              if (isLeftSwipe) {
-                nextImage();
+            <img
+              src={
+                auction.images[
+                  selectedImage
+                ]
               }
+              alt={auction.title}
+              className="w-full rounded-3xl border object-cover aspect-square"
+            />
 
-              if (isRightSwipe) {
-                previousImage();
-              }
+            {auction.images.length > 1 && (
 
-            }}
-          >
+              <div className="grid grid-cols-5 gap-3 mt-4">
 
-            {auction.images?.length > 0 ? (
+                {auction.images.map(
+                  (
+                    image: string,
+                    index: number
+                  ) => (
+
+                    <button
+                      key={index}
+                      onClick={() =>
+                        setSelectedImage(index)
+                      }
+                      className={`border rounded-2xl overflow-hidden ${
+                        selectedImage === index
+                          ? "ring-2 ring-black"
+                          : ""
+                      }`}
+                    >
+
+                      <img
+                        src={image}
+                        alt={`Preview ${index}`}
+                        className="aspect-square object-cover"
+                      />
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+          </div>
+
+        ) : (
+
+          <div className="aspect-square rounded-3xl bg-gray-100" />
+
+        )}
+
+      </div>
+
+      {/* RIGHT */}
+      <div>
+
+        <div className="flex items-center gap-3 mb-5">
+
+          <span className="px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
+            {auction.category}
+          </span>
+
+          <span className="px-4 py-2 rounded-full bg-red-500 text-white text-sm font-medium">
+            {auction.status}
+          </span>
+
+        </div>
+
+        <h1 className="text-5xl font-semibold leading-tight">
+          {auction.title}
+        </h1>
+
+        {/* SELLER */}
+        <div className="mt-8">
+
+          <p className="text-sm text-gray-500 mb-3">
+            Seller
+          </p>
+
+          <div className="flex items-center gap-4">
+
+            {auction.seller?.avatarUrl ? (
 
               <img
                 src={
-                  auction.images[
-                    selectedImage
-                  ]
+                  auction.seller.avatarUrl
                 }
-                alt={auction.title}
-                className="w-full rounded-3xl border object-cover aspect-square max-h-[70vh] transition-all duration-300 select-none"
-                draggable={false}
+                alt={
+                  auction.seller.name ||
+                  "Seller"
+                }
+                className="w-14 h-14 rounded-full object-cover border"
               />
 
             ) : (
 
-              <div className="aspect-square rounded-3xl bg-gray-100" />
+              <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-500">
+                {auction.seller?.name?.charAt(0) || "M"}
+              </div>
 
             )}
+
+            <div>
+
+              <p className="font-semibold text-lg">
+                {auction.seller?.name || "Marketplace Seller"}
+              </p>
+
+              {auction.seller?.tiktokUsername && (
+
+                <p className="text-gray-500">
+                  {auction.seller.tiktokUsername}
+                </p>
+
+              )}
+
+            </div>
 
           </div>
 
         </div>
 
-        {/* RIGHT */}
-        <div>
+        {/* COUNTDOWN */}
+        <div className="mt-8">
+          <CountdownTimer endAt={auction.endAt} />
+        </div>
 
-          <h1 className="text-4xl font-bold">
-            {auction.title}
-          </h1>
+        {/* CURRENT BID */}
+        <div className="mt-10">
 
-          {/* SHIPPING */}
-          <div className="mt-8 border rounded-3xl p-6 bg-gray-50">
+          <p className="text-sm text-gray-500 mb-2">
+            Current Bid
+          </p>
 
-            <h2 className="text-xl font-semibold mb-4">
-              Shipping Details
-            </h2>
+          <p className="text-5xl font-semibold">
+            $
+            {auction.currentBid?.toLocaleString()}
+          </p>
 
-            {auction.freeShipping ? (
+          <p className="mt-2 text-sm text-gray-500">
+            {auction.bidCount} bids
+          </p>
 
-              <div className="inline-flex items-center px-4 py-3 rounded-2xl bg-green-100 text-green-700 font-semibold">
+        </div>
 
-                🚚 Free Shipping
+        {/* RESERVE */}
+        {auction.reservePrice && (
+
+          <div className="mt-6 border rounded-2xl p-5 bg-gray-50">
+
+            <p className="text-sm text-gray-500 mb-2">
+              Reserve Status
+            </p>
+
+            {auction.currentBid >= auction.reservePrice ? (
+
+              <p className="text-green-600 font-semibold">
+                Reserve Met
+              </p>
+
+            ) : (
+
+              <p className="text-orange-500 font-semibold">
+                Reserve Not Met
+              </p>
+
+            )}
+
+          </div>
+
+        )}
+
+        {/* SHIPPING */}
+        <div className="mt-6 border rounded-3xl p-6 bg-gray-50">
+
+          <h2 className="text-xl font-semibold mb-4">
+            Shipping Details
+          </h2>
+
+          {auction.freeShipping ? (
+
+            <div className="inline-flex items-center px-4 py-3 rounded-2xl bg-green-100 text-green-700 font-semibold">
+              🚚 Free Shipping
+            </div>
+
+          ) : auction.localPickup ? (
+
+            <div className="inline-flex items-center px-4 py-3 rounded-2xl bg-blue-100 text-blue-700 font-semibold">
+              📍 Local Pickup Available
+            </div>
+
+          ) : (
+
+            <div className="flex items-center justify-between border rounded-2xl bg-white px-5 py-4">
+
+              <div>
+
+                <p className="text-sm text-gray-500">
+                  Shipping Type
+                </p>
+
+                <p className="font-semibold text-lg">
+                  {auction.shippingLabel || "Standard Shipping"}
+                </p>
 
               </div>
 
-            ) : auction.localPickup ? (
+              <div className="text-right">
 
-              <div className="inline-flex items-center px-4 py-3 rounded-2xl bg-blue-100 text-blue-700 font-semibold">
+                <p className="text-sm text-gray-500">
+                  Shipping Cost
+                </p>
 
-                📍 Local Pickup Available
+                <p className="font-semibold text-lg">
+                  $
+                  {(
+                    (auction.shippingCost || 0) / 100
+                  ).toFixed(2)}
+                </p>
 
+              </div>
+
+            </div>
+
+          )}
+
+        </div>
+
+        {/* DESCRIPTION */}
+        <div className="mt-8">
+
+          <p className="text-sm text-gray-500 mb-3">
+            Description
+          </p>
+
+          <div className="text-lg text-gray-700 leading-relaxed border rounded-2xl p-6">
+            {auction.description ||
+              "No description provided."}
+          </div>
+
+        </div>
+
+        {/* BID HISTORY */}
+        <div className="mt-10">
+
+          <div className="flex items-center justify-between mb-4">
+
+            <p className="text-sm text-gray-500">
+              Recent Bids
+            </p>
+
+            <button
+              onClick={toggleWatchlist}
+              disabled={watchlistLoading}
+              className="text-sm font-medium"
+            >
+              {isSaved
+                ? "★ Saved"
+                : "☆ Watchlist"}
+            </button>
+
+          </div>
+
+          <div className="border rounded-2xl divide-y overflow-hidden">
+
+            {formattedBids.length === 0 ? (
+
+              <div className="p-6 text-gray-500">
+                No bids yet.
               </div>
 
             ) : (
 
-              <div className="flex items-center justify-between border rounded-2xl bg-white px-5 py-4">
+              formattedBids.map(
+                (bid: any) => (
 
-                <div>
+                  <div
+                    key={bid.id}
+                    className="flex items-center justify-between p-5"
+                  >
 
-                  <p className="text-sm text-gray-500">
-                    Shipping Type
-                  </p>
+                    <div>
 
-                  <p className="font-semibold text-lg">
-                    {auction.shippingLabel || "Standard Shipping"}
-                  </p>
+                      <p className="font-medium">
+                        {bid.displayName}
+                      </p>
 
-                </div>
+                      <p className="text-sm text-gray-500">
+                        {new Date(
+                          bid.createdAt
+                        ).toLocaleString()}
+                      </p>
 
-                <div className="text-right">
+                    </div>
 
-                  <p className="text-sm text-gray-500">
-                    Shipping Cost
-                  </p>
+                    <p className="text-xl font-semibold">
+                      $
+                      {bid.amount.toLocaleString()}
+                    </p>
 
-                  <p className="font-semibold text-lg">
+                  </div>
 
-                    $
-                    {(
-                      (auction.shippingCost || 0) / 100
-                    ).toFixed(2)}
-
-                  </p>
-
-                </div>
-
-              </div>
+                )
+              )
 
             )}
-
-            <p className="mt-4 text-sm text-gray-500">
-              Shipping is charged separately at checkout after winning the auction.
-            </p>
 
           </div>
 
         </div>
 
+        {/* BID INPUT */}
+        {auction.status === "LIVE" && !isSeller && (
+
+          <div className="mt-10">
+
+            <div className="border rounded-2xl p-6">
+
+              <p className="text-sm text-gray-500 mb-2">
+                Minimum Bid
+              </p>
+
+              <p className="text-3xl font-semibold mb-5">
+                $
+                {minimumBid.toLocaleString()}
+              </p>
+
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) =>
+                  setAmount(
+                    Number(
+                      e.target.value
+                    )
+                  )
+                }
+                className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold outline-none focus:ring-2 focus:ring-black"
+              />
+
+              <button
+                onClick={handleBid}
+                disabled={loading}
+                className="w-full mt-5 py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+              >
+
+                {loading
+                  ? "Placing Bid..."
+                  : "Place Bid"}
+
+              </button>
+
+            </div>
+
+          </div>
+
+        )}
+
+        {/* WINNER CHECKOUT */}
+        {isWinner && !auction.shippingPaid && (
+
+          <div className="mt-10 border rounded-3xl p-6 bg-green-50">
+
+            <h2 className="text-2xl font-semibold">
+              🎉 You Won
+            </h2>
+
+            <p className="mt-3 text-gray-700">
+              Complete payment to finalize your purchase.
+            </p>
+
+            <div className="mt-5 space-y-2">
+
+              <div className="flex justify-between">
+                <span>Winning Bid</span>
+
+                <span>
+                  $
+                  {auction.currentBid?.toLocaleString()}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Shipping</span>
+
+                <span>
+                  $
+                  {(
+                    (auction.shippingCost || 0) / 100
+                  ).toFixed(2)}
+                </span>
+              </div>
+
+              <div className="flex justify-between font-semibold text-lg pt-3 border-t">
+                <span>Total Due</span>
+
+                <span>
+                  $
+                  {totalDue.toLocaleString()}
+                </span>
+              </div>
+
+            </div>
+
+            <button
+              onClick={handleCheckout}
+              disabled={paymentLoading}
+              className="w-full mt-6 py-5 rounded-full bg-green-600 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+            >
+
+              {paymentLoading
+                ? "Redirecting..."
+                : "Complete Payment"}
+
+            </button>
+
+          </div>
+
+        )}
+
+        {/* ERROR */}
+        {error && (
+
+          <div className="mt-6 border border-red-200 bg-red-50 text-red-600 rounded-2xl p-4">
+            {error}
+          </div>
+
+        )}
+
+        {/* SUCCESS */}
+        {success && (
+
+          <div className="mt-6 border border-green-200 bg-green-50 text-green-600 rounded-2xl p-4">
+            {success}
+          </div>
+
+        )}
+
       </div>
-    </>
+
+    </div>
   );
 }
