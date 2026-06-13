@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
                         </h1>
 
                         <p style="margin:0 0 18px; font-size:16px; color:#444;">
-                          You're one click away from accessing your live auctions, bids, and opportunities.
+                          You're one click away from accessing live marketplace auctions, bids, watchlists, and exclusive deals.
                         </p>
 
                         <p style="margin:0 0 28px; font-size:14px; color:#666;">
@@ -99,11 +99,11 @@ export const authOptions: NextAuthOptions = {
                       <td style="padding:22px; text-align:center; border-top:1px solid #f1f1f1;">
 
                         <p style="margin:0 0 6px; font-size:13px; color:#555; font-weight:500;">
-                          MrBids — Real-time real estate auctions
+                          MrBids — Live marketplace auctions
                         </p>
 
                         <p style="margin:0; font-size:12px; color:#888;">
-                          Built for investors, wholesalers, and dealmakers
+                          Discover real estate, luxury items, collectibles, vehicles, electronics, and more
                         </p>
 
                         <p style="margin-top:14px; font-size:11px; color:#aaa;">
