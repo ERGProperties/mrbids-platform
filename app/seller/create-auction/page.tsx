@@ -109,7 +109,7 @@ export default function CreateMarketplaceAuctionPage() {
       }
 
       window.location.href =
-        `/marketplace-auctions/${data.auction.id}`;
+        `/marketplace-auctions/${data.auction.id}?created=true`;
 
     } catch (err: any) {
 
