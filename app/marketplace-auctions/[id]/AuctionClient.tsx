@@ -19,10 +19,6 @@ import { useSession } from "next-auth/react";
 
 import { useSearchParams } from "next/navigation";
 
-import { Swiper, SwiperSlide } from "swiper/react";
-
-import "swiper/css";
-
 const fetcher = (
   url: string
 ) =>
@@ -457,36 +453,15 @@ export default function AuctionClient({
 
   <div>
 
-    <Swiper
-      spaceBetween={10}
-      slidesPerView={1}
-      onSlideChange={(swiper) =>
-        setSelectedImage(swiper.activeIndex)
+    <img
+      src={
+        auction.images[
+          selectedImage
+        ]
       }
-      initialSlide={selectedImage}
-      className="rounded-3xl border overflow-hidden"
-    >
-
-      {auction.images.map(
-        (
-          image: string,
-          index: number
-        ) => (
-
-          <SwiperSlide key={index}>
-
-            <img
-              src={image}
-              alt={`${auction.title} ${index}`}
-              className="w-full object-cover aspect-square"
-            />
-
-          </SwiperSlide>
-
-        )
-      )}
-
-    </Swiper>
+      alt={auction.title}
+      className="w-full rounded-3xl border object-cover aspect-square"
+    />
 
     {auction.images.length > 1 && (
 
