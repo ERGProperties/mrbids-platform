@@ -15,7 +15,13 @@ import CountdownTimer from "@/components/CountdownTimer";
 
 import { pusherClient } from "@/lib/pusher-client";
 
-import { useSession } from "next-auth/react";
+import { useSession } from "next-auth/react"; 
+
+import { useSearchParams } from "next/navigation";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+
+import "swiper/css";
 
 const fetcher = (
   url: string
@@ -34,6 +40,12 @@ export default function AuctionClient({
 
   const { data: session } =
     useSession();
+
+  const searchParams =
+    useSearchParams();
+
+  const wasJustCreated =
+    searchParams.get("created") === "true";
 
   const {
     data: auction,
@@ -441,60 +453,81 @@ export default function AuctionClient({
       {/* LEFT */}
       <div>
 
-        {auction.images?.length > 0 ? (
+{auction.images?.length > 0 ? (
 
-          <div>
+  <div>
+
+    <Swiper
+      spaceBetween={10}
+      slidesPerView={1}
+      onSlideChange={(swiper) =>
+        setSelectedImage(swiper.activeIndex)
+      }
+      initialSlide={selectedImage}
+      className="rounded-3xl border overflow-hidden"
+    >
+
+      {auction.images.map(
+        (
+          image: string,
+          index: number
+        ) => (
+
+          <SwiperSlide key={index}>
 
             <img
-              src={
-                auction.images[
-                  selectedImage
-                ]
-              }
-              alt={auction.title}
-              className="w-full rounded-3xl border object-cover aspect-square"
+              src={image}
+              alt={`${auction.title} ${index}`}
+              className="w-full object-cover aspect-square"
             />
 
-            {auction.images.length > 1 && (
+          </SwiperSlide>
 
-              <div className="grid grid-cols-5 gap-3 mt-4">
+        )
+      )}
 
-                {auction.images.map(
-                  (
-                    image: string,
-                    index: number
-                  ) => (
+    </Swiper>
 
-                    <button
-                      key={index}
-                      onClick={() =>
-                        setSelectedImage(index)
-                      }
-                      className={`border rounded-2xl overflow-hidden ${
-                        selectedImage === index
-                          ? "ring-2 ring-black"
-                          : ""
-                      }`}
-                    >
+    {auction.images.length > 1 && (
 
-                      <img
-                        src={image}
-                        alt={`Preview ${index}`}
-                        className="aspect-square object-cover"
-                      />
+      <div className="grid grid-cols-5 gap-3 mt-4">
 
-                    </button>
+        {auction.images.map(
+          (
+            image: string,
+            index: number
+          ) => (
 
-                  )
-                )}
+            <button
+              key={index}
+              onClick={() =>
+                setSelectedImage(index)
+              }
+              className={`border rounded-2xl overflow-hidden ${
+                selectedImage === index
+                  ? "ring-2 ring-black"
+                  : ""
+              }`}
+            >
 
-              </div>
+              <img
+                src={image}
+                alt={`Preview ${index}`}
+                className="aspect-square object-cover"
+              />
 
-            )}
+            </button>
 
-          </div>
+          )
+        )}
 
-        ) : (
+      </div>
+
+    )}
+
+  </div>
+
+) : (
 
           <div className="aspect-square rounded-3xl bg-gray-100" />
 
@@ -504,6 +537,46 @@ export default function AuctionClient({
 
       {/* RIGHT */}
       <div>
+
+{wasJustCreated && isSeller && (
+
+  <div className="mb-8 border border-green-200 bg-green-50 rounded-3xl p-6">
+
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+
+      <div>
+
+        <h2 className="text-2xl font-semibold text-green-700">
+          🎉 Your auction is LIVE
+        </h2>
+
+        <p className="mt-2 text-gray-700">
+          Share your auction link to start receiving bids.
+        </p>
+
+      </div>
+
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(
+            window.location.origin +
+            `/marketplace-auctions/${auction.id}`
+          );
+
+          setSuccess(
+            "Auction link copied!"
+          );
+        }}
+        className="px-6 py-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
+      >
+        Copy Share Link
+      </button>
+
+    </div>
+
+  </div>
+
+)}
 
         <div className="flex items-center gap-3 mb-5">
 
