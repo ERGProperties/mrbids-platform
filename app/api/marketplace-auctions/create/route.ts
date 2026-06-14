@@ -52,25 +52,6 @@ export async function POST(
 
     }
 
-    // AUTO-CONVERT USER TO MARKETPLACE SELLER
-    if (
-      !user.isMarketplaceSeller
-    ) {
-
-      user =
-        await prisma.user.update({
-          where: {
-            id: user.id,
-          },
-
-          data: {
-            isMarketplaceSeller:
-              true,
-          },
-        });
-
-    }
-
     const body =
       await req.json();
 
@@ -244,6 +225,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       auction,
+      shareUrl: `${process.env.NEXT_PUBLIC_APP_URL}/auction/${auction.id}`,
     });
 
   } catch (error) {

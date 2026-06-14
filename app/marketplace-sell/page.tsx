@@ -170,7 +170,7 @@ export default function MarketplaceSellPage() {
       }
 
       router.push(
-        `/marketplace-auctions/${data.auction.id}`
+        `/marketplace-auctions/${data.auction.id}?created=true`
       );
 
     } catch (err: any) {
@@ -355,104 +355,6 @@ export default function MarketplaceSellPage() {
 
           </div>
 
-          {/* ADDITIONAL IMAGES */}
-          <div>
-
-            <label className="block text-sm font-medium mb-3">
-              Additional Images
-            </label>
-
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={async (e) => {
-
-                const files =
-                  Array.from(
-                    e.target.files || []
-                  );
-
-                if (
-                  files.length === 0
-                ) return;
-
-                setUploading(true);
-
-                try {
-
-                  const uploadedImages:
-                    string[] = [];
-
-                  for (const file of files) {
-
-                    const imageUrl =
-                      await handleImageUpload(
-                        file
-                      );
-
-                    uploadedImages.push(
-                      imageUrl
-                    );
-
-                  }
-
-                  setForm({
-                    ...form,
-                    images: [
-                      ...form.images,
-                      ...uploadedImages,
-                    ],
-                  });
-
-                } catch (err) {
-
-                  console.error(err);
-
-                  setError(
-                    "Additional image upload failed"
-                  );
-
-                }
-
-                setUploading(false);
-
-              }}
-              className="w-full border rounded-2xl px-5 py-4"
-            />
-
-            {uploading && (
-              <p className="mt-3 text-sm text-gray-500">
-                Uploading images...
-              </p>
-            )}
-
-            {form.images.length > 0 && (
-
-              <div className="mt-6 grid grid-cols-3 gap-4">
-
-                {form.images.map(
-                  (
-                    image,
-                    index
-                  ) => (
-
-                    <img
-                      key={index}
-                      src={image}
-                      alt={`Image ${index + 1}`}
-                      className="aspect-square object-cover rounded-2xl border"
-                    />
-
-                  )
-                )}
-
-              </div>
-
-            )}
-
-          </div>
-
           {/* RETAIL PRICE */}
           <div>
 
@@ -523,10 +425,6 @@ export default function MarketplaceSellPage() {
               className="w-full border rounded-2xl px-5 py-4"
               placeholder="Hidden minimum selling price"
             />
-
-            <p className="mt-2 text-sm text-gray-500">
-              If bidding does not reach this amount, the item will not sell.
-            </p>
 
           </div>
 
@@ -689,10 +587,6 @@ export default function MarketplaceSellPage() {
 
             </select>
 
-            <p className="mt-3 text-sm text-gray-500">
-              Shipping will be shown to buyers before bidding.
-            </p>
-
           </div>
 
           {/* DURATION */}
@@ -716,49 +610,37 @@ export default function MarketplaceSellPage() {
               className="w-full border rounded-2xl px-5 py-4"
             >
 
-              <optgroup label="LIVE Flash Auctions">
+              <option value={5}>
+                5 Minutes
+              </option>
 
-                <option value={1}>
-                  1 Minute
-                </option>
+              <option value={10}>
+                10 Minutes
+              </option>
 
-                <option value={5}>
-                  5 Minutes
-                </option>
+              <option value={15}>
+                15 Minutes
+              </option>
 
-                <option value={10}>
-                  10 Minutes
-                </option>
+              <option value={30}>
+                30 Minutes
+              </option>
 
-                <option value={15}>
-                  15 Minutes
-                </option>
+              <option value={60}>
+                1 Hour
+              </option>
 
-                <option value={30}>
-                  30 Minutes
-                </option>
+              <option value={1440}>
+                1 Day
+              </option>
 
-                <option value={60}>
-                  1 Hour
-                </option>
+              <option value={4320}>
+                3 Days
+              </option>
 
-              </optgroup>
-
-              <optgroup label="Marketplace Auctions">
-
-                <option value={1440}>
-                  1 Day
-                </option>
-
-                <option value={4320}>
-                  3 Days
-                </option>
-
-                <option value={10080}>
-                  7 Days
-                </option>
-
-              </optgroup>
+              <option value={10080}>
+                7 Days
+              </option>
 
             </select>
 
