@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/notifications/email";
+import { sendEndingSoonPush } from "@/lib/notifications/sendEndingSoonPush";
 
 export async function GET() {
   try {
@@ -41,18 +42,27 @@ export async function GET() {
         ];
 
         for (const bidderId of uniqueBidderIds) {
-          const user = await prisma.user.findUnique({
-            where: { id: bidderId },
-          });
+
+          const user =
+            await prisma.user.findUnique({
+              where: {
+                id: bidderId,
+              },
+            });
 
           if (!user?.email) continue;
 
           await sendEmail({
             to: user.email,
-            subject: "Auction ending soon ⏰",
+
+            subject:
+              "Auction ending soon ⏰",
+
             html: `
               <h2>Auction ending soon</h2>
+
               <p>${auction.title}</p>
+
               <p>
                 <a href="https://mrbids.com/auctions/${auction.slug}">
                   View auction
@@ -60,6 +70,18 @@ export async function GET() {
               </p>
             `,
           });
+
+          await sendEndingSoonPush({
+            userId:
+              bidderId,
+
+            title:
+              auction.title || "Auction",
+
+            auctionId:
+              auction.id,
+          });
+
         }
 
         // ⭐ LOCK so this only sends once
