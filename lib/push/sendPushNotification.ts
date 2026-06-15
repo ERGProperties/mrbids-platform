@@ -1,3 +1,6 @@
+import { getMessaging }
+  from "firebase-admin/messaging";
+
 import { firebaseAdmin }
   from "@/lib/firebaseAdmin";
 
@@ -18,20 +21,21 @@ export async function sendPushNotification({
 
   try {
 
-    await firebaseAdmin
-      .messaging()
-      .send({
-        token,
+    await getMessaging(
+      firebaseAdmin
+    ).send({
+      token,
 
-        notification: {
-          title,
-          body,
-        },
+      notification: {
+        title,
+        body,
+      },
 
-        data: {
-          url: url || "/",
-        },
-      });
+      data: {
+        url:
+          url || "/",
+      },
+    });
 
   } catch (err) {
 
