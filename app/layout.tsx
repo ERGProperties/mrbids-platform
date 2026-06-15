@@ -1,33 +1,61 @@
 import "./globals.css";
-import type { Metadata } from "next";
-import Script from "next/script";
 
-import SessionProvider from "@/components/auth/SessionProvider";
-import LayoutWrapper from "@/components/LayoutWrapper";
-import PushNotificationSetup from "@/components/PushNotificationSetup";
+import type { Metadata }
+  from "next";
+
+import Script
+  from "next/script";
+
+import SessionProvider
+  from "@/components/auth/SessionProvider";
+
+import LayoutWrapper
+  from "@/components/LayoutWrapper";
+
+import PushNotificationSetup
+  from "@/components/PushNotificationSetup";
+
+import DeepLinkHandler
+  from "@/components/DeepLinkHandler";
 
 export const metadata: Metadata = {
   title: "MrBids",
+
   description:
     "LIVE marketplace auctions starting at $1.",
 
-  manifest: "/manifest.json",
+  manifest:
+    "/manifest.json",
 
   icons: {
     icon: [
-      { url: "/favicon.ico" },
       {
-        url: "/favicon-96x96.png",
-        sizes: "96x96",
-        type: "image/png",
+        url:
+          "/favicon.ico",
       },
+
       {
-        url: "/favicon.svg",
-        type: "image/svg+xml",
+        url:
+          "/favicon-96x96.png",
+
+        sizes:
+          "96x96",
+
+        type:
+          "image/png",
+      },
+
+      {
+        url:
+          "/favicon.svg",
+
+        type:
+          "image/svg+xml",
       },
     ],
 
-    apple: "/apple-touch-icon.png",
+    apple:
+      "/apple-touch-icon.png",
   },
 };
 
@@ -111,6 +139,8 @@ export default function RootLayout({
         <SessionProvider>
 
           <PushNotificationSetup />
+
+          <DeepLinkHandler />
 
           <LayoutWrapper>
 
