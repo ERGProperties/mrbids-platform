@@ -355,6 +355,88 @@ export default function MarketplaceSellPage() {
 
           </div>
 
+{/* ADDITIONAL IMAGES */}
+<div>
+
+  <label className="block text-sm font-medium mb-3">
+    Additional Images
+  </label>
+
+  <input
+    type="file"
+    accept="image/*"
+    multiple
+    onChange={async (e) => {
+
+      const files =
+        Array.from(
+          e.target.files || []
+        );
+
+      if (!files.length) return;
+
+      setUploading(true);
+
+      try {
+
+        const uploadedImages =
+          await Promise.all(
+            files.map((file) =>
+              handleImageUpload(file)
+            )
+          );
+
+        setForm({
+          ...form,
+
+          images: [
+            ...form.images,
+            ...uploadedImages,
+          ],
+        });
+
+      } catch (err) {
+
+        console.error(err);
+
+        setError(
+          "Additional image upload failed"
+        );
+
+      }
+
+      setUploading(false);
+
+    }}
+    className="w-full border rounded-2xl px-5 py-4"
+  />
+
+  {form.images.length > 0 && (
+
+    <div className="grid grid-cols-3 gap-4 mt-6">
+
+      {form.images.map(
+        (
+          image,
+          index
+        ) => (
+
+          <img
+            key={index}
+            src={image}
+            alt={`Additional ${index}`}
+            className="w-full aspect-square object-cover rounded-2xl border"
+          />
+
+        )
+      )}
+
+    </div>
+
+  )}
+
+</div>
+
           {/* RETAIL PRICE */}
           <div>
 
