@@ -1,7 +1,7 @@
 import { getMessaging }
   from "firebase-admin/messaging";
 
-import { firebaseAdmin }
+import { firebaseApp }
   from "@/lib/firebaseAdmin";
 
 export async function sendPushNotification({
@@ -22,7 +22,7 @@ export async function sendPushNotification({
   try {
 
     await getMessaging(
-      firebaseAdmin
+      firebaseApp
     ).send({
       token,
 

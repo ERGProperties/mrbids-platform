@@ -1,6 +1,9 @@
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-
-import admin from "firebase-admin";
+import {
+  cert,
+  getApps,
+  initializeApp,
+  getApp,
+} from "firebase-admin/app";
 
 import fs from "fs";
 
@@ -23,13 +26,14 @@ const serviceAccount =
     )
   );
 
-if (!getApps().length) {
+const firebaseApp =
+  getApps().length
+    ? getApp()
+    : initializeApp({
+        credential:
+          cert(serviceAccount),
+      });
 
-  initializeApp({
-    credential:
-      cert(serviceAccount),
-  });
-}
-
-export const firebaseAdmin =
-  admin;
+export {
+  firebaseApp,
+};
