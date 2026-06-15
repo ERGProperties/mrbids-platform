@@ -10,6 +10,8 @@ import { pusherServer } from "@/lib/pusher";
 
 import { sendOutbidEmail } from "@/lib/email/sendOutbidEmail";
 
+import { sendPushNotification } from "@/lib/push/sendPushNotification";
+
 export async function POST(
   req: Request,
   {
@@ -379,6 +381,51 @@ export async function POST(
             },
           },
         });
+
+      }
+
+    }
+
+    // SEND PUSH NOTIFICATION
+    if (
+      previousHighestBid &&
+      previousHighestBid.bidderId !==
+        user.id
+    ) {
+
+      const pushSubscriptions =
+        await prisma.pushSubscription.findMany({
+          where: {
+            userId:
+              previousHighestBid.bidderId,
+          },
+        });
+
+      for (const sub of pushSubscriptions) {
+
+        try {
+
+          await sendPushNotification({
+            token:
+              sub.endpoint,
+
+            title:
+              "You've been outbid",
+
+            body:
+              `${auction.title} has a higher bid now.`,
+
+            url:
+              `/marketplace-auctions/${auction.id}`,
+          });
+
+        } catch (err) {
+
+          console.error(
+            "OUTBID PUSH ERROR:",
+            err
+          );
+        }
 
       }
 
