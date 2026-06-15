@@ -4,6 +4,7 @@ import Script from "next/script";
 
 import SessionProvider from "@/components/auth/SessionProvider";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import PushNotificationSetup from "@/components/PushNotificationSetup";
 
 export const metadata: Metadata = {
   title: "MrBids",
@@ -108,6 +109,8 @@ export default function RootLayout({
       <body className="bg-white text-gray-900 antialiased flex flex-col min-h-screen">
 
         <SessionProvider>
+
+          <PushNotificationSetup />
 
           <LayoutWrapper>
 
