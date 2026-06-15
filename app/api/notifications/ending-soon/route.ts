@@ -186,6 +186,9 @@ export async function GET() {
           ),
         ];
 
+        // =========================================
+        // BIDDER NOTIFICATIONS
+        // =========================================
         for (const bidderId of uniqueBidderIds) {
 
           const user =
@@ -222,6 +225,69 @@ export async function GET() {
           await sendEndingSoonPush({
             userId:
               bidderId,
+
+            title:
+              auction.title,
+
+            auctionId:
+              auction.id,
+          });
+
+        }
+
+        // =========================================
+        // WATCHLIST USERS
+        // =========================================
+        const watchlistUsers =
+          await prisma.watchlist.findMany({
+            where: {
+              auctionId:
+                auction.id,
+            },
+
+            include: {
+              user: true,
+            },
+          });
+
+        for (const item of watchlistUsers) {
+
+          // SKIP USERS WHO ALREADY BID
+          if (
+            uniqueBidderIds.includes(
+              item.userId
+            )
+          ) {
+            continue;
+          }
+
+          if (!item.user.email) {
+            continue;
+          }
+
+          await sendEmail({
+            to:
+              item.user.email,
+
+            subject:
+              "Watchlisted auction ending soon ⏰",
+
+            html: `
+              <h2>Your watched auction is ending soon</h2>
+
+              <p>${auction.title}</p>
+
+              <p>
+                <a href="https://mrbids.com/marketplace-auctions/${auction.id}">
+                  View auction
+                </a>
+              </p>
+            `,
+          });
+
+          await sendEndingSoonPush({
+            userId:
+              item.userId,
 
             title:
               auction.title,
