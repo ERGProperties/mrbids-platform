@@ -737,14 +737,18 @@ export default function MarketplaceSellPage() {
 
           )}
 
-{/* UPLOAD STATUS */}
-{(uploading || loading) && (
+          {/* STATUS */}
+          {(uploading || loading) && (
 
-  <div className="border rounded-2xl bg-blue-50 border-blue-200 text-blue-700 px-5 py-4 text-sm font-medium">
-    Uploading images...
-  </div>
+            <div className="border rounded-2xl bg-blue-50 border-blue-200 text-blue-700 px-5 py-4 text-sm font-medium">
 
-)}
+              {uploading
+                ? "Uploading images..."
+                : "Creating auction..."}
+
+            </div>
+
+          )}
 
           {/* SUBMIT */}
           <button
@@ -755,7 +759,9 @@ export default function MarketplaceSellPage() {
             className="w-full py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
           >
 
-            {loading
+            {uploading
+              ? "Uploading Images..."
+              : loading
               ? "Creating Auction..."
               : "Create Marketplace Auction"}
 
