@@ -323,7 +323,9 @@ export default function MarketplaceSellPage() {
 
                     images: [
                       imageUrl,
-                      ...form.images,
+                      ...form.images.filter(
+                        (img) => img !== form.coverImage
+                      ),
                     ],
                   });
 
@@ -335,13 +337,23 @@ export default function MarketplaceSellPage() {
                     "Image upload failed"
                   );
 
-                }
+                } finally {
 
-                setUploading(false);
+                  setUploading(false);
+
+                }
 
               }}
               className="w-full border rounded-2xl px-5 py-4"
             />
+
+            {uploading && (
+
+              <div className="mt-4 border rounded-2xl bg-blue-50 border-blue-200 text-blue-700 px-5 py-4 text-sm font-medium">
+                Uploading images...
+              </div>
+
+            )}
 
             {form.coverImage && (
 
@@ -355,87 +367,89 @@ export default function MarketplaceSellPage() {
 
           </div>
 
-{/* ADDITIONAL IMAGES */}
-<div>
+          {/* ADDITIONAL IMAGES */}
+          <div>
 
-  <label className="block text-sm font-medium mb-3">
-    Additional Images
-  </label>
+            <label className="block text-sm font-medium mb-3">
+              Additional Images
+            </label>
 
-  <input
-    type="file"
-    accept="image/*"
-    multiple
-    onChange={async (e) => {
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={async (e) => {
 
-      const files =
-        Array.from(
-          e.target.files || []
-        );
+                const files =
+                  Array.from(
+                    e.target.files || []
+                  );
 
-      if (!files.length) return;
+                if (!files.length) return;
 
-      setUploading(true);
+                setUploading(true);
 
-      try {
+                try {
 
-        const uploadedImages =
-          await Promise.all(
-            files.map((file) =>
-              handleImageUpload(file)
-            )
-          );
+                  const uploadedImages =
+                    await Promise.all(
+                      files.map((file) =>
+                        handleImageUpload(file)
+                      )
+                    );
 
-        setForm({
-          ...form,
+                  setForm({
+                    ...form,
 
-          images: [
-            ...form.images,
-            ...uploadedImages,
-          ],
-        });
+                    images: [
+                      ...form.images,
+                      ...uploadedImages,
+                    ],
+                  });
 
-      } catch (err) {
+                } catch (err) {
 
-        console.error(err);
+                  console.error(err);
 
-        setError(
-          "Additional image upload failed"
-        );
+                  setError(
+                    "Additional image upload failed"
+                  );
 
-      }
+                } finally {
 
-      setUploading(false);
+                  setUploading(false);
 
-    }}
-    className="w-full border rounded-2xl px-5 py-4"
-  />
+                }
 
-  {form.images.length > 0 && (
+              }}
+              className="w-full border rounded-2xl px-5 py-4"
+            />
 
-    <div className="grid grid-cols-3 gap-4 mt-6">
+            {form.images.length > 0 && (
 
-      {form.images.map(
-        (
-          image,
-          index
-        ) => (
+              <div className="grid grid-cols-3 gap-4 mt-6">
 
-          <img
-            key={index}
-            src={image}
-            alt={`Additional ${index}`}
-            className="w-full aspect-square object-cover rounded-2xl border"
-          />
+                {form.images.map(
+                  (
+                    image,
+                    index
+                  ) => (
 
-        )
-      )}
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`Additional ${index}`}
+                      className="w-full aspect-square object-cover rounded-2xl border"
+                    />
 
-    </div>
+                  )
+                )}
 
-  )}
+              </div>
 
-</div>
+            )}
+
+          </div>
 
           {/* RETAIL PRICE */}
           <div>
@@ -733,19 +747,6 @@ export default function MarketplaceSellPage() {
 
             <div className="text-red-600 text-sm">
               {error}
-            </div>
-
-          )}
-
-          {/* STATUS */}
-          {(uploading || loading) && (
-
-            <div className="border rounded-2xl bg-blue-50 border-blue-200 text-blue-700 px-5 py-4 text-sm font-medium">
-
-              {uploading
-                ? "Uploading images..."
-                : "Creating auction..."}
-
             </div>
 
           )}
