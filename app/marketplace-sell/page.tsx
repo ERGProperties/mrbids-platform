@@ -350,7 +350,7 @@ export default function MarketplaceSellPage() {
             {uploading && (
 
               <div className="mt-4 border rounded-2xl bg-blue-50 border-blue-200 text-blue-700 px-5 py-4 text-sm font-medium">
-                Uploading images...
+                Uploading image...
               </div>
 
             )}
@@ -424,6 +424,14 @@ export default function MarketplaceSellPage() {
               }}
               className="w-full border rounded-2xl px-5 py-4"
             />
+
+{uploading && (
+
+  <div className="mt-4 border rounded-2xl bg-blue-50 border-blue-200 text-blue-700 px-5 py-4 text-sm font-medium">
+    Uploading images...
+  </div>
+
+)}
 
             {form.images.length > 0 && (
 
