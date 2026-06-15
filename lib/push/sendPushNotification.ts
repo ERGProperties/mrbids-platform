@@ -4,6 +4,9 @@ import { getMessaging }
 import { getFirebaseApp }
   from "@/lib/firebaseAdmin";
 
+import { prisma }
+  from "@/lib/prisma";
+
 export async function sendPushNotification({
   token,
   title,
@@ -40,11 +43,45 @@ export async function sendPushNotification({
       },
     });
 
-  } catch (err) {
+  } catch (err: any) {
 
     console.error(
       "PUSH SEND ERROR:",
       err
     );
+
+    const errorCode =
+      err?.errorInfo?.code;
+
+    // REMOVE INVALID TOKENS
+    if (
+      errorCode ===
+        "messaging/registration-token-not-registered" ||
+
+      errorCode ===
+        "messaging/invalid-registration-token"
+    ) {
+
+      try {
+
+        await prisma.pushSubscription.deleteMany({
+          where: {
+            endpoint:
+              token,
+          },
+        });
+
+        console.log(
+          "Removed invalid push token"
+        );
+
+      } catch (deleteErr) {
+
+        console.error(
+          "Failed removing invalid token:",
+          deleteErr
+        );
+      }
+    }
   }
 }

@@ -1,14 +1,24 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { sendEmail } from "@/lib/notifications/email";
-import { sendEndingSoonPush } from "@/lib/notifications/sendEndingSoonPush";
+import { NextResponse }
+  from "next/server";
+
+import { prisma }
+  from "@/lib/prisma";
+
+import { sendEmail }
+  from "@/lib/notifications/email";
+
+import { sendEndingSoonPush }
+  from "@/lib/notifications/sendEndingSoonPush";
 
 export async function GET() {
+
   try {
-    const now = new Date();
+
+    const now =
+      new Date();
 
     // =========================
-    // ENDING SOON EMAILS
+    // TIME WINDOWS
     // =========================
     const windows = [
       60 * 60 * 1000,
@@ -16,29 +26,55 @@ export async function GET() {
       5 * 60 * 1000,
     ];
 
+    // =====================================================
+    // REAL ESTATE AUCTIONS
+    // =====================================================
     for (const windowMs of windows) {
-      const start = new Date(now.getTime() + windowMs - 60_000);
-      const end = new Date(now.getTime() + windowMs + 60_000);
 
-      const auctions = await prisma.auction.findMany({
-        where: {
-          status: "LIVE",
-          endingSoonSent: false,
-          endAt: {
-            gte: start,
-            lte: end,
+      const start =
+        new Date(
+          now.getTime() +
+            windowMs -
+            60_000
+        );
+
+      const end =
+        new Date(
+          now.getTime() +
+            windowMs +
+            60_000
+        );
+
+      const auctions =
+        await prisma.auction.findMany({
+          where: {
+            status: "LIVE",
+
+            endingSoonSent: false,
+
+            endAt: {
+              gte: start,
+              lte: end,
+            },
           },
-        },
-        include: {
-          bids: {
-            select: { bidderId: true },
+
+          include: {
+            bids: {
+              select: {
+                bidderId: true,
+              },
+            },
           },
-        },
-      });
+        });
 
       for (const auction of auctions) {
+
         const uniqueBidderIds = [
-          ...new Set(auction.bids.map((b) => b.bidderId)),
+          ...new Set(
+            auction.bids.map(
+              (b) => b.bidderId
+            )
+          ),
         ];
 
         for (const bidderId of uniqueBidderIds) {
@@ -50,10 +86,13 @@ export async function GET() {
               },
             });
 
-          if (!user?.email) continue;
+          if (!user?.email) {
+            continue;
+          }
 
           await sendEmail({
-            to: user.email,
+            to:
+              user.email,
 
             subject:
               "Auction ending soon ⏰",
@@ -84,9 +123,11 @@ export async function GET() {
 
         }
 
-        // ⭐ LOCK so this only sends once
         await prisma.auction.update({
-          where: { id: auction.id },
+          where: {
+            id: auction.id,
+          },
+
           data: {
             endingSoonSent: true,
           },
@@ -94,55 +135,198 @@ export async function GET() {
       }
     }
 
-    // =========================
+    // =====================================================
+    // MARKETPLACE AUCTIONS
+    // =====================================================
+    for (const windowMs of windows) {
+
+      const start =
+        new Date(
+          now.getTime() +
+            windowMs -
+            60_000
+        );
+
+      const end =
+        new Date(
+          now.getTime() +
+            windowMs +
+            60_000
+        );
+
+      const auctions =
+        await prisma.marketplaceAuction.findMany({
+          where: {
+            status: "LIVE",
+
+            endingSoonSent: false,
+
+            endAt: {
+              gte: start,
+              lte: end,
+            },
+          },
+
+          include: {
+            bids: {
+              select: {
+                bidderId: true,
+              },
+            },
+          },
+        });
+
+      for (const auction of auctions) {
+
+        const uniqueBidderIds = [
+          ...new Set(
+            auction.bids.map(
+              (b) => b.bidderId
+            )
+          ),
+        ];
+
+        for (const bidderId of uniqueBidderIds) {
+
+          const user =
+            await prisma.user.findUnique({
+              where: {
+                id: bidderId,
+              },
+            });
+
+          if (!user?.email) {
+            continue;
+          }
+
+          await sendEmail({
+            to:
+              user.email,
+
+            subject:
+              "Marketplace auction ending soon ⏰",
+
+            html: `
+              <h2>Marketplace auction ending soon</h2>
+
+              <p>${auction.title}</p>
+
+              <p>
+                <a href="https://mrbids.com/marketplace-auctions/${auction.id}">
+                  View auction
+                </a>
+              </p>
+            `,
+          });
+
+          await sendEndingSoonPush({
+            userId:
+              bidderId,
+
+            title:
+              auction.title,
+
+            auctionId:
+              auction.id,
+          });
+
+        }
+
+        await prisma.marketplaceAuction.update({
+          where: {
+            id: auction.id,
+          },
+
+          data: {
+            endingSoonSent: true,
+          },
+        });
+      }
+    }
+
+    // =====================================================
     // AUCTION ENDED EMAILS
-    // =========================
-    const endedAuctions = await prisma.auction.findMany({
-      where: {
-        status: "LIVE",
-        endedEmailsSent: false,
-        endAt: {
-          lte: now,
+    // =====================================================
+    const endedAuctions =
+      await prisma.auction.findMany({
+        where: {
+          status: "LIVE",
+
+          endedEmailsSent: false,
+
+          endAt: {
+            lte: now,
+          },
         },
-      },
-      include: {
-        bids: {
-          orderBy: { amount: "desc" },
+
+        include: {
+          bids: {
+            orderBy: {
+              amount: "desc",
+            },
+          },
         },
-      },
-    });
+      });
 
     for (const auction of endedAuctions) {
-      const highestBid = auction.bids[0] || null;
 
-      // close auction + lock emails
+      const highestBid =
+        auction.bids[0] || null;
+
       await prisma.auction.update({
-        where: { id: auction.id },
+        where: {
+          id: auction.id,
+        },
+
         data: {
           status: "CLOSED",
-          finalPrice: highestBid?.amount ?? null,
+
+          finalPrice:
+            highestBid?.amount ??
+            null,
+
           endedEmailsSent: true,
         },
       });
 
       const bidderIds = [
-        ...new Set(auction.bids.map((b) => b.bidderId)),
+        ...new Set(
+          auction.bids.map(
+            (b) => b.bidderId
+          )
+        ),
       ];
 
-      // ---------- WINNER ----------
+      // WINNER
       if (highestBid) {
-        const winner = await prisma.user.findUnique({
-          where: { id: highestBid.bidderId },
-        });
+
+        const winner =
+          await prisma.user.findUnique({
+            where: {
+              id:
+                highestBid.bidderId,
+            },
+          });
 
         if (winner?.email) {
+
           await sendEmail({
-            to: winner.email,
-            subject: "🎉 You won the auction!",
+            to:
+              winner.email,
+
+            subject:
+              "🎉 You won the auction!",
+
             html: `
               <h2>Congratulations — you won!</h2>
+
               <p>${auction.title}</p>
-              <p>Winning bid: $${highestBid.amount}</p>
+
+              <p>
+                Winning bid:
+                $${highestBid.amount}
+              </p>
+
               <p>
                 <a href="https://mrbids.com/auctions/${auction.slug}">
                   View auction
@@ -153,23 +337,44 @@ export async function GET() {
         }
       }
 
-      // ---------- LOSERS ----------
+      // LOSERS
       for (const bidderId of bidderIds) {
-        if (bidderId === highestBid?.bidderId) continue;
 
-        const user = await prisma.user.findUnique({
-          where: { id: bidderId },
-        });
+        if (
+          bidderId ===
+          highestBid?.bidderId
+        ) {
+          continue;
+        }
 
-        if (!user?.email) continue;
+        const user =
+          await prisma.user.findUnique({
+            where: {
+              id: bidderId,
+            },
+          });
+
+        if (!user?.email) {
+          continue;
+        }
 
         await sendEmail({
-          to: user.email,
-          subject: "Auction ended — you were outbid",
+          to:
+            user.email,
+
+          subject:
+            "Auction ended — you were outbid",
+
           html: `
             <h2>This auction has ended</h2>
+
             <p>${auction.title}</p>
-            <p>Final price: $${highestBid?.amount ?? "N/A"}</p>
+
+            <p>
+              Final price:
+              $${highestBid?.amount ?? "N/A"}
+            </p>
+
             <p>
               <a href="https://mrbids.com/auctions/${auction.slug}">
                 View results
@@ -179,32 +384,60 @@ export async function GET() {
         });
       }
 
-      // ---------- SELLER ----------
+      // SELLER
       if (auction.sellerId) {
-        const seller = await prisma.user.findUnique({
-          where: { id: auction.sellerId },
-        });
+
+        const seller =
+          await prisma.user.findUnique({
+            where: {
+              id:
+                auction.sellerId,
+            },
+          });
 
         if (seller?.email) {
+
           await sendEmail({
-            to: seller.email,
-            subject: "Your auction has ended",
+            to:
+              seller.email,
+
+            subject:
+              "Your auction has ended",
+
             html: `
               <h2>Your auction has ended</h2>
+
               <p>${auction.title}</p>
-              <p>Final price: $${highestBid?.amount ?? "No bids"}</p>
+
+              <p>
+                Final price:
+                $${highestBid?.amount ?? "No bids"}
+              </p>
             `,
           });
         }
       }
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({
+      success: true,
+    });
+
   } catch (err) {
-    console.error("NOTIFICATION CRON ERROR:", err);
+
+    console.error(
+      "NOTIFICATION CRON ERROR:",
+      err
+    );
+
     return NextResponse.json(
-      { error: "Server error" },
-      { status: 500 }
+      {
+        error:
+          "Server error",
+      },
+      {
+        status: 500,
+      }
     );
   }
 }
