@@ -738,7 +738,7 @@ export default function MarketplaceSellPage() {
           )}
 
 {/* UPLOAD STATUS */}
-{uploading && (
+{(uploading || loading) && (
 
   <div className="border rounded-2xl bg-blue-50 border-blue-200 text-blue-700 px-5 py-4 text-sm font-medium">
     Uploading images...
