@@ -262,6 +262,7 @@ export default function AuctionClient({
           }
         );
 
+        fbq('track', 'AddToWishlist');
         setIsSaved(true);
 
       }
