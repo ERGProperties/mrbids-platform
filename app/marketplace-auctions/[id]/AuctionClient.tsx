@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useCallback,
 } from "react";
 
 import useSWR, {
@@ -20,6 +21,19 @@ import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 
 declare const fbq: any;
+
+const trackViewContent = (
+  auction: any
+) => {
+
+  fbq('track', 'ViewContent', {
+    content_name: auction.title,
+    content_category: auction.category,
+    value: auction.currentBid || auction.startingBid,
+    currency: 'USD',
+  });
+
+};
 
 const fetcher = (
   url: string
@@ -103,6 +117,14 @@ export default function AuctionClient({
 
   const previousHighestBidder =
     useRef<string | null>(null);
+
+useEffect(() => {
+
+  if (!auction) return;
+
+  trackViewContent(auction);
+
+}, [auction]);
 
   useEffect(() => {
 
