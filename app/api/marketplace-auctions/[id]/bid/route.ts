@@ -386,50 +386,78 @@ export async function POST(
 
     }
 
-    // SEND PUSH NOTIFICATION
-    if (
-      previousHighestBid &&
-      previousHighestBid.bidderId !==
-        user.id
-    ) {
+// SEND PUSH NOTIFICATION
+if (
+  previousHighestBid &&
+  previousHighestBid.bidderId !==
+    user.id
+) {
 
-      const pushSubscriptions =
-        await prisma.pushSubscription.findMany({
-          where: {
-            userId:
-              previousHighestBid.bidderId,
-          },
-        });
+  const pushSubscriptions =
+    await prisma.pushSubscription.findMany({
+      where: {
+        userId:
+          previousHighestBid.bidderId,
+      },
+    });
 
-      for (const sub of pushSubscriptions) {
+  for (const sub of pushSubscriptions) {
 
-        try {
+    try {
 
-          await sendPushNotification({
-            token:
-              sub.endpoint,
+      await sendPushNotification({
+        token:
+          sub.endpoint,
 
-            title:
-              "You've been outbid",
+        title:
+          "You've been outbid",
 
-            body:
-              `${auction.title} has a higher bid now.`,
+        body:
+          `${auction.title} has a higher bid now.`,
 
-            url:
-              `/marketplace-auctions/${auction.id}`,
-          });
+        url:
+          `/marketplace-auctions/${auction.id}`,
+      });
 
-        } catch (err) {
+    } catch (err) {
 
-          console.error(
-            "OUTBID PUSH ERROR:",
-            err
-          );
-        }
-
-      }
-
+      console.error(
+        "OUTBID PUSH ERROR:",
+        err
+      );
     }
+
+  }
+
+  // CREATE IN-APP NOTIFICATION
+  await prisma.notificationLog.create({
+    data: {
+      userId:
+        previousHighestBid.bidderId,
+
+      title:
+        "You've been outbid",
+
+      message:
+        `${auction.title} has a higher bid now.`,
+
+      auctionId:
+        auction.id,
+
+      type:
+        "OUTBID",
+
+      link:
+        `/marketplace-auctions/${auction.id}`,
+
+      metadata: {
+        bidAmount:
+          amount,
+      },
+    },
+  });
+
+}
 
     // REALTIME BROADCAST
     await pusherServer.trigger(
