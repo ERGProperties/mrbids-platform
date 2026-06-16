@@ -2,8 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import MobileBottomNav from "./MobileBottomNav";
-import LiveActivityToasts from "./LiveActivityToasts";
+
+import MobileBottomNav from "./MobileBottomNav"
+import LiveActivityToasts from "./LiveActivityToasts"
+import NotificationBell from "@/components/notifications/NotificationBell"
 
 export default function LayoutWrapper({
   children,
@@ -53,18 +55,21 @@ export default function LayoutWrapper({
               Real Estate
             </Link>
 
-            <Link
-  href="/coming-soon"
-  className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
->
-  <span className="sm:hidden">
-    Sell
-  </span>
+            {/* NOTIFICATION BELL */}
+            <NotificationBell />
 
-  <span className="hidden sm:inline">
-    Create an Auction
-  </span>
-</Link>
+            <Link
+              href="/coming-soon"
+              className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
+            >
+              <span className="sm:hidden">
+                Sell
+              </span>
+
+              <span className="hidden sm:inline">
+                Create an Auction
+              </span>
+            </Link>
 
           </nav>
 
