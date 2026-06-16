@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 
+declare const fbq: any;
+
 export default function SellerOnboardingPage() {
 
   const [email, setEmail] =
@@ -111,11 +113,15 @@ export default function SellerOnboardingPage() {
               <>
 
                 <button
-                  onClick={() =>
-                    signIn("google", {
+                  onClick={async () => {
+
+                    fbq('track', 'CompleteRegistration');
+
+                    await signIn("google", {
                       callbackUrl: "/marketplace-sell",
-                    })
-                  }
+                    });
+
+                  }}
                   className="w-full py-5 rounded-full border border-gray-300 bg-white text-black font-medium hover:bg-gray-50 transition flex items-center justify-center gap-3"
                 >
                   <svg
