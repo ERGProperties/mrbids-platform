@@ -1,7 +1,5 @@
 import { prisma } from "@/lib/prisma";
 
-import { pusherServer } from "@/lib/pusher";
-
 type CreateNotificationParams = {
   userId: string;
 
@@ -25,7 +23,7 @@ export async function createNotification({
   type,
   auctionId,
   link,
-  metadata,
+ metadata,
 }: CreateNotificationParams) {
 
   const notification =
@@ -46,15 +44,6 @@ export async function createNotification({
         metadata,
       },
     });
-
-  // REALTIME EVENT
-  await pusherServer.trigger(
-    "notifications",
-    "new-notification",
-    {
-      userId,
-    }
-  );
 
   return notification;
 }

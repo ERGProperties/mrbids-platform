@@ -5,15 +5,16 @@ import Link from "next/link";
 
 import { Bell } from "lucide-react";
 
-import { pusherClient } from "@/lib/pusher-client";
-
 type NotificationResponse = {
   unreadCount: number;
 };
 
 export default function NotificationBell() {
-  const [unreadCount, setUnreadCount] =
-    useState(0);
+
+  const [
+    unreadCount,
+    setUnreadCount,
+  ] = useState(0);
 
   useEffect(() => {
 
@@ -47,20 +48,7 @@ export default function NotificationBell() {
 
     fetchNotifications();
 
-    // REALTIME CHANNEL
-    const channel =
-      pusherClient.subscribe(
-        "notifications"
-      );
-
-    channel.bind(
-      "new-notification",
-      () => {
-        fetchNotifications();
-      }
-    );
-
-    // FALLBACK POLLING
+    // POLLING
     const interval =
       setInterval(
         fetchNotifications,
@@ -69,13 +57,8 @@ export default function NotificationBell() {
 
     return () => {
 
-      channel.unbind_all();
-
-      pusherClient.unsubscribe(
-        "notifications"
-      );
-
       clearInterval(interval);
+
     };
 
   }, []);

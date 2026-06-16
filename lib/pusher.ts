@@ -1,6 +1,12 @@
 import Pusher from "pusher";
 
+const globalForPusher =
+  global as unknown as {
+    pusher?: Pusher;
+  };
+
 export const pusherServer =
+  globalForPusher.pusher ??
   new Pusher({
     appId:
       process.env
@@ -20,3 +26,11 @@ export const pusherServer =
 
     useTLS: true,
   });
+
+if (
+  process.env.NODE_ENV !==
+  "production"
+) {
+  globalForPusher.pusher =
+    pusherServer;
+}
