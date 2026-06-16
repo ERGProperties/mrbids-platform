@@ -301,9 +301,18 @@ useEffect(() => {
 
   }
 
-  async function handleBid() {
+async function handleBid() {
 
-    try {
+  if (!session?.user) {
+
+    window.location.href =
+      `/signin?callbackUrl=/marketplace-auctions/${auction.id}`;
+
+    return;
+
+  }
+
+  try {
 
       setLoading(true);
 
