@@ -7,6 +7,9 @@ import { sendEmail }
 import { sendPushNotification }
   from "@/lib/push/sendPushNotification";
 
+import { createNotification }
+  from "@/lib/notifications/createNotification";
+
 export async function finalizeMarketplaceAuction(
   auctionId: string
 ) {
@@ -142,153 +145,147 @@ export async function finalizeMarketplaceAuction(
         },
       });
 
-for (const sub of winnerPushSubs) {
+    for (const sub of winnerPushSubs) {
 
-  await sendPushNotification({
-    token:
-      sub.endpoint,
+      await sendPushNotification({
+        token:
+          sub.endpoint,
 
-    title:
-      "🎉 You won the auction!",
+        title:
+          "🎉 You won the auction!",
 
-    body:
-      `${auction.title}`,
+        body:
+          `${auction.title}`,
 
-    url:
-      `/marketplace-auctions/${auction.id}`,
-  });
-}
+        url:
+          `/marketplace-auctions/${auction.id}`,
+      });
+    }
 
-// WINNER IN-APP NOTIFICATION
-await prisma.notificationLog.create({
-  data: {
-    userId:
-      winner.id,
+    await createNotification({
+      userId:
+        winner.id,
 
-    title:
-      "🎉 You won the auction!",
+      title:
+        "🎉 You won the auction!",
 
-    message:
-      `${auction.title} was won for $${highestBid.amount}.`,
+      message:
+        `${auction.title} was won for $${highestBid.amount}.`,
 
-    auctionId:
-      auction.id,
+      auctionId:
+        auction.id,
 
-    type:
-      "AUCTION_WON",
+      type:
+        "AUCTION_WON",
 
-    link:
-      `/marketplace-auctions/${auction.id}`,
+      link:
+        `/marketplace-auctions/${auction.id}`,
 
-    metadata: {
-      winningBid:
-        highestBid.amount,
-    },
-  },
-});
-
-}
-
-// LOSERS
-for (const bidderId of bidderIds) {
-
-  if (
-    bidderId ===
-    highestBid.bidderId
-  ) {
-    continue;
-  }
-
-  const user =
-    await prisma.user.findUnique({
-      where: {
-        id: bidderId,
+      metadata: {
+        winningBid:
+          highestBid.amount,
       },
     });
 
-  if (!user?.email) {
-    continue;
   }
 
-  await sendEmail({
-    to:
-      user.email,
+  // LOSERS
+  for (const bidderId of bidderIds) {
 
-    subject:
-      "Auction ended — you were outbid",
+    if (
+      bidderId ===
+      highestBid.bidderId
+    ) {
+      continue;
+    }
 
-    html: `
-      <h2>This auction has ended</h2>
+    const user =
+      await prisma.user.findUnique({
+        where: {
+          id: bidderId,
+        },
+      });
 
-      <p>${auction.title}</p>
+    if (!user?.email) {
+      continue;
+    }
 
-      <p>
-        Final price:
-        $${highestBid.amount}
-      </p>
+    await sendEmail({
+      to:
+        user.email,
 
-      <p>
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}">
-          View results
-        </a>
-      </p>
-    `,
-  });
+      subject:
+        "Auction ended — you were outbid",
 
-  const loserPushSubs =
-    await prisma.pushSubscription.findMany({
-      where: {
-        userId:
-          user.id,
+      html: `
+        <h2>This auction has ended</h2>
+
+        <p>${auction.title}</p>
+
+        <p>
+          Final price:
+          $${highestBid.amount}
+        </p>
+
+        <p>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}">
+            View results
+          </a>
+        </p>
+      `,
+    });
+
+    const loserPushSubs =
+      await prisma.pushSubscription.findMany({
+        where: {
+          userId:
+            user.id,
+        },
+      });
+
+    for (const sub of loserPushSubs) {
+
+      await sendPushNotification({
+        token:
+          sub.endpoint,
+
+        title:
+          "Auction ended",
+
+        body:
+          `${auction.title} has ended.`,
+
+        url:
+          `/marketplace-auctions/${auction.id}`,
+      });
+    }
+
+    await createNotification({
+      userId:
+        user.id,
+
+      title:
+        "Auction ended",
+
+      message:
+        `You were outbid on ${auction.title}.`,
+
+      auctionId:
+        auction.id,
+
+      type:
+        "AUCTION_LOST",
+
+      link:
+        `/marketplace-auctions/${auction.id}`,
+
+      metadata: {
+        finalPrice:
+          highestBid.amount,
       },
     });
 
-for (const sub of loserPushSubs) {
-
-  await sendPushNotification({
-    token:
-      sub.endpoint,
-
-    title:
-      "Auction ended",
-
-    body:
-      `${auction.title} has ended.`,
-
-    url:
-      `/marketplace-auctions/${auction.id}`,
-  });
-}
-
-// LOSER IN-APP NOTIFICATION
-await prisma.notificationLog.create({
-  data: {
-    userId:
-      user.id,
-
-    title:
-      "Auction ended",
-
-    message:
-      `You were outbid on ${auction.title}.`,
-
-    auctionId:
-      auction.id,
-
-    type:
-      "AUCTION_LOST",
-
-    link:
-      `/marketplace-auctions/${auction.id}`,
-
-    metadata: {
-      finalPrice:
-        highestBid.amount,
-    },
-  },
-});
-
-}
+  }
 
   // SELLER
   if (auction.seller?.email) {
@@ -320,50 +317,48 @@ await prisma.notificationLog.create({
         },
       });
 
-for (const sub of sellerPushSubs) {
+    for (const sub of sellerPushSubs) {
 
-  await sendPushNotification({
-    token:
-      sub.endpoint,
+      await sendPushNotification({
+        token:
+          sub.endpoint,
 
-    title:
-      "Your auction ended",
+        title:
+          "Your auction ended",
 
-    body:
-      `${auction.title} sold successfully.`,
+        body:
+          `${auction.title} sold successfully.`,
 
-    url:
-      `/marketplace-auctions/${auction.id}`,
-  });
-}
+        url:
+          `/marketplace-auctions/${auction.id}`,
+      });
+    }
 
-// SELLER IN-APP NOTIFICATION
-await prisma.notificationLog.create({
-  data: {
-    userId:
-      auction.seller.id,
+    await createNotification({
+      userId:
+        auction.seller.id,
 
-    title:
-      "Your auction sold",
+      title:
+        "Your auction sold",
 
-    message:
-      `${auction.title} sold for $${highestBid.amount}.`,
+      message:
+        `${auction.title} sold for $${highestBid.amount}.`,
 
-    auctionId:
-      auction.id,
+      auctionId:
+        auction.id,
 
-    type:
-      "AUCTION_WON",
+      type:
+        "AUCTION_WON",
 
-    link:
-      `/marketplace-auctions/${auction.id}`,
+      link:
+        `/marketplace-auctions/${auction.id}`,
 
-    metadata: {
-      finalPrice:
-        highestBid.amount,
-    },
-  },
-});
-}
+      metadata: {
+        finalPrice:
+          highestBid.amount,
+      },
+    });
+
+  }
 
 }

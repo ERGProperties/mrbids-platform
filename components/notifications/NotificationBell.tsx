@@ -5,33 +5,79 @@ import Link from "next/link";
 
 import { Bell } from "lucide-react";
 
+import { pusherClient } from "@/lib/pusher-client";
+
 type NotificationResponse = {
   unreadCount: number;
 };
 
 export default function NotificationBell() {
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadCount, setUnreadCount] =
+    useState(0);
 
   useEffect(() => {
+
     async function fetchNotifications() {
+
       try {
-        const res = await fetch("/api/notifications");
+
+        const res =
+          await fetch(
+            "/api/notifications"
+          );
 
         if (!res.ok) return;
 
-        const data: NotificationResponse = await res.json();
+        const data:
+          NotificationResponse =
+            await res.json();
 
-        setUnreadCount(data.unreadCount || 0);
+        setUnreadCount(
+          data.unreadCount || 0
+        );
+
       } catch (error) {
-        console.error("NOTIFICATION_FETCH_ERROR", error);
+
+        console.error(
+          "NOTIFICATION_FETCH_ERROR",
+          error
+        );
       }
     }
 
     fetchNotifications();
 
-    const interval = setInterval(fetchNotifications, 30000);
+    // REALTIME CHANNEL
+    const channel =
+      pusherClient.subscribe(
+        "notifications"
+      );
 
-    return () => clearInterval(interval);
+    channel.bind(
+      "new-notification",
+      () => {
+        fetchNotifications();
+      }
+    );
+
+    // FALLBACK POLLING
+    const interval =
+      setInterval(
+        fetchNotifications,
+        30000
+      );
+
+    return () => {
+
+      channel.unbind_all();
+
+      pusherClient.unsubscribe(
+        "notifications"
+      );
+
+      clearInterval(interval);
+    };
+
   }, []);
 
   return (
@@ -43,7 +89,9 @@ export default function NotificationBell() {
 
       {unreadCount > 0 && (
         <span className="absolute -top-1 -right-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
-          {unreadCount > 9 ? "9+" : unreadCount}
+          {unreadCount > 9
+            ? "9+"
+            : unreadCount}
         </span>
       )}
     </Link>
