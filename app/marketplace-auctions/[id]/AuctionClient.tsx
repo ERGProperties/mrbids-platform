@@ -19,6 +19,8 @@ import { useSession } from "next-auth/react";
 
 import { useSearchParams } from "next/navigation";
 
+declare const fbq: any;
+
 const fetcher = (
   url: string
 ) =>
@@ -316,9 +318,11 @@ export default function AuctionClient({
         return;
       }
 
-      setSuccess(
-        "Bid placed successfully!"
-      );
+fbq('track', 'InitiateCheckout');
+
+setSuccess(
+  "Bid placed successfully!"
+);
 
     } catch (err) {
 
