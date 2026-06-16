@@ -380,6 +380,10 @@ setSuccess(
         return;
       }
 
+fbq('track', 'Purchase', {
+  value: totalDue,
+  currency: 'USD',
+});
       window.location.href =
         data.url;
 
