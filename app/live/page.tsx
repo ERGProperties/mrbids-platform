@@ -33,7 +33,7 @@ export default async function LivePage() {
       },
 
       orderBy: {
-        createdAt: "desc",
+        endAt: "asc",
       },
 
       include: {
