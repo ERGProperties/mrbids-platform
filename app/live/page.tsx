@@ -220,7 +220,7 @@ export default async function LivePage() {
 
       <div className="ml-2">
         <CountdownTimer
-          endAt={auction.endAt}
+          endAt={auction.endAt.toISOString()}
         />
       </div>
 
