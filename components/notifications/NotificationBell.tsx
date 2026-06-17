@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+import { useSession } from "next-auth/react";
+
 import { Bell } from "lucide-react";
 
 type NotificationResponse = {
@@ -11,12 +13,23 @@ type NotificationResponse = {
 
 export default function NotificationBell() {
 
+  const { status } =
+    useSession();
+
   const [
     unreadCount,
     setUnreadCount,
   ] = useState(0);
 
   useEffect(() => {
+
+    // ONLY FETCH IF SIGNED IN
+    if (status !== "authenticated") {
+
+      setUnreadCount(0);
+
+      return;
+    }
 
     async function fetchNotifications() {
 
@@ -61,7 +74,7 @@ export default function NotificationBell() {
 
     };
 
-  }, []);
+  }, [status]);
 
   return (
     <Link
