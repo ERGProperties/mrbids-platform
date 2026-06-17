@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+declare const fbq: any;
+
 export default function SellerOnboardingPage() {
 
   const [form, setForm] = useState({
@@ -78,6 +80,11 @@ export default function SellerOnboardingPage() {
           "Something went wrong"
         );
       }
+
+      fbq(
+        'track',
+        'CompleteRegistration'
+      );
 
       window.location.href =
         "/seller/dashboard";
