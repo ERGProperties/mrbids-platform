@@ -1,3 +1,5 @@
+import CountdownTimer from "@/components/CountdownTimer";
+
 import Link from "next/link";
 
 import { prisma } from "@/lib/prisma";
@@ -195,19 +197,37 @@ export default async function MarketplaceAuctionsPage({
             </div>
           </div>
 
-          {/* CURRENT BID */}
-          <div className="mt-6">
+{/* CURRENT BID */}
+<div className="mt-6">
 
-            <p className="text-sm text-gray-500 mb-1">
-              Current Bid
-            </p>
+  <p className="text-sm text-gray-500 mb-1">
+    Current Bid
+  </p>
 
-            <p className="text-2xl md:text-3xl font-semibold">
-              $
-              {auction.currentBid?.toLocaleString()}
-            </p>
+  <p className="text-2xl md:text-3xl font-semibold">
+    $
+    {auction.currentBid?.toLocaleString()}
+  </p>
 
-          </div>
+  {auction.endAt && (
+
+    <div className="mt-3 inline-flex items-center px-3 py-2 rounded-full bg-red-50 border border-red-100">
+
+      <span className="text-sm font-medium text-red-700">
+        Ends In:
+      </span>
+
+      <div className="ml-2">
+        <CountdownTimer
+          endAt={auction.endAt.toISOString()}
+        />
+      </div>
+
+    </div>
+
+  )}
+
+</div>
 
           {/* RETAIL PRICE */}
           <div className="mt-5 border rounded-2xl p-4 bg-green-50 border-green-200">
