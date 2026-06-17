@@ -1,5 +1,7 @@
 "use client";
 
+import imageCompression from "browser-image-compression";
+
 import { useState } from "react";
 
 import { useRouter } from "next/navigation";
@@ -73,46 +75,53 @@ export default function MarketplaceSellPage() {
       localPickup: false,
     });
 
-  // CLOUDINARY UPLOAD
-  async function handleImageUpload(
-    file: File
-  ) {
+// CLOUDINARY UPLOAD
+async function handleImageUpload(
+  file: File
+) {
 
-    const formData =
-      new FormData();
+  const compressedFile =
+    await imageCompression(file, {
+      maxSizeMB: 0.6,
+      maxWidthOrHeight: 1600,
+      useWebWorker: true,
+    });
 
-    formData.append(
-      "file",
-      file
-    );
+  const formData =
+    new FormData();
 
-    formData.append(
-      "upload_preset",
-      "mrbids_upload"
-    );
+  formData.append(
+    "file",
+    compressedFile
+  );
 
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/dx1okt4vf/image/upload",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+  formData.append(
+    "upload_preset",
+    "mrbids_upload"
+  );
 
-    const data =
-      await res.json();
-
-    if (!res.ok) {
-
-      throw new Error(
-        data.error?.message ||
-        "Image upload failed"
-      );
-
+  const res = await fetch(
+    "https://api.cloudinary.com/v1_1/dx1okt4vf/image/upload",
+    {
+      method: "POST",
+      body: formData,
     }
+  );
 
-    return data.secure_url;
+  const data =
+    await res.json();
+
+  if (!res.ok) {
+
+    throw new Error(
+      data.error?.message ||
+      "Image upload failed"
+    );
+
   }
+
+  return data.secure_url;
+}
 
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
