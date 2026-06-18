@@ -246,19 +246,19 @@ export async function POST(
             1000
         );
 
-      // EXTEND IF UNDER 15 SECONDS
-      if (
-        secondsRemaining <=
-        15
-      ) {
+// EXTEND IF UNDER 15 MINUTES
+if (
+  secondsRemaining <=
+  15 * 60
+) {
 
-        updatedEndAt =
-          new Date(
-            endTime +
-              15 * 1000
-          );
+  updatedEndAt =
+    new Date(
+      endTime +
+        15 * 60 * 1000
+    );
 
-      }
+}
 
     }
 
