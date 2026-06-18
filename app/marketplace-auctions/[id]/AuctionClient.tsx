@@ -661,8 +661,16 @@ fbq('track', 'Purchase', {
 
         {/* COUNTDOWN */}
         <div className="mt-8">
-          <CountdownTimer endAt={auction.endAt} />
-        </div>
+
+          {auction.endAt && (
+
+            <CountdownTimer
+              endAt={auction.endAt.toISOString()}
+        />
+
+        )}
+
+      </div>
 
         {/* CURRENT BID */}
         <div className="mt-10">
