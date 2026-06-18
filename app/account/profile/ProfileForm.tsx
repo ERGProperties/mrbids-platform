@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 declare const fbq: any;
+declare const gtag: any;
 
 export default function ProfileForm({ user }: { user: any }) {
 
@@ -115,6 +116,15 @@ export default function ProfileForm({ user }: { user: any }) {
       fbq(
         'track',
         'CompleteRegistration'
+      );
+
+      gtag(
+        'event',
+        'conversion',
+        {
+          send_to:
+            'AW-18177376162/OdB9CMfGoLMcEKL_OttD'
+        }
       );
 
       setSuccess(true);

@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 declare const fbq: any;
+declare const gtag: any;
 
 export default function SellerOnboardingPage() {
 
@@ -84,6 +85,15 @@ export default function SellerOnboardingPage() {
       fbq(
         'track',
         'CompleteRegistration'
+      );
+
+      gtag(
+        'event',
+        'conversion',
+        {
+          send_to:
+            'AW-18177376162/OdB9CMfGoLMcEKL_OttD'
+        }
       );
 
       window.location.href =
