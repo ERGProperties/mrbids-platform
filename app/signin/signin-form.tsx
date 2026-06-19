@@ -48,7 +48,7 @@ export default function SignInPage() {
             MrBids
           </h1>
           <p className="mt-2 text-sm text-gray-600">
-            Secure access for verified real estate bidders
+            Secure access for verified marketplace bidders
           </p>
         </div>
 
