@@ -665,7 +665,7 @@ fbq('track', 'Purchase', {
           {auction.endAt && (
 
             <CountdownTimer
-              endAt={auction.endAt.toISOString()}
+              endAt={new Date(auction.endAt).toISOString()}
         />
 
         )}
