@@ -10,6 +10,8 @@ import { pusherServer } from "@/lib/pusher";
 
 import { sendOutbidEmail } from "@/lib/email/sendOutbidEmail";
 
+import { sendHighestBidderEmail } from "@/lib/email/sendHighestBidderEmail";
+
 import { sendPushNotification } from "@/lib/push/sendPushNotification";
 
 export async function POST(
@@ -242,23 +244,22 @@ export async function POST(
 
       const secondsRemaining =
         Math.floor(
-          (endTime - now) /
-            1000
+          (endTime - now) / 1000
         );
 
-// EXTEND IF UNDER 15 MINUTES
-if (
-  secondsRemaining <=
-  15 * 60
-) {
+      // EXTEND IF UNDER 15 MINUTES
+      if (
+        secondsRemaining <=
+        15 * 60
+      ) {
 
-  updatedEndAt =
-    new Date(
-      endTime +
-        15 * 60 * 1000
-    );
+        updatedEndAt =
+          new Date(
+            endTime +
+            15 * 60 * 1000
+          );
 
-}
+      }
 
     }
 
@@ -321,7 +322,7 @@ if (
       const fiveMinutesAgo =
         new Date(
           Date.now() -
-            5 * 60 * 1000
+          5 * 60 * 1000
         );
 
       const recentNotification =
@@ -386,78 +387,122 @@ if (
 
     }
 
-// SEND PUSH NOTIFICATION
-if (
-  previousHighestBid &&
-  previousHighestBid.bidderId !==
-    user.id
-) {
+    // SEND HIGHEST BIDDER EMAIL
+    if (user.email) {
 
-  const pushSubscriptions =
-    await prisma.pushSubscription.findMany({
-      where: {
-        userId:
-          previousHighestBid.bidderId,
-      },
-    });
+      await sendHighestBidderEmail({
+        to:
+          user.email,
 
-  for (const sub of pushSubscriptions) {
+        address:
+          auction.title,
 
-    try {
-
-      await sendPushNotification({
-        token:
-          sub.endpoint,
-
-        title:
-          "You've been outbid",
-
-        body:
-          `${auction.title} has a higher bid now.`,
-
-        url:
-          `/marketplace-auctions/${auction.id}`,
-      });
-
-    } catch (err) {
-
-      console.error(
-        "OUTBID PUSH ERROR:",
-        err
-      );
-    }
-
-  }
-
-  // CREATE IN-APP NOTIFICATION
-  await prisma.notificationLog.create({
-    data: {
-      userId:
-        previousHighestBid.bidderId,
-
-      title:
-        "You've been outbid",
-
-      message:
-        `${auction.title} has a higher bid now.`,
-
-      auctionId:
-        auction.id,
-
-      type:
-        "OUTBID",
-
-      link:
-        `/marketplace-auctions/${auction.id}`,
-
-      metadata: {
         bidAmount:
           amount,
-      },
-    },
-  });
 
-}
+        auctionUrl:
+          `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
+
+        coverImage:
+          auction.coverImage ||
+          auction.images?.[0] ||
+          undefined,
+      });
+
+      // LOG NOTIFICATION
+      await prisma.notificationLog.create({
+        data: {
+          userId:
+            user.id,
+
+          auctionId:
+            auction.id,
+
+          type:
+            "HIGHEST_BIDDER_EMAIL",
+
+          metadata: {
+            bidAmount:
+              amount,
+          },
+        },
+      });
+
+    }
+
+    // SEND PUSH NOTIFICATION
+    if (
+      previousHighestBid &&
+      previousHighestBid.bidderId !==
+        user.id
+    ) {
+
+      const pushSubscriptions =
+        await prisma.pushSubscription.findMany({
+          where: {
+            userId:
+              previousHighestBid.bidderId,
+          },
+        });
+
+      for (const sub of pushSubscriptions) {
+
+        try {
+
+          await sendPushNotification({
+            token:
+              sub.endpoint,
+
+            title:
+              "You've been outbid",
+
+            body:
+              `${auction.title} has a higher bid now.`,
+
+            url:
+              `/marketplace-auctions/${auction.id}`,
+          });
+
+        } catch (err) {
+
+          console.error(
+            "OUTBID PUSH ERROR:",
+            err
+          );
+
+        }
+
+      }
+
+      // CREATE IN-APP NOTIFICATION
+      await prisma.notificationLog.create({
+        data: {
+          userId:
+            previousHighestBid.bidderId,
+
+          title:
+            "You've been outbid",
+
+          message:
+            `${auction.title} has a higher bid now.`,
+
+          auctionId:
+            auction.id,
+
+          type:
+            "OUTBID",
+
+          link:
+            `/marketplace-auctions/${auction.id}`,
+
+          metadata: {
+            bidAmount:
+              amount,
+          },
+        },
+      });
+
+    }
 
     // REALTIME BROADCAST
     await pusherServer.trigger(

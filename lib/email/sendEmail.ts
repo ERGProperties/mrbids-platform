@@ -14,7 +14,7 @@ export async function sendEmail({
   html?: string;
 }) {
   await resend.emails.send({
-    from: "MrBids <noreply@mrbids.com>",
+    from: "MrBids <no-reply@mrbids.com>",
     to,
     subject,
     text,

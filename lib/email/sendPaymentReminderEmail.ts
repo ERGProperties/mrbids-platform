@@ -115,11 +115,11 @@ export async function sendPaymentReminderEmail({
               <td style="padding:22px; text-align:center; border-top:1px solid #f1f1f1;">
 
                 <p style="font-size:13px; color:#555;">
-                  MrBids Marketplace
+                  MrBids — Real-time marketplace auctions
                 </p>
 
                 <p style="font-size:12px; color:#888;">
-                  Real-time auctions powered by MrBids
+                  Secure real-time bidding powered by MrBids
                 </p>
 
               </td>
