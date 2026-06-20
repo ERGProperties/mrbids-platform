@@ -430,6 +430,34 @@ export async function POST(
 
     }
 
+// CREATE HIGHEST BIDDER NOTIFICATION
+await prisma.notificationLog.create({
+  data: {
+    userId:
+      user.id,
+
+    title:
+      "You're the highest bidder",
+
+    message:
+      `You're currently winning ${auction.title}.`,
+
+    auctionId:
+      auction.id,
+
+    type:
+      "HIGHEST_BIDDER",
+
+    link:
+      `/marketplace-auctions/${auction.id}`,
+
+    metadata: {
+      bidAmount:
+        amount,
+    },
+  },
+});
+
     // SEND PUSH NOTIFICATION
     if (
       previousHighestBid &&
