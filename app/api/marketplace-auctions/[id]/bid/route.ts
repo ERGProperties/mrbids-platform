@@ -409,25 +409,6 @@ export async function POST(
           undefined,
       });
 
-      // LOG NOTIFICATION
-      await prisma.notificationLog.create({
-        data: {
-          userId:
-            user.id,
-
-          auctionId:
-            auction.id,
-
-          type:
-            "HIGHEST_BIDDER_EMAIL",
-
-          metadata: {
-            bidAmount:
-              amount,
-          },
-        },
-      });
-
     }
 
 // CREATE HIGHEST BIDDER NOTIFICATION
