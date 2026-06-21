@@ -166,7 +166,11 @@ model MarketplaceAuction {
 
   watchlistedBy Watchlist[]
 
-  endingSoonSent Boolean @default(false)
+  oneHourEndingSoonSent Boolean @default(false)
+
+  fifteenMinEndingSoonSent Boolean @default(false)
+
+  fiveMinEndingSoonSent Boolean @default(false)
 
   @@index([sellerId])
   @@index([status])

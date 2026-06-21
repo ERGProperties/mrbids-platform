@@ -16,7 +16,7 @@ export async function autoCloseExpiredAuctions() {
       where: {
         status: "LIVE",
 
-        endingSoonSent: false,
+        fifteenMinEndingSoonSent: false,
 
         endAt: {
           lte: new Date(
@@ -112,7 +112,7 @@ export async function autoCloseExpiredAuctions() {
       },
 
       data: {
-        endingSoonSent: true,
+        fifteenMinEndingSoonSent: true,
       },
     });
   }

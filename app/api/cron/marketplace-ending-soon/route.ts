@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { resend, EMAIL_FROM } from "@/lib/email/mailer";
 
 export async function GET() {
+
   try {
 
     const now =
@@ -22,7 +23,7 @@ export async function GET() {
         where: {
           status: "LIVE",
 
-          endingSoonSent: false,
+          fifteenMinEndingSoonSent: false,
 
           endAt: {
             lte:
@@ -159,7 +160,7 @@ export async function GET() {
         },
 
         data: {
-          endingSoonSent: true,
+          fifteenMinEndingSoonSent: true,
         },
       });
 

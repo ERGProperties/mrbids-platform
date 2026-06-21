@@ -156,16 +156,26 @@ export async function GET() {
 
       const auctions =
         await prisma.marketplaceAuction.findMany({
-          where: {
-            status: "LIVE",
+where: {
+  status: "LIVE",
 
-            endingSoonSent: false,
+  endAt: {
+    gte: start,
+    lte: end,
+  },
 
-            endAt: {
-              gte: start,
-              lte: end,
-            },
-          },
+  ...(windowMs === 60 * 60 * 1000 && {
+    oneHourEndingSoonSent: false,
+  }),
+
+  ...(windowMs === 15 * 60 * 1000 && {
+    fifteenMinEndingSoonSent: false,
+  }),
+
+  ...(windowMs === 5 * 60 * 1000 && {
+    fiveMinEndingSoonSent: false,
+  }),
+},
 
           include: {
             bids: {
@@ -303,9 +313,19 @@ export async function GET() {
             id: auction.id,
           },
 
-          data: {
-            endingSoonSent: true,
-          },
+data: {
+  ...(windowMs === 60 * 60 * 1000 && {
+    oneHourEndingSoonSent: true,
+  }),
+
+  ...(windowMs === 15 * 60 * 1000 && {
+    fifteenMinEndingSoonSent: true,
+  }),
+
+  ...(windowMs === 5 * 60 * 1000 && {
+    fiveMinEndingSoonSent: true,
+  }),
+},
         });
       }
     }
