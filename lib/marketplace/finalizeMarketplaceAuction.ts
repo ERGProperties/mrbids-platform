@@ -118,48 +118,48 @@ export async function finalizeMarketplaceAuction(
 
   if (winner?.email) {
 
-await sendAuctionWonEmail({
-  to:
-    winner.email,
+    await sendAuctionWonEmail({
+      to:
+        winner.email,
 
-  address:
-    auction.title,
+      address:
+        auction.title,
 
-  winningBid:
-    highestBid.amount,
+      winningBid:
+        highestBid.amount,
 
-  sellerName:
-    auction.seller?.name ||
-    "MrBids Seller",
+      sellerName:
+        auction.seller?.name ||
+        "MrBids Seller",
 
-  sellerEmail:
-    auction.seller?.email ||
-    "no-reply@mrbids.com",
+      sellerEmail:
+        auction.seller?.email ||
+        "no-reply@mrbids.com",
 
-  auctionUrl:
-    `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
+      auctionUrl:
+        `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
 
-  coverImage:
-    auction.coverImage ||
-    auction.images?.[0] ||
-    undefined,
+      coverImage:
+        auction.coverImage ||
+        auction.images?.[0] ||
+        undefined,
 
-  shippingCost:
-    auction.shippingCost ||
-    undefined,
+      shippingCost:
+        auction.shippingCost ||
+        undefined,
 
-  shippingLabel:
-    auction.shippingLabel ||
-    undefined,
+      shippingLabel:
+        auction.shippingLabel ||
+        undefined,
 
-  freeShipping:
-    auction.shippingType ===
-    "FREE",
+      freeShipping:
+        auction.shippingType ===
+        "FREE",
 
-  localPickup:
-    auction.shippingType ===
-    "LOCAL_PICKUP",
-});
+      localPickup:
+        auction.shippingType ===
+        "LOCAL_PICKUP",
+    });
 
     const winnerPushSubs =
       await prisma.pushSubscription.findMany({
@@ -171,19 +171,31 @@ await sendAuctionWonEmail({
 
     for (const sub of winnerPushSubs) {
 
-      await sendPushNotification({
-        token:
-          sub.endpoint,
+      try {
 
-        title:
-          "🎉 You won the auction!",
+        await sendPushNotification({
+          token:
+            sub.endpoint,
 
-        body:
-          `${auction.title}`,
+          title:
+            "🎉 You won the auction!",
 
-        url:
-          `/marketplace-auctions/${auction.id}`,
-      });
+          body:
+            `${auction.title}`,
+
+          url:
+            `/marketplace-auctions/${auction.id}`,
+        });
+
+      } catch (err) {
+
+        console.error(
+          "PUSH SEND ERROR:",
+          err
+        );
+
+      }
+
     }
 
     await createNotification({
@@ -269,19 +281,31 @@ await sendAuctionWonEmail({
 
     for (const sub of loserPushSubs) {
 
-      await sendPushNotification({
-        token:
-          sub.endpoint,
+      try {
 
-        title:
-          "Auction ended",
+        await sendPushNotification({
+          token:
+            sub.endpoint,
 
-        body:
-          `${auction.title} has ended.`,
+          title:
+            "Auction ended",
 
-        url:
-          `/marketplace-auctions/${auction.id}`,
-      });
+          body:
+            `${auction.title} has ended.`,
+
+          url:
+            `/marketplace-auctions/${auction.id}`,
+        });
+
+      } catch (err) {
+
+        console.error(
+          "PUSH SEND ERROR:",
+          err
+        );
+
+      }
+
     }
 
     await createNotification({
@@ -314,32 +338,33 @@ await sendAuctionWonEmail({
   // SELLER
   if (auction.seller?.email) {
 
-await sendSellerWinnerEmail({
-  to:
-    auction.seller.email,
+    await sendSellerWinnerEmail({
+      to:
+        auction.seller.email,
 
-  address:
-    auction.title,
+      address:
+        auction.title,
 
-  winningBid:
-    highestBid.amount,
+      winningBid:
+        highestBid.amount,
 
-  buyerName:
-    winner?.name ||
-    "Winning Bidder",
+      buyerName:
+        winner?.name ||
+        "Winning Bidder",
 
-  buyerEmail:
-    winner?.email ||
-    "no-reply@mrbids.com",
+      buyerEmail:
+        winner?.email ||
+        "no-reply@mrbids.com",
 
-  auctionUrl:
-    `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
+      auctionUrl:
+        `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
 
-  coverImage:
-    auction.coverImage ||
-    auction.images?.[0] ||
-    undefined,
-});
+      coverImage:
+        auction.coverImage ||
+        auction.images?.[0] ||
+        undefined,
+    });
+
     const sellerPushSubs =
       await prisma.pushSubscription.findMany({
         where: {
@@ -350,19 +375,31 @@ await sendSellerWinnerEmail({
 
     for (const sub of sellerPushSubs) {
 
-      await sendPushNotification({
-        token:
-          sub.endpoint,
+      try {
 
-        title:
-          "Your auction ended",
+        await sendPushNotification({
+          token:
+            sub.endpoint,
 
-        body:
-          `${auction.title} sold successfully.`,
+          title:
+            "Your auction ended",
 
-        url:
-          `/marketplace-auctions/${auction.id}`,
-      });
+          body:
+            `${auction.title} sold successfully.`,
+
+          url:
+            `/marketplace-auctions/${auction.id}`,
+        });
+
+      } catch (err) {
+
+        console.error(
+          "PUSH SEND ERROR:",
+          err
+        );
+
+      }
+
     }
 
     await createNotification({
