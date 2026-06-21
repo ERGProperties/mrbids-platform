@@ -324,8 +324,13 @@ await sendSellerWinnerEmail({
   winningBid:
     highestBid.amount,
 
-  winnerEmail:
-    winner?.email || "Winner",
+  buyerName:
+    winner?.name ||
+    "Winning Bidder",
+
+  buyerEmail:
+    winner?.email ||
+    "no-reply@mrbids.com",
 
   auctionUrl:
     `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
@@ -335,7 +340,6 @@ await sendSellerWinnerEmail({
     auction.images?.[0] ||
     undefined,
 });
-
     const sellerPushSubs =
       await prisma.pushSubscription.findMany({
         where: {
