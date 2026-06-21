@@ -4,6 +4,12 @@ import { prisma }
 import { sendEmail }
   from "@/lib/notifications/email";
 
+import { sendAuctionWonEmail }
+  from "@/lib/email/sendAuctionWonEmail";
+
+import { sendSellerWinnerEmail }
+  from "@/lib/email/sendSellerWinnerEmail";
+
 import { sendPushNotification }
   from "@/lib/push/sendPushNotification";
 
@@ -112,30 +118,24 @@ export async function finalizeMarketplaceAuction(
 
   if (winner?.email) {
 
-    await sendEmail({
-      to:
-        winner.email,
+await sendAuctionWonEmail({
+  to:
+    winner.email,
 
-      subject:
-        "🎉 You won the auction!",
+  address:
+    auction.title,
 
-      html: `
-        <h2>Congratulations — you won!</h2>
+  winningBid:
+    highestBid.amount,
 
-        <p>${auction.title}</p>
+  auctionUrl:
+    `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
 
-        <p>
-          Winning bid:
-          $${highestBid.amount}
-        </p>
-
-        <p>
-          <a href="${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}">
-            View auction
-          </a>
-        </p>
-      `,
-    });
+  coverImage:
+    auction.coverImage ||
+    auction.images?.[0] ||
+    undefined,
+});
 
     const winnerPushSubs =
       await prisma.pushSubscription.findMany({
@@ -290,24 +290,27 @@ export async function finalizeMarketplaceAuction(
   // SELLER
   if (auction.seller?.email) {
 
-    await sendEmail({
-      to:
-        auction.seller.email,
+await sendSellerWinnerEmail({
+  to:
+    auction.seller.email,
 
-      subject:
-        "Your auction has ended",
+  address:
+    auction.title,
 
-      html: `
-        <h2>Your auction has ended</h2>
+  winningBid:
+    highestBid.amount,
 
-        <p>${auction.title}</p>
+  winnerEmail:
+    winner?.email || "Winner",
 
-        <p>
-          Final price:
-          $${highestBid.amount}
-        </p>
-      `,
-    });
+  auctionUrl:
+    `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
+
+  coverImage:
+    auction.coverImage ||
+    auction.images?.[0] ||
+    undefined,
+});
 
     const sellerPushSubs =
       await prisma.pushSubscription.findMany({
