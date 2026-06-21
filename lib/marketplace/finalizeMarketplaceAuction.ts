@@ -128,6 +128,14 @@ await sendAuctionWonEmail({
   winningBid:
     highestBid.amount,
 
+  sellerName:
+    auction.seller?.name ||
+    "MrBids Seller",
+
+  sellerEmail:
+    auction.seller?.email ||
+    "no-reply@mrbids.com",
+
   auctionUrl:
     `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
 
@@ -135,6 +143,22 @@ await sendAuctionWonEmail({
     auction.coverImage ||
     auction.images?.[0] ||
     undefined,
+
+  shippingCost:
+    auction.shippingCost ||
+    undefined,
+
+  shippingLabel:
+    auction.shippingLabel ||
+    undefined,
+
+  freeShipping:
+    auction.shippingType ===
+    "FREE",
+
+  localPickup:
+    auction.shippingType ===
+    "LOCAL_PICKUP",
 });
 
     const winnerPushSubs =
