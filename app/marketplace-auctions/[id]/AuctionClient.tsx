@@ -75,15 +75,10 @@ export default function AuctionClient({
     setSelectedImage,
   ] = useState(0);
 
-  const [
-    amount,
-    setAmount,
-  ] = useState(
-    auction.currentBid > 0
-      ? auction.currentBid +
-          auction.bidIncrement
-      : auction.startingBid
-  );
+const [
+  amount,
+  setAmount,
+] = useState("");
 
   const [
     loading,
@@ -226,12 +221,14 @@ useEffect(() => {
 
     if (!auction) return;
 
-    setAmount(
-      auction.currentBid > 0
-        ? auction.currentBid +
-            auction.bidIncrement
-        : auction.startingBid
-    );
+setAmount(
+  String(
+    auction.currentBid > 0
+      ? auction.currentBid +
+          auction.bidIncrement
+      : auction.startingBid
+  )
+);
 
   }, [
     auction.currentBid,
@@ -331,9 +328,9 @@ async function handleBid() {
                 "application/json",
             },
 
-            body: JSON.stringify({
-              amount,
-            }),
+body: JSON.stringify({
+  amount: Number(amount),
+}),
           }
         );
 
@@ -875,13 +872,11 @@ fbq('track', 'Purchase', {
               <input
                 type="number"
                 value={amount}
-                onChange={(e) =>
-                  setAmount(
-                    Number(
-                      e.target.value
-                    )
-                  )
-                }
+onChange={(e) =>
+  setAmount(
+    e.target.value
+  )
+}
                 className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold outline-none focus:ring-2 focus:ring-black"
               />
 
