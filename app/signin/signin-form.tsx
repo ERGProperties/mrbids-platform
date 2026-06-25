@@ -92,6 +92,28 @@ export default function SignInPage() {
   Continue with Google
 </button>
 
+<button
+type="button"
+onClick={() => signIn("apple", { callbackUrl })}
+className="mt-4 w-full rounded-xl bg-black py-3 text-sm font-medium text-white hover:bg-gray-900 transition flex items-center justify-center gap-3"
+
+>
+
+<svg
+xmlns="http://www.w3.org/2000/svg"
+viewBox="0 0 24 24"
+fill="currentColor"
+className="w-5 h-5"
+
+>
+
+<path d="M16.365 1.43c0 1.14-.466 2.19-1.224 2.94-.825.82-2.173 1.45-3.34 1.36-.15-1.11.42-2.3 1.17-3.05.82-.83 2.24-1.42 3.394-1.25.03.1.045.2.045.3zm4.207 16.978c-.57 1.31-.84 1.89-1.574 3.02-1.02 1.57-2.46 3.53-4.25 3.55-1.59.02-2-.99-4.16-.98-2.16.01-2.61 1-4.2.98-1.79-.02-3.15-1.79-4.17-3.36-2.86-4.38-3.16-9.52-1.4-12.22 1.25-1.93 3.23-3.06 5.09-3.06 1.9 0 3.09 1.04 4.66 1.04 1.52 0 2.45-1.04 4.65-1.04 1.66 0 3.43.9 4.68 2.45-4.12 2.26-3.45 8.14.67 9.62z" />
+
+  </svg>
+
+Continue with Apple
+</button>
+
 <div className="relative my-6">
   <div className="absolute inset-0 flex items-center">
     <div className="w-full border-t border-gray-300" />
