@@ -23,7 +23,6 @@ async function handleSubmit(
 e: React.FormEvent<HTMLFormElement>
 ) {
 
-```
 e.preventDefault();
 
 setLoading(true);
@@ -62,13 +61,11 @@ try {
   setLoading(false);
 
 }
-```
 
 }
 
 return ( <main className="min-h-screen bg-white">
 
-```
   {/* HERO */}
   <section className="max-w-5xl mx-auto px-6 pt-32 pb-20 text-center">
 
