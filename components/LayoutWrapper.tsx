@@ -3,6 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { useSession, signOut } from "next-auth/react"
+
 import MobileBottomNav from "./MobileBottomNav"
 import LiveActivityToasts from "./LiveActivityToasts"
 import NotificationBell from "@/components/notifications/NotificationBell"
@@ -12,6 +14,9 @@ export default function LayoutWrapper({
 }: {
   children: React.ReactNode
 }) {
+
+  const { data: session } = useSession()
+
   return (
     <>
       {/* ================= HEADER ================= */}
@@ -58,18 +63,46 @@ export default function LayoutWrapper({
             {/* NOTIFICATION BELL */}
             <NotificationBell />
 
-            <Link
-              href="/coming-soon"
-              className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
-            >
-              <span className="sm:hidden">
-                Sell
-              </span>
+            {session ? (
 
-              <span className="hidden sm:inline">
-                Create an Auction
-              </span>
-            </Link>
+              <div className="flex items-center gap-3">
+
+                <Link
+                  href="/coming-soon"
+                  className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
+                >
+                  <span className="sm:hidden">
+                    Sell
+                  </span>
+
+                  <span className="hidden sm:inline">
+                    Create an Auction
+                  </span>
+                </Link>
+
+                <button
+                  onClick={() =>
+                    signOut({
+                      callbackUrl: "/",
+                    })
+                  }
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
+                >
+                  Logout
+                </button>
+
+              </div>
+
+            ) : (
+
+              <Link
+                href="/signin"
+                className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
+              >
+                Sign In
+              </Link>
+
+            )}
 
           </nav>
 
