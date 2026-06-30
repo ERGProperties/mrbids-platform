@@ -45,18 +45,18 @@ export default async function LivePage() {
     });
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-zinc-950 text-white">
 
       {/* HERO */}
       <section className="max-w-7xl mx-auto px-6 pt-32 pb-24">
 
         <div className="max-w-3xl">
 
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-red-50 border border-red-100 mb-8">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-red-500/10 border border-red-500/20 mb-8">
 
             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
 
-            <span className="text-sm font-medium text-red-700">
+            <span className="text-sm font-medium text-red-400">
               LIVE Marketplace Auctions
             </span>
 
@@ -66,7 +66,7 @@ export default async function LivePage() {
             LIVE Auctions
           </h1>
 
-          <p className="mt-8 text-lg md:text-xl text-gray-600">
+          <p className="mt-8 text-lg md:text-xl text-zinc-400">
             Watch high-energy LIVE auctions featuring liquidation deals,
             luxury items, collectibles, electronics, jewelry, and more.
           </p>
@@ -76,19 +76,19 @@ export default async function LivePage() {
       </section>
 
       {/* LIVE GRID */}
-      <section className="border-t">
+      <section className="border-t border-zinc-800">
 
         <div className="max-w-7xl mx-auto px-6 py-24">
 
           {auctions.length === 0 ? (
 
-            <div className="border rounded-3xl p-16 text-center">
+            <div className="border border-zinc-800 rounded-3xl p-16 text-center bg-zinc-900">
 
-              <h2 className="text-3xl font-semibold">
+              <h2 className="text-3xl font-semibold text-white">
                 No LIVE Auctions Right Now
               </h2>
 
-              <p className="mt-4 text-gray-600">
+              <p className="mt-4 text-zinc-400">
                 Check back soon for upcoming marketplace auctions.
               </p>
 
@@ -114,11 +114,11 @@ export default async function LivePage() {
                   <Link
                     key={auction.id}
                     href={`/marketplace-auctions/${auction.id}`}
-                    className="group border rounded-3xl overflow-hidden hover:shadow-xl transition bg-white"
+                    className="group border border-zinc-800 rounded-3xl overflow-hidden hover:border-zinc-700 hover:shadow-2xl hover:shadow-black/40 transition bg-zinc-900"
                   >
 
                     {/* IMAGE */}
-                    <div className="aspect-[4/5] md:aspect-square bg-gray-100 overflow-hidden relative">
+                    <div className="aspect-[4/5] md:aspect-square bg-zinc-800 overflow-hidden relative">
 
                       {auction.coverImage ? (
 
@@ -130,14 +130,14 @@ export default async function LivePage() {
 
                       ) : (
 
-                        <div className="w-full h-full bg-gray-100" />
+                        <div className="w-full h-full bg-zinc-800" />
 
                       )}
 
                       {/* LIVE BADGE */}
                       <div className="absolute top-4 left-4">
 
-                        <span className="px-3 py-1 rounded-full bg-red-600 text-white text-xs font-semibold tracking-wide animate-pulse">
+                        <span className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-semibold tracking-wide animate-pulse shadow-lg shadow-red-500/30">
                           LIVE
                         </span>
 
@@ -151,14 +151,14 @@ export default async function LivePage() {
                       {/* CATEGORY */}
                       <div className="mb-4">
 
-                        <span className="px-3 py-1 rounded-full bg-black text-white text-xs font-medium">
+                        <span className="px-3 py-1 rounded-full bg-white text-black text-xs font-medium">
                           {auction.category}
                         </span>
 
                       </div>
 
                       {/* TITLE */}
-                      <h2 className="text-xl md:text-2xl font-semibold leading-snug">
+                      <h2 className="text-xl md:text-2xl font-semibold leading-snug text-white">
                         {auction.title}
                       </h2>
 
@@ -175,12 +175,12 @@ export default async function LivePage() {
                               auction.seller.name ||
                               "Seller"
                             }
-                            className="w-10 h-10 rounded-full object-cover border"
+                            className="w-10 h-10 rounded-full object-cover border border-zinc-700"
                           />
 
                         ) : (
 
-                          <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-500">
+                          <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-sm font-semibold text-zinc-400">
                             {auction.seller.name?.charAt(0) ||
                               "M"}
                           </div>
@@ -189,7 +189,7 @@ export default async function LivePage() {
 
                         <div>
 
-                          <p className="font-medium text-sm md:text-base">
+                          <p className="font-medium text-sm md:text-base text-zinc-300">
                             {auction.seller.name ||
                               "Marketplace Seller"}
                           </p>
@@ -198,40 +198,40 @@ export default async function LivePage() {
 
                       </div>
 
-{/* CURRENT BID */}
-<div className="mt-6">
+                      {/* CURRENT BID */}
+                      <div className="mt-6 border border-zinc-800 rounded-2xl p-5 bg-zinc-950">
 
-  <p className="text-sm text-gray-500 mb-1">
-    Current Bid
-  </p>
+                        <p className="text-sm text-zinc-500 mb-1">
+                          Current Bid
+                        </p>
 
-  <p className="text-2xl md:text-3xl font-semibold">
-    $
-    {auction.currentBid?.toLocaleString()}
-  </p>
+                        <p className="text-2xl md:text-3xl font-semibold text-white">
+                          $
+                          {auction.currentBid?.toLocaleString()}
+                        </p>
 
-  {auction.endAt && (
+                        {auction.endAt && (
 
-    <div className="mt-3 inline-flex items-center px-3 py-2 rounded-full bg-red-50 border border-red-100">
+                          <div className="mt-4 inline-flex items-center px-3 py-2 rounded-full bg-red-500/10 border border-red-500/20">
 
-      <span className="text-sm font-medium text-red-700">
-        Ends In:
-      </span>
+                            <span className="text-sm font-medium text-red-400">
+                              Ends In:
+                            </span>
 
-      <div className="ml-2">
-        <CountdownTimer
-          endAt={auction.endAt.toISOString()}
-        />
-      </div>
+                            <div className="ml-2 text-white">
+                              <CountdownTimer
+                                endAt={auction.endAt.toISOString()}
+                              />
+                            </div>
 
-    </div>
+                          </div>
 
-  )}
+                        )}
 
-</div>
+                      </div>
 
                       {/* RETAIL PRICE */}
-                      <div className="mt-5 border rounded-2xl p-4 bg-green-50 border-green-200">
+                      <div className="mt-5 border border-emerald-500/20 rounded-2xl p-4 bg-emerald-500/10">
 
                         {auction.retailPrice ? (
 
@@ -239,11 +239,11 @@ export default async function LivePage() {
 
                             <div>
 
-                              <p className="text-xs text-green-700 mb-1 font-medium">
+                              <p className="text-xs text-emerald-400 mb-1 font-medium">
                                 Retail
                               </p>
 
-                              <p className="text-lg md:text-xl font-semibold text-green-900">
+                              <p className="text-lg md:text-xl font-semibold text-emerald-200">
                                 $
                                 {auction.retailPrice.toLocaleString()}
                               </p>
@@ -252,11 +252,11 @@ export default async function LivePage() {
 
                             <div className="text-right">
 
-                              <p className="text-xs text-green-700 mb-1 font-medium">
+                              <p className="text-xs text-emerald-400 mb-1 font-medium">
                                 Savings
                               </p>
 
-                              <p className="text-lg md:text-xl font-semibold text-green-900">
+                              <p className="text-lg md:text-xl font-semibold text-emerald-200">
 
                                 $
                                 {savings.toLocaleString()}
@@ -271,7 +271,7 @@ export default async function LivePage() {
 
                           <div className="flex items-center justify-center min-h-[72px]">
 
-                            <p className="text-sm text-green-800 font-medium">
+                            <p className="text-sm text-emerald-300 font-medium">
                               Retail price unavailable
                             </p>
 
@@ -284,7 +284,7 @@ export default async function LivePage() {
                       {/* BUTTON */}
                       <div className="mt-6">
 
-                        <div className="w-full py-3 rounded-full bg-black text-white text-center text-sm font-medium">
+                        <div className="w-full py-3 rounded-full bg-white text-black text-center text-sm font-semibold hover:bg-zinc-200 transition">
                           Watch LIVE
                         </div>
 
