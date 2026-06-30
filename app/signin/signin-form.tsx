@@ -1,15 +1,28 @@
 "use client";
 
 import { signIn, useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 
-import { Capacitor } from "@capacitor/core";
-import { Browser } from "@capacitor/browser";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  useSearchParams,
+} from "next/navigation";
+
+import {
+  Capacitor,
+} from "@capacitor/core";
+
+import {
+  Browser,
+} from "@capacitor/browser";
 
 export default function SignInPage() {
 
-  const { status } = useSession();
+  const { status } =
+    useSession();
 
   const searchParams =
     useSearchParams();
@@ -56,6 +69,50 @@ export default function SignInPage() {
     setLoading(false);
   }
 
+  async function handleGoogleLogin() {
+
+    if (isNativeApp) {
+
+      const url =
+        `/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+
+      await Browser.open({
+        url: `https://mrbids.com${url}`,
+      });
+
+      return;
+    }
+
+    await signIn(
+      "google",
+      {
+        callbackUrl,
+      }
+    );
+  }
+
+  async function handleAppleLogin() {
+
+    if (isNativeApp) {
+
+      const url =
+        `/api/auth/signin/apple?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+
+      await Browser.open({
+        url: `https://mrbids.com${url}`,
+      });
+
+      return;
+    }
+
+    await signIn(
+      "apple",
+      {
+        callbackUrl,
+      }
+    );
+  }
+
   return (
 
     <main className="min-h-screen relative overflow-hidden bg-black flex items-center justify-center px-4">
@@ -93,30 +150,13 @@ export default function SignInPage() {
         </h2>
 
         <p className="text-sm text-gray-600 text-center mt-2 mb-6">
-          Continue with Apple, Google, or Magic Link.
+          We’ll email you a secure magic link.
         </p>
 
         {/* GOOGLE */}
 
         <button
-          onClick={async () => {
-
-            if (isNativeApp) {
-
-              await Browser.open({
-                url:
-                  `${window.location.origin}/api/auth/signin/google?callbackUrl=/auctions`,
-              });
-
-              return;
-            }
-
-            signIn(
-              "google",
-              { callbackUrl }
-            );
-
-          }}
+          onClick={handleGoogleLogin}
           className="w-full rounded-xl border border-gray-300 bg-white py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition flex items-center justify-center gap-3"
         >
 
@@ -156,24 +196,7 @@ export default function SignInPage() {
 
         <button
           type="button"
-          onClick={async () => {
-
-            if (isNativeApp) {
-
-              await Browser.open({
-                url:
-                  `${window.location.origin}/api/auth/signin/apple?callbackUrl=/auctions`,
-              });
-
-              return;
-            }
-
-            signIn(
-              "apple",
-              { callbackUrl }
-            );
-
-          }}
+          onClick={handleAppleLogin}
           className="mt-4 w-full rounded-xl bg-black py-3 text-sm font-medium text-white hover:bg-gray-900 transition flex items-center justify-center gap-3"
         >
 
@@ -210,7 +233,7 @@ export default function SignInPage() {
 
         </div>
 
-        {/* MAGIC LINK */}
+        {/* EMAIL */}
 
         <form
           onSubmit={handleSubmit}
@@ -247,7 +270,7 @@ export default function SignInPage() {
         {/* TRUST */}
 
         <p className="mt-6 text-xs text-gray-500 text-center">
-          🔒 Secure authentication powered by MrBids.
+          🔒 Magic links expire automatically for your security.
         </p>
 
       </div>

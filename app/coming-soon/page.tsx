@@ -1,16 +1,20 @@
 "use client";
 
-import { useState }
-  from "react";
+import {
+  useState,
+} from "react";
 
-import { signIn }
-  from "next-auth/react";
+import {
+  signIn,
+} from "next-auth/react";
 
-import { Capacitor }
-  from "@capacitor/core";
+import {
+  Capacitor,
+} from "@capacitor/core";
 
-import { Browser }
-  from "@capacitor/browser";
+import {
+  Browser,
+} from "@capacitor/browser";
 
 declare const fbq: any;
 
@@ -80,6 +84,58 @@ export default function SellerOnboardingPage() {
 
   }
 
+  async function handleGoogleLogin() {
+
+    fbq(
+      "track",
+      "CompleteRegistration"
+    );
+
+    if (isNativeApp) {
+
+      await Browser.open({
+        url:
+          "https://mrbids.com/api/auth/signin/google?callbackUrl=/marketplace-sell",
+      });
+
+      return;
+    }
+
+    await signIn(
+      "google",
+      {
+        callbackUrl:
+          "/marketplace-sell",
+      }
+    );
+  }
+
+  async function handleAppleLogin() {
+
+    fbq(
+      "track",
+      "CompleteRegistration"
+    );
+
+    if (isNativeApp) {
+
+      await Browser.open({
+        url:
+          "https://mrbids.com/api/auth/signin/apple?callbackUrl=/marketplace-sell",
+      });
+
+      return;
+    }
+
+    await signIn(
+      "apple",
+      {
+        callbackUrl:
+          "/marketplace-sell",
+      }
+    );
+  }
+
   return (
 
     <main className="min-h-screen bg-white">
@@ -97,7 +153,7 @@ export default function SellerOnboardingPage() {
         </h1>
 
         <p className="mt-8 text-xl text-gray-600 max-w-2xl mx-auto">
-          Start selling on MrBids using secure authentication.
+          Start selling on MrBids using secure passwordless login.
         </p>
 
       </section>
@@ -135,32 +191,7 @@ export default function SellerOnboardingPage() {
                 {/* GOOGLE */}
 
                 <button
-                  onClick={async () => {
-
-                    fbq(
-                      "track",
-                      "CompleteRegistration"
-                    );
-
-                    if (isNativeApp) {
-
-                      await Browser.open({
-                        url:
-                          `${window.location.origin}/api/auth/signin/google?callbackUrl=/marketplace-sell`,
-                      });
-
-                      return;
-                    }
-
-                    await signIn(
-                      "google",
-                      {
-                        callbackUrl:
-                          "/marketplace-sell",
-                      }
-                    );
-
-                  }}
+                  onClick={handleGoogleLogin}
                   className="w-full py-5 rounded-full border border-gray-300 bg-white text-black font-medium hover:bg-gray-50 transition flex items-center justify-center gap-3"
                 >
 
@@ -200,32 +231,7 @@ export default function SellerOnboardingPage() {
 
                 <button
                   type="button"
-                  onClick={async () => {
-
-                    fbq(
-                      "track",
-                      "CompleteRegistration"
-                    );
-
-                    if (isNativeApp) {
-
-                      await Browser.open({
-                        url:
-                          `${window.location.origin}/api/auth/signin/apple?callbackUrl=/marketplace-sell`,
-                      });
-
-                      return;
-                    }
-
-                    await signIn(
-                      "apple",
-                      {
-                        callbackUrl:
-                          "/marketplace-sell",
-                      }
-                    );
-
-                  }}
+                  onClick={handleAppleLogin}
                   className="w-full mt-4 py-5 rounded-full bg-black text-white font-medium hover:bg-gray-900 transition flex items-center justify-center gap-3"
                 >
 
@@ -262,7 +268,7 @@ export default function SellerOnboardingPage() {
 
                 </div>
 
-                {/* MAGIC LINK */}
+                {/* EMAIL */}
 
                 <form
                   onSubmit={handleSubmit}
