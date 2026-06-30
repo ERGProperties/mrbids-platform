@@ -8,7 +8,8 @@ import { useRouter } from "next/navigation";
 
 export default function DeepLinkHandler() {
 
-  const router = useRouter();
+  const router =
+    useRouter();
 
   useEffect(() => {
 
@@ -16,47 +17,40 @@ export default function DeepLinkHandler() {
       "appUrlOpen",
       async (event) => {
 
-        const url = event.url;
+        const url =
+          event.url;
 
         if (!url) {
           return;
         }
 
-        console.log(
-          "Deep link opened:",
-          url
-        );
-
         try {
 
-          // Handle auth callbacks
-          if (
-            url.includes("/api/auth/callback")
-          ) {
+          console.log(
+            "🔗 OPENED URL:",
+            url
+          );
 
-            // Reload app session
-            window.location.href =
-              "/auctions";
-
-            return;
-          }
-
-          // Handle normal deep links
           const parsedUrl =
             new URL(url);
 
-          const path =
+          const pathname =
             parsedUrl.pathname;
 
-          if (path) {
+          const search =
+            parsedUrl.search;
 
-            router.push(path);
-          }
+          const fullPath =
+            `${pathname}${search}`;
+
+          router.push(
+            fullPath
+          );
 
         } catch (err) {
 
           console.error(
-            "Deep link error:",
+            "❌ Deep link error:",
             err
           );
         }
