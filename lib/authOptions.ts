@@ -1,35 +1,71 @@
 import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { prisma } from "@/lib/prisma";
-import type { NextAuthOptions } from "next-auth";
-import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { PrismaAdapter }
+  from "@next-auth/prisma-adapter";
+
+import { prisma }
+  from "@/lib/prisma";
+
+import type {
+  NextAuthOptions,
+} from "next-auth";
+
+import { Resend }
+  from "resend";
+
+const resend =
+  new Resend(
+    process.env.RESEND_API_KEY
+  );
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+
+  adapter:
+    PrismaAdapter(prisma),
 
   providers: [
+
     AppleProvider({
-      clientId: process.env.APPLE_ID!,
-      clientSecret: process.env.APPLE_SECRET!,
+
+      clientId:
+        process.env.APPLE_ID!,
+
+      clientSecret:
+        process.env.APPLE_SECRET!,
+
     }),
 
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+
+      clientId:
+        process.env.GOOGLE_CLIENT_ID!,
+
+      clientSecret:
+        process.env.GOOGLE_CLIENT_SECRET!,
+
     }),
 
     EmailProvider({
-      from: process.env.EMAIL_FROM!,
 
-      async sendVerificationRequest({ identifier, url }) {
-        console.log("🔥 SEND VERIFICATION CALLED", identifier);
+      from:
+        process.env.EMAIL_FROM!,
+
+      async sendVerificationRequest({
+        identifier,
+        url,
+      }) {
+
+        console.log(
+          "🔥 SEND VERIFICATION CALLED",
+          identifier
+        );
 
         try {
-          const subject = "Sign in to MrBids";
+
+          const subject =
+            "Sign in to MrBids";
 
           const html = `
           <div style="margin:0; padding:0; background:#f4f4f5; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
@@ -38,21 +74,20 @@ export const authOptions: NextAuthOptions = {
               <tr>
                 <td align="center" style="padding:40px 16px;">
 
-                  <!-- CONTAINER -->
                   <table width="100%" style="max-width:600px; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.08);">
 
-                    <!-- HEADER -->
                     <tr>
                       <td style="padding:28px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
+
                         <img 
                           src="https://mrbids.com/logo.png" 
                           alt="MrBids"
                           style="height:60px;"
                         />
+
                       </td>
                     </tr>
 
-                    <!-- BODY -->
                     <tr>
                       <td style="padding:34px 28px;">
 
@@ -68,8 +103,8 @@ export const authOptions: NextAuthOptions = {
                           This secure login link was requested from your device.
                         </p>
 
-                        <!-- CTA -->
                         <div style="text-align:center; margin:30px 0;">
+
                           <a 
                             href="${url}" 
                             style="
@@ -86,9 +121,9 @@ export const authOptions: NextAuthOptions = {
                           >
                             Sign In to MrBids
                           </a>
+
                         </div>
 
-                        <!-- Secondary -->
                         <p style="margin:24px 0 0; font-size:13px; color:#777; text-align:center;">
                           Or copy and paste this link into your browser:
                         </p>
@@ -100,7 +135,6 @@ export const authOptions: NextAuthOptions = {
                       </td>
                     </tr>
 
-                    <!-- FOOTER -->
                     <tr>
                       <td style="padding:22px; text-align:center; border-top:1px solid #f1f1f1;">
 
@@ -128,20 +162,38 @@ export const authOptions: NextAuthOptions = {
           </div>
           `;
 
-          const text = `Sign in to MrBids\n${url}`;
+          const text =
+            `Sign in to MrBids\n${url}`;
 
-          const result = await resend.emails.send({
-            from: process.env.EMAIL_FROM!,
-            to: identifier,
-            subject,
-            html,
-            text,
-          });
+          const result =
+            await resend.emails.send({
 
-          console.log("✅ RESEND RESULT:", result);
+              from:
+                process.env.EMAIL_FROM!,
+
+              to:
+                identifier,
+
+              subject,
+
+              html,
+
+              text,
+
+            });
+
+          console.log(
+            "✅ RESEND RESULT:",
+            result
+          );
 
         } catch (err) {
-          console.error("❌ RESEND ERROR:", err);
+
+          console.error(
+            "❌ RESEND ERROR:",
+            err
+          );
+
           throw err;
         }
       },
@@ -152,25 +204,101 @@ export const authOptions: NextAuthOptions = {
     strategy: "database",
   },
 
+  cookies: {
+
+    pkceCodeVerifier: {
+
+      name:
+        "next-auth.pkce.code_verifier",
+
+      options: {
+
+        httpOnly: true,
+
+        sameSite: "none",
+
+        path: "/",
+
+        secure: true,
+
+      },
+    },
+
+    state: {
+
+      name:
+        "next-auth.state",
+
+      options: {
+
+        httpOnly: true,
+
+        sameSite: "none",
+
+        path: "/",
+
+        secure: true,
+
+      },
+    },
+
+    nonce: {
+
+      name:
+        "next-auth.nonce",
+
+      options: {
+
+        httpOnly: true,
+
+        sameSite: "none",
+
+        path: "/",
+
+        secure: true,
+
+      },
+    },
+  },
+
   pages: {
     signIn: "/signin",
   },
 
   callbacks: {
-    async session({ session, user }) {
+
+    async session({
+      session,
+      user,
+    }) {
+
       if (session.user) {
-        session.user.id = user.id;
-        session.user.email = user.email ?? undefined;
+
+        session.user.id =
+          user.id;
+
+        session.user.email =
+          user.email ?? undefined;
       }
+
       return session;
     },
 
-    async redirect({ url, baseUrl }) {
+    async redirect({
+      url,
+      baseUrl,
+    }) {
+
       if (url.startsWith("/")) {
+
         return `${baseUrl}${url}`;
       }
 
-      if (new URL(url).origin === baseUrl) {
+      if (
+        new URL(url).origin
+        === baseUrl
+      ) {
+
         return url;
       }
 
