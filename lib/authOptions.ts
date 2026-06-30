@@ -289,20 +289,40 @@ export const authOptions: NextAuthOptions = {
       baseUrl,
     }) {
 
-      if (url.startsWith("/")) {
+      try {
 
-        return `${baseUrl}${url}`;
+        if (url.startsWith("/")) {
+
+          return `${baseUrl}${url}`;
+        }
+
+        const parsed =
+          new URL(url);
+
+        if (
+          parsed.origin
+          === baseUrl
+        ) {
+
+          return url;
+        }
+
+        const callbackUrl =
+          parsed.searchParams.get(
+            "callbackUrl"
+          );
+
+        if (callbackUrl) {
+
+          return `${baseUrl}${callbackUrl}`;
+        }
+
+        return `${baseUrl}/live`;
+
+      } catch {
+
+        return `${baseUrl}/live`;
       }
-
-      if (
-        new URL(url).origin
-        === baseUrl
-      ) {
-
-        return url;
-      }
-
-      return `${baseUrl}/live`;
     },
   },
 };
