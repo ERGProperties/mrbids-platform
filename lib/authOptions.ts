@@ -302,7 +302,7 @@ export const authOptions: NextAuthOptions = {
         return url;
       }
 
-      return `${baseUrl}/auctions`;
+      return `${baseUrl}/live`;
     },
   },
 };

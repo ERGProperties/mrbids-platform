@@ -1,6 +1,7 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { signIn, useSession }
+  from "next-auth/react";
 
 import {
   useEffect,
@@ -37,7 +38,8 @@ export default function SignInPage() {
     Capacitor.isNativePlatform();
 
   const callbackUrl =
-    "/live";
+    searchParams.get("callbackUrl")
+    || "/live";
 
   useEffect(() => {
 
@@ -47,7 +49,7 @@ export default function SignInPage() {
         callbackUrl;
     }
 
-  }, [status]);
+  }, [status, callbackUrl]);
 
   async function handleSubmit(
     e: React.FormEvent
@@ -61,8 +63,7 @@ export default function SignInPage() {
       "email",
       {
         email,
-        callbackUrl:
-          "/live",
+        callbackUrl,
       }
     );
 
@@ -74,8 +75,10 @@ export default function SignInPage() {
     if (isNativeApp) {
 
       await Browser.open({
+
         url:
-          "https://mrbids.com/api/auth/signin/google?callbackUrl=/live",
+          `https://mrbids.com/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+
       });
 
       return;
@@ -84,8 +87,7 @@ export default function SignInPage() {
     await signIn(
       "google",
       {
-        callbackUrl:
-          "/live",
+        callbackUrl,
       }
     );
   }
@@ -95,8 +97,10 @@ export default function SignInPage() {
     if (isNativeApp) {
 
       await Browser.open({
+
         url:
-          "https://mrbids.com/api/auth/signin/apple?callbackUrl=/live",
+          `https://mrbids.com/api/auth/signin/apple?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+
       });
 
       return;
@@ -105,8 +109,7 @@ export default function SignInPage() {
     await signIn(
       "apple",
       {
-        callbackUrl:
-          "/live",
+        callbackUrl,
       }
     );
   }

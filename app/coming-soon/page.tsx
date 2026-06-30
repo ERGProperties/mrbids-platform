@@ -35,6 +35,9 @@ export default function SellerOnboardingPage() {
   const isNativeApp =
     Capacitor.isNativePlatform();
 
+  const callbackUrl =
+    "/marketplace-sell";
+
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
@@ -55,8 +58,7 @@ export default function SellerOnboardingPage() {
 
             redirect: false,
 
-            callbackUrl:
-              "/live",
+            callbackUrl,
           }
         );
 
@@ -94,8 +96,10 @@ export default function SellerOnboardingPage() {
     if (isNativeApp) {
 
       await Browser.open({
+
         url:
-          "https://mrbids.com/api/auth/signin/google?callbackUrl=/live",
+          `https://mrbids.com/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+
       });
 
       return;
@@ -104,8 +108,7 @@ export default function SellerOnboardingPage() {
     await signIn(
       "google",
       {
-        callbackUrl:
-          "/live",
+        callbackUrl,
       }
     );
   }
@@ -120,8 +123,10 @@ export default function SellerOnboardingPage() {
     if (isNativeApp) {
 
       await Browser.open({
+
         url:
-          "https://mrbids.com/api/auth/signin/apple?callbackUrl=/live",
+          `https://mrbids.com/api/auth/signin/apple?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+
       });
 
       return;
@@ -130,8 +135,7 @@ export default function SellerOnboardingPage() {
     await signIn(
       "apple",
       {
-        callbackUrl:
-          "/live",
+        callbackUrl,
       }
     );
   }
