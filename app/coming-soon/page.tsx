@@ -56,7 +56,7 @@ export default function SellerOnboardingPage() {
             redirect: false,
 
             callbackUrl:
-              "/marketplace-sell",
+              "/live",
           }
         );
 
@@ -95,7 +95,7 @@ export default function SellerOnboardingPage() {
 
       await Browser.open({
         url:
-          "https://mrbids.com/api/auth/signin/google?callbackUrl=/marketplace-sell",
+          "https://mrbids.com/api/auth/signin/google?callbackUrl=/live",
       });
 
       return;
@@ -105,7 +105,7 @@ export default function SellerOnboardingPage() {
       "google",
       {
         callbackUrl:
-          "/marketplace-sell",
+          "/live",
       }
     );
   }
@@ -121,7 +121,7 @@ export default function SellerOnboardingPage() {
 
       await Browser.open({
         url:
-          "https://mrbids.com/api/auth/signin/apple?callbackUrl=/marketplace-sell",
+          "https://mrbids.com/api/auth/signin/apple?callbackUrl=/live",
       });
 
       return;
@@ -131,7 +131,7 @@ export default function SellerOnboardingPage() {
       "apple",
       {
         callbackUrl:
-          "/marketplace-sell",
+          "/live",
       }
     );
   }

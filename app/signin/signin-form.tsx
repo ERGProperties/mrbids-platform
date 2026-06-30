@@ -37,8 +37,7 @@ export default function SignInPage() {
     Capacitor.isNativePlatform();
 
   const callbackUrl =
-    searchParams.get("callbackUrl")
-    || "/auctions";
+    "/live";
 
   useEffect(() => {
 
@@ -48,7 +47,7 @@ export default function SignInPage() {
         callbackUrl;
     }
 
-  }, [status, callbackUrl]);
+  }, [status]);
 
   async function handleSubmit(
     e: React.FormEvent
@@ -62,7 +61,8 @@ export default function SignInPage() {
       "email",
       {
         email,
-        callbackUrl,
+        callbackUrl:
+          "/live",
       }
     );
 
@@ -73,11 +73,9 @@ export default function SignInPage() {
 
     if (isNativeApp) {
 
-      const url =
-        `/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`;
-
       await Browser.open({
-        url: `https://mrbids.com${url}`,
+        url:
+          "https://mrbids.com/api/auth/signin/google?callbackUrl=/live",
       });
 
       return;
@@ -86,7 +84,8 @@ export default function SignInPage() {
     await signIn(
       "google",
       {
-        callbackUrl,
+        callbackUrl:
+          "/live",
       }
     );
   }
@@ -95,11 +94,9 @@ export default function SignInPage() {
 
     if (isNativeApp) {
 
-      const url =
-        `/api/auth/signin/apple?callbackUrl=${encodeURIComponent(callbackUrl)}`;
-
       await Browser.open({
-        url: `https://mrbids.com${url}`,
+        url:
+          "https://mrbids.com/api/auth/signin/apple?callbackUrl=/live",
       });
 
       return;
@@ -108,7 +105,8 @@ export default function SignInPage() {
     await signIn(
       "apple",
       {
-        callbackUrl,
+        callbackUrl:
+          "/live",
       }
     );
   }
@@ -150,7 +148,7 @@ export default function SignInPage() {
         </h2>
 
         <p className="text-sm text-gray-600 text-center mt-2 mb-6">
-          We’ll email you a secure magic link.
+          Continue with Apple, Google, or Magic Link.
         </p>
 
         {/* GOOGLE */}
