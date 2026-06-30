@@ -310,40 +310,46 @@ export const authOptions: NextAuthOptions = {
       baseUrl,
     }) {
 
-      try {
+      console.log(
+        "REDIRECT URL:",
+        url
+      );
 
-        if (url.startsWith("/")) {
+      if (
+        url.includes(
+          "/marketplace-sell"
+        )
+      ) {
 
-          return `${baseUrl}${url}`;
-        }
+        return `${baseUrl}/marketplace-sell`;
+      }
 
-        const parsed =
-          new URL(url);
-
-        if (
-          parsed.origin
-          === baseUrl
-        ) {
-
-          return url;
-        }
-
-        const callbackUrl =
-          parsed.searchParams.get(
-            "callbackUrl"
-          );
-
-        if (callbackUrl) {
-
-          return callbackUrl;
-        }
-
-        return `${baseUrl}/live`;
-
-      } catch {
+      if (
+        url.includes(
+          "/live"
+        )
+      ) {
 
         return `${baseUrl}/live`;
       }
+
+      if (
+        url.startsWith(
+          baseUrl
+        )
+      ) {
+
+        return url;
+      }
+
+      if (
+        url.startsWith("/")
+      ) {
+
+        return `${baseUrl}${url}`;
+      }
+
+      return `${baseUrl}/live`;
     },
   },
 };
