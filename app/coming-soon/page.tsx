@@ -38,6 +38,9 @@ export default function SellerOnboardingPage() {
   const callbackUrl =
     "/marketplace-sell";
 
+  const fullCallbackUrl =
+    `https://mrbids.com${callbackUrl}`;
+
   async function handleSubmit(
     e: React.FormEvent<HTMLFormElement>
   ) {
@@ -98,7 +101,7 @@ export default function SellerOnboardingPage() {
       await Browser.open({
 
         url:
-          `https://mrbids.com/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+          `https://mrbids.com/api/auth/signin/google?callbackUrl=${encodeURIComponent(fullCallbackUrl)}`,
 
       });
 
@@ -125,7 +128,7 @@ export default function SellerOnboardingPage() {
       await Browser.open({
 
         url:
-          `https://mrbids.com/api/auth/signin/apple?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+          `https://mrbids.com/api/auth/signin/apple?callbackUrl=${encodeURIComponent(fullCallbackUrl)}`,
 
       });
 

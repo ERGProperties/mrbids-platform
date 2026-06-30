@@ -39,7 +39,10 @@ export default function SignInPage() {
 
   const callbackUrl =
     searchParams.get("callbackUrl")
-    || "/live";
+    || "/auctions";
+
+  const fullCallbackUrl =
+    `https://mrbids.com${callbackUrl}`;
 
   useEffect(() => {
 
@@ -77,7 +80,7 @@ export default function SignInPage() {
       await Browser.open({
 
         url:
-          `https://mrbids.com/api/auth/signin/google?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+          `https://mrbids.com/api/auth/signin/google?callbackUrl=${encodeURIComponent(fullCallbackUrl)}`,
 
       });
 
@@ -99,7 +102,7 @@ export default function SignInPage() {
       await Browser.open({
 
         url:
-          `https://mrbids.com/api/auth/signin/apple?callbackUrl=${encodeURIComponent(callbackUrl)}`,
+          `https://mrbids.com/api/auth/signin/apple?callbackUrl=${encodeURIComponent(fullCallbackUrl)}`,
 
       });
 
