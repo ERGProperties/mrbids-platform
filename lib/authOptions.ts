@@ -201,7 +201,11 @@ export const authOptions: NextAuthOptions = {
   ],
 
   session: {
-    strategy: "database",
+    strategy: "jwt",
+  },
+
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60,
   },
 
   cookies: {
@@ -267,18 +271,35 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
 
+    async jwt({
+      token,
+      user,
+    }) {
+
+      if (user) {
+
+        token.id =
+          user.id;
+
+        token.email =
+          user.email;
+      }
+
+      return token;
+    },
+
     async session({
       session,
-      user,
+      token,
     }) {
 
       if (session.user) {
 
         session.user.id =
-          user.id;
+          token.id as string;
 
         session.user.email =
-          user.email ?? undefined;
+          token.email as string;
       }
 
       return session;
@@ -314,7 +335,7 @@ export const authOptions: NextAuthOptions = {
 
         if (callbackUrl) {
 
-          return `${baseUrl}${callbackUrl}`;
+          return callbackUrl;
         }
 
         return `${baseUrl}/live`;
