@@ -15,7 +15,10 @@ export default function LayoutWrapper({
   children: React.ReactNode
 }) {
 
-  const { data: session } = useSession()
+  const {
+    data: session,
+    status,
+  } = useSession()
 
   return (
     <>
@@ -63,12 +66,12 @@ export default function LayoutWrapper({
             {/* NOTIFICATION BELL */}
             <NotificationBell />
 
-            {session ? (
+            {status === "loading" ? null : session ? (
 
               <div className="flex items-center gap-3">
 
                 <Link
-                  href="/coming-soon"
+                  href="/marketplace-sell"
                   className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
                 >
                   <span className="sm:hidden">
@@ -151,7 +154,7 @@ export default function LayoutWrapper({
               </li>
 
               <li>
-                <Link href="/coming-soon" className="hover:underline">
+                <Link href="/marketplace-sell" className="hover:underline">
                   Create an Auction
                 </Link>
               </li>
