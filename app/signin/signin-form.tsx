@@ -34,6 +34,9 @@ export default function SignInPage() {
   const [loading, setLoading] =
     useState(false);
 
+  const [success, setSuccess] =
+    useState(false);
+
   const isNativeApp =
     Capacitor.isNativePlatform();
 
@@ -62,35 +65,36 @@ export default function SignInPage() {
 
     setLoading(true);
 
-const result =
-  await signIn(
-    "email",
-    {
-      email,
-      redirect: false,
-      callbackUrl,
+    const result =
+      await signIn(
+        "email",
+        {
+          email,
+          redirect: false,
+          callbackUrl,
+        }
+      );
+
+    if (result?.error) {
+
+      console.error(
+        "Magic Link Error:",
+        result.error
+      );
     }
-  );
 
-if (result?.error) {
+    if (result?.ok) {
 
-  console.error(
-    "Magic Link Error:",
-    result.error
-  );
-}
+      console.log(
+        "Magic Link Sent:",
+        callbackUrl
+      );
 
-if (result?.ok) {
+      setSuccess(true);
+    }
 
-  console.log(
-    "Magic Link Sent:",
-    callbackUrl
-  );
-}
-
-setLoading(false);
-
-}
+    setLoading(false);
+  }
 
   async function handleGoogleLogin() {
 
@@ -258,37 +262,59 @@ setLoading(false);
 
         {/* EMAIL */}
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4"
-        >
+        {success ? (
 
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) =>
-              setEmail(
-                e.target.value
-              )
-            }
-            required
-            className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-          />
+          <div className="text-center py-6">
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-black text-white py-3 text-sm font-medium hover:bg-gray-900 transition disabled:opacity-60"
+            <div className="text-5xl mb-4">
+              ✉️
+            </div>
+
+            <h3 className="text-2xl font-semibold text-gray-900">
+              Check Your Email
+            </h3>
+
+            <p className="mt-3 text-sm text-gray-600">
+              Your secure Magic Link has been sent.
+            </p>
+
+          </div>
+
+        ) : (
+
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
           >
 
-            {loading
-              ? "Sending magic link..."
-              : "Send Magic Link"}
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) =>
+                setEmail(
+                  e.target.value
+                )
+              }
+              required
+              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            />
 
-          </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-black text-white py-3 text-sm font-medium hover:bg-gray-900 transition disabled:opacity-60"
+            >
 
-        </form>
+              {loading
+                ? "Sending magic link..."
+                : "Send Magic Link"}
+
+            </button>
+
+          </form>
+
+        )}
 
         {/* TRUST */}
 
