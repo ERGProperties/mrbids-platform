@@ -62,6 +62,11 @@ export const authOptions: NextAuthOptions = {
           identifier
         );
 
+        console.log(
+          "MAGIC LINK URL:",
+          url
+        );
+
         try {
 
           const subject =
@@ -311,45 +316,58 @@ export const authOptions: NextAuthOptions = {
     }) {
 
       console.log(
-        "REDIRECT URL:",
+        "REDIRECT CALLBACK URL:",
         url
       );
 
-      if (
-        url.includes(
-          "/marketplace-sell"
-        )
-      ) {
+      console.log(
+        "REDIRECT CALLBACK BASE:",
+        baseUrl
+      );
 
-        return `${baseUrl}/marketplace-sell`;
-      }
-
-      if (
-        url.includes(
-          "/live"
-        )
-      ) {
-
-        return `${baseUrl}/live`;
-      }
-
-      if (
-        url.startsWith(
-          baseUrl
-        )
-      ) {
-
-        return url;
-      }
-
-      if (
-        url.startsWith("/")
-      ) {
+      if (url.startsWith("/")) {
 
         return `${baseUrl}${url}`;
       }
 
-      return `${baseUrl}/live`;
+      try {
+
+        const parsed =
+          new URL(url);
+
+        const callbackUrl =
+          parsed.searchParams.get(
+            "callbackUrl"
+          );
+
+        if (callbackUrl) {
+
+          if (
+            callbackUrl.startsWith("http")
+          ) {
+
+            return callbackUrl;
+          }
+
+          return `${baseUrl}${callbackUrl}`;
+        }
+
+        if (
+          parsed.origin === baseUrl
+        ) {
+
+          return url;
+        }
+
+      } catch (err) {
+
+        console.error(
+          "Redirect Parse Error:",
+          err
+        );
+      }
+
+      return `${baseUrl}/`;
     },
   },
 };
