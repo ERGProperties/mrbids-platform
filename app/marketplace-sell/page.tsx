@@ -232,6 +232,17 @@ if (status !== "authenticated") {
 
         </div>
 
+<div className="mb-6 rounded-2xl border border-yellow-200 bg-yellow-50 px-5 py-4">
+
+  <p className="text-sm text-yellow-900">
+
+    You must be signed in to create an auction.
+    If prompted to sign in, you’ll be redirected back here afterward.
+
+  </p>
+
+</div>
+
         <form
           onSubmit={handleSubmit}
           className="space-y-8 border rounded-3xl p-8"
