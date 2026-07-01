@@ -6,6 +6,8 @@ import { useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useSession } from "next-auth/react";
+
 const SHIPPING_PRESETS = {
   small: {
     label: "Small Item",
@@ -32,6 +34,10 @@ export default function MarketplaceSellPage() {
 
   const router =
     useRouter();
+
+  const {
+    status,
+  } = useSession();
 
   const [loading, setLoading] =
     useState(false);
@@ -128,6 +134,15 @@ async function handleImageUpload(
   ) {
 
     e.preventDefault();
+
+if (status !== "authenticated") {
+
+  router.push(
+    "/signin?callbackUrl=/marketplace-sell"
+  );
+
+  return;
+}
 
     setLoading(true);
 
