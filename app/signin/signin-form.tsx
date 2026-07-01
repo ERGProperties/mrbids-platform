@@ -39,7 +39,7 @@ export default function SignInPage() {
 
   const callbackUrl =
     searchParams.get("callbackUrl")
-    || "/auctions";
+    || "/";
 
   const fullCallbackUrl =
     `https://mrbids.com${callbackUrl}`;
@@ -62,16 +62,35 @@ export default function SignInPage() {
 
     setLoading(true);
 
-    await signIn(
-      "email",
-      {
-        email,
-        callbackUrl,
-      }
-    );
+const result =
+  await signIn(
+    "email",
+    {
+      email,
+      redirect: false,
+      callbackUrl,
+    }
+  );
 
-    setLoading(false);
-  }
+if (result?.error) {
+
+  console.error(
+    "Magic Link Error:",
+    result.error
+  );
+}
+
+if (result?.ok) {
+
+  console.log(
+    "Magic Link Sent:",
+    callbackUrl
+  );
+}
+
+setLoading(false);
+
+}
 
   async function handleGoogleLogin() {
 
