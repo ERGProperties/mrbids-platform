@@ -335,23 +335,6 @@ export const authOptions: NextAuthOptions = {
         const parsed =
           new URL(url);
 
-        const callbackUrl =
-          parsed.searchParams.get(
-            "callbackUrl"
-          );
-
-        if (callbackUrl) {
-
-          if (
-            callbackUrl.startsWith("http")
-          ) {
-
-            return callbackUrl;
-          }
-
-          return `${baseUrl}${callbackUrl}`;
-        }
-
         if (
           parsed.origin === baseUrl
         ) {
