@@ -237,7 +237,6 @@ if (status !== "authenticated") {
   <p className="text-sm text-yellow-900">
 
     You must be signed in to create an auction.
-    If prompted to sign in, you’ll be redirected back here afterward.
 
   </p>
 

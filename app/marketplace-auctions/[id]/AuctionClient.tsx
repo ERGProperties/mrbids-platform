@@ -300,14 +300,13 @@ setAmount(
 
 async function handleBid() {
 
-  if (!session?.user) {
+if (!session?.user) {
 
-    window.location.href =
-      `/signin?callbackUrl=/marketplace-auctions/${auction.id}`;
+  window.location.href =
+    `/signin?callbackUrl=/marketplace-auctions/${auction.id}`;
 
-    return;
-
-  }
+  return;
+}
 
   try {
 

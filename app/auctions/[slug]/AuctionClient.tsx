@@ -238,14 +238,22 @@ export default function AuctionClient({
                       currentBid={liveAuction.highestBid || 0}
                     />
                   ) : (
-                    <button
-                      onClick={() =>
-                        (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction.slug}`)
-                      }
-                      className="w-full bg-black text-white py-3 rounded-xl"
-                    >
-                      Sign In to Bid
-                    </button>
+                    <>
+
+                      <button
+                        onClick={() =>
+                          (window.location.href = `/signin?callbackUrl=/auctions/${liveAuction.slug}`)
+                        }
+                        className="w-full bg-black text-white py-3 rounded-xl"
+                      >
+                        Sign In to Bid
+                      </button>
+
+                      <p className="mt-3 text-xs text-center text-gray-500">
+                        You must be signed in to place a bid.
+                      </p>
+
+                    </>
                   )}
                 </div>
 
