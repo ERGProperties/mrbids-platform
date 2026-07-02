@@ -99,7 +99,7 @@ export default function LayoutWrapper({
             ) : (
 
               <Link
-                href="/signin"
+                href="/signin?callbackUrl=/live"
                 className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
               >
                 Sign In

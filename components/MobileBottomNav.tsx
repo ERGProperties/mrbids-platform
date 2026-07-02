@@ -22,12 +22,12 @@ export default function MobileBottomNav() {
       icon: Home,
     },
     {
-      href: "/marketplace-auctions",
+      href: "/live",
       label: "LIVE",
       icon: Radio,
     },
     {
-      href: "/coming-soon",
+      href: "/marketplace-sell",
       label: "Sell",
       icon: PlusSquare,
       primary: true,
