@@ -232,15 +232,19 @@ if (status !== "authenticated") {
 
         </div>
 
-<div className="mb-6 rounded-2xl border border-yellow-200 bg-yellow-50 px-5 py-4">
+{status !== "authenticated" && (
 
-  <p className="text-sm text-yellow-900">
+  <div className="mb-6 rounded-2xl border border-yellow-200 bg-yellow-50 px-5 py-4">
 
-    You must be signed in to create an auction.
+    <p className="text-sm text-yellow-900">
 
-  </p>
+      You must be signed in to create an auction.
 
-</div>
+    </p>
+
+  </div>
+
+)}
 
         <form
           onSubmit={handleSubmit}
