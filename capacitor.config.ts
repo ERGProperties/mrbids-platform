@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
 
   appName: "MrBids",
 
-  webDir: "out",
+  webDir: ".next",
 
   ios: {
     scheme: "mrbids",
