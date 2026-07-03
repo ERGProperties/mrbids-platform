@@ -12,10 +12,6 @@ const config: CapacitorConfig = {
     scheme: "mrbids",
   },
 
-  android: {
-    scheme: "https",
-  },
-
 };
 
 export default config;
