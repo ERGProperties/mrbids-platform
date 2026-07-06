@@ -1,70 +1,133 @@
-export default function DeleteAccountPage() {
-  return (
-    <main className="min-h-screen bg-white px-6 py-20">
-      <div className="max-w-3xl mx-auto">
+"use client";
 
-        <h1 className="text-4xl font-semibold mb-8">
-          Delete Your MrBids Account
+import { useState } from "react";
+
+import { signOut } from "next-auth/react";
+
+export default function DeleteAccountPage() {
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    deleted,
+    setDeleted,
+  ] = useState(false);
+
+  async function handleDelete() {
+
+    const confirmed =
+      window.confirm(
+        "Are you sure you want to permanently delete your MrBids account?"
+      );
+
+    if (!confirmed) return;
+
+    try {
+
+      setLoading(true);
+
+      const res =
+        await fetch(
+          "/api/delete-account",
+          {
+            method: "DELETE",
+          }
+        );
+
+      if (!res.ok) {
+
+        throw new Error(
+          "Delete failed"
+        );
+      }
+
+      setDeleted(true);
+
+      setTimeout(() => {
+
+        signOut({
+          callbackUrl: "/",
+        });
+
+      }, 1500);
+
+    } catch (err) {
+
+      console.error(err);
+
+      alert(
+        "Failed to delete account."
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
+  }
+
+  return (
+
+    <main className="min-h-screen bg-gray-50 px-6 py-20">
+
+      <div className="max-w-2xl mx-auto bg-white border rounded-2xl p-8">
+
+        <h1 className="text-4xl font-bold text-black">
+          Delete Your Account
         </h1>
 
-        <p className="text-lg text-gray-600 mb-6">
-          MrBids users may request deletion of their
-          account and associated personal data at any time.
+        <p className="mt-6 text-gray-600 leading-7">
+          Permanently delete your MrBids account and associated personal data.
         </p>
 
-        <div className="space-y-6 text-gray-700 leading-8">
+        <ul className="mt-6 space-y-3 text-gray-700 list-disc pl-6">
 
-          <p>
-            To request account deletion, please send an email to:
-          </p>
+          <li>
+            Your profile will be removed
+          </li>
 
-          <p className="text-xl font-semibold text-black">
-            support@mrbids.com
-          </p>
+          <li>
+            Your sessions and account access will end
+          </li>
 
-          <p>
-            Include the email address associated with your
-            MrBids account and the subject line:
-          </p>
+          <li>
+            This action cannot be undone
+          </li>
 
-          <p className="font-medium">
-            "Account Deletion Request"
-          </p>
+        </ul>
 
-          <p>
-            Once verified, your account and associated
-            personal information will be permanently deleted
-            within 30 days, unless retention is required for:
-          </p>
+        <div className="mt-10">
 
-          <ul className="list-disc pl-6 space-y-2">
+          <button
+            onClick={handleDelete}
+            disabled={loading || deleted}
+            className="
+              bg-red-600
+              hover:bg-red-700
+              text-white
+              px-6
+              py-3
+              rounded-xl
+              font-medium
+              transition
+              disabled:opacity-50
+            "
+          >
 
-            <li>
-              fraud prevention
-            </li>
+            {loading
+              ? "Deleting..."
+              : deleted
+              ? "Account Deleted"
+              : "Delete My Account"}
 
-            <li>
-              legal compliance
-            </li>
-
-            <li>
-              dispute resolution
-            </li>
-
-            <li>
-              transaction record requirements
-            </li>
-
-          </ul>
-
-          <p>
-            Certain transactional or legal records may be
-            retained where required by law.
-          </p>
+          </button>
 
         </div>
 
       </div>
+
     </main>
   );
 }
