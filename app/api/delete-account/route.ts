@@ -50,12 +50,6 @@ export async function DELETE() {
       },
     });
 
-    await prisma.bid.deleteMany({
-      where: {
-        userId: user.id,
-      },
-    });
-
     await prisma.session.deleteMany({
       where: {
         userId: user.id,
