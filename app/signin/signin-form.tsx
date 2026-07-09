@@ -20,6 +20,10 @@ import {
   Browser,
 } from "@capacitor/browser";
 
+import {
+  FirebaseAuthentication,
+} from "@capacitor-firebase/authentication";
+
 export default function SignInPage() {
 
   const { status } =

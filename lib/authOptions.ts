@@ -1,6 +1,7 @@
 import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
+import CredentialsProvider from "next-auth/providers/credentials";
 
 import { PrismaAdapter }
   from "@next-auth/prisma-adapter";
@@ -203,6 +204,33 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
+
+    CredentialsProvider({
+
+      id: "firebase",
+
+      name: "Firebase",
+
+      credentials: {
+
+        idToken: {
+
+          label: "Firebase ID Token",
+
+          type: "text",
+
+        },
+
+      },
+
+      async authorize() {
+
+        return null;
+
+      },
+
+    }),
+
   ],
 
   session: {
