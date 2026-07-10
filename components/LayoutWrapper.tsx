@@ -23,9 +23,14 @@ export default function LayoutWrapper({
   return (
     <>
       {/* ================= HEADER ================= */}
-      <header className="fixed top-0 inset-x-0 z-50 bg-white border-b border-gray-100">
+      <header
+  className="fixed inset-x-0 z-50 bg-white border-b border-gray-100"
+  style={{
+    top: "env(safe-area-inset-top)",
+  }}
+>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
 
           {/* LOGO */}
           <Link href="/" className="flex items-center">
@@ -40,11 +45,11 @@ export default function LayoutWrapper({
           </Link>
 
           {/* NAV */}
-          <nav className="flex items-center gap-3 sm:gap-8">
+          <nav className="flex items-center gap-2 sm:gap-8">
 
             <Link
               href="/live"
-              className="text-sm font-medium text-gray-700 hover:text-gray-900"
+              className="hidden sm:block text-sm font-medium text-gray-700 hover:text-gray-900"
             >
               LIVE
             </Link>
@@ -58,7 +63,7 @@ export default function LayoutWrapper({
 
             <Link
               href="/real-estate"
-              className="text-sm font-medium text-gray-700 hover:text-gray-900"
+              className="hidden sm:block text-sm font-medium text-gray-700 hover:text-gray-900"
             >
               Real Estate
             </Link>
@@ -72,7 +77,7 @@ export default function LayoutWrapper({
 
                 <Link
                   href="/marketplace-sell"
-                  className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
+                  className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-xs sm:text-sm font-medium hover:opacity-90 transition"
                 >
                   <span className="sm:hidden">
                     Sell
@@ -114,9 +119,14 @@ export default function LayoutWrapper({
       </header>
 
       {/* ================= MAIN ================= */}
-      <main className="flex-grow pt-[64px] sm:pt-[80px]">
-        {children}
-      </main>
+      <main
+  className="flex-grow sm:pt-[80px]"
+  style={{
+    paddingTop: "calc(env(safe-area-inset-top) + 64px)",
+  }}
+>
+  {children}
+</main>
 
       {/* ================= FOOTER ================= */}
       <footer className="border-t border-gray-100 bg-white">
