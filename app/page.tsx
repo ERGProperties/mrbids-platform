@@ -249,7 +249,7 @@ export default async function HomePage() {
                   </div>
 
                   <Link
-                    href="/marketplace-auctions"
+                    href="/live"
                     className="block text-center w-full mt-6 py-4 bg-black text-white rounded-full font-medium"
                   >
                     Join LIVE Auction
