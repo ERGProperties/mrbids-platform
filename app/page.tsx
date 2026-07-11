@@ -160,11 +160,11 @@ export default async function HomePage() {
                   href="/marketplace-auctions"
                   className="w-full sm:w-auto text-center px-8 md:px-10 py-4 md:py-5 bg-black text-white rounded-full"
                 >
-                  Browse Marketplace
+                  Browse LIVE Auctions
                 </Link>
 
                 <Link
-                  href="/marketplace-sell"
+                  href="/live"
                   className="w-full sm:w-auto text-center px-8 md:px-10 py-4 md:py-5 border rounded-full"
                 >
                   Start Selling
