@@ -157,14 +157,14 @@ export default async function HomePage() {
 
               <div className="mt-10 md:mt-14 flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/marketplace-auctions"
+                  href="/live"
                   className="w-full sm:w-auto text-center px-8 md:px-10 py-4 md:py-5 bg-black text-white rounded-full"
                 >
                   Browse LIVE Auctions
                 </Link>
 
                 <Link
-                  href="/live"
+                  href="/marketplace-sell"
                   className="w-full sm:w-auto text-center px-8 md:px-10 py-4 md:py-5 border rounded-full"
                 >
                   Start Selling
