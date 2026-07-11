@@ -4,6 +4,8 @@ import { useEffect } from "react";
 
 import { Capacitor } from "@capacitor/core";
 
+import { StatusBar } from "@capacitor/status-bar";
+
 import {
   PushNotifications,
 } from "@capacitor/push-notifications";
@@ -15,6 +17,12 @@ export default function PushNotificationSetup() {
     if (!Capacitor.isNativePlatform()) {
       return;
     }
+
+    // Prevent the WebView from rendering underneath
+    // the iPhone status bar.
+    StatusBar.setOverlaysWebView({
+      overlay: false,
+    });
 
     const registerPush = async () => {
 
@@ -46,40 +54,40 @@ export default function PushNotificationSetup() {
         "registration",
         async (token) => {
 
-console.log(
-  "Push registration success:",
-  token.value
-);
+          console.log(
+            "Push registration success:",
+            token.value
+          );
 
-try {
+          try {
 
-  await fetch(
-    "/api/push/register",
-    {
-      method: "POST",
+            await fetch(
+              "/api/push/register",
+              {
+                method: "POST",
 
-      headers: {
-        "Content-Type":
-          "application/json",
-      },
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                },
 
-      body: JSON.stringify({
-        token: token.value,
-      }),
-    }
-  );
+                body: JSON.stringify({
+                  token: token.value,
+                }),
+              }
+            );
 
-  console.log(
-    "Push token saved"
-  );
+            console.log(
+              "Push token saved"
+            );
 
-} catch (err) {
+          } catch (err) {
 
-  console.error(
-    "Failed to save push token:",
-    err
-  );
-}
+            console.error(
+              "Failed to save push token:",
+              err
+            );
+          }
 
         }
       );
