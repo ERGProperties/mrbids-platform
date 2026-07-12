@@ -478,16 +478,25 @@ console.log(
 
     };
 
-  } catch (err) {
+} catch (err) {
 
-    console.error(
-      "Error in Firebase CredentialsProvider.authorize:",
-      err
-    );
+  console.error(
+    "🔥 FIREBASE AUTHORIZE ERROR"
+  );
 
-    return null;
+  console.error(err);
+
+  if (err instanceof Error) {
+
+    console.error(err.message);
+
+    console.error(err.stack);
 
   }
+
+  throw err;
+
+}
 
 },
 
