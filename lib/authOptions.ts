@@ -227,6 +227,15 @@ export const authOptions: NextAuthOptions = {
 
 async authorize(credentials) {
 
+  console.log("🔥 Firebase authorize() called");
+
+  console.log(
+    "Credentials received:",
+    credentials
+      ? Object.keys(credentials)
+      : "NONE"
+  );
+
   // Ensure an idToken was provided
   if (!credentials?.idToken) {
 
@@ -250,6 +259,16 @@ async authorize(credentials) {
         .verifyIdToken(
           credentials.idToken
         );
+
+    console.log(
+      "✅ Firebase token verified:",
+      {
+        uid: decoded.uid,
+        email: decoded.email,
+        provider:
+          decoded.firebase?.sign_in_provider,
+      }
+    );
 
     if (!decoded) {
 
@@ -425,6 +444,15 @@ async authorize(credentials) {
     }
 
     // Return the NextAuth user
+
+console.log(
+  "✅ Returning NextAuth user:",
+  {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  }
+);
     return {
 
       id:
