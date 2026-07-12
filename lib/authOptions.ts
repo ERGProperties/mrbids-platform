@@ -248,23 +248,43 @@ async authorize(credentials) {
   try {
 
     // Get your existing Firebase Admin app
-const { getAuth } =
-  await import(
-    "firebase-admin/auth"
-  );
+    console.log(
+      "1 - Before dynamic imports"
+    );
 
-const { getFirebaseApp } =
-  await import(
-    "@/lib/firebaseAdmin"
-  );
+    const { getAuth } =
+      await import(
+        "firebase-admin/auth"
+      );
 
-const firebaseApp =
-  await getFirebaseApp();
+    console.log(
+      "2 - firebase-admin/auth imported"
+    );
 
-const decoded =
-  await getAuth(firebaseApp)
-    .verifyIdToken(
-      credentials.idToken
+    const { getFirebaseApp } =
+      await import(
+        "@/lib/firebaseAdmin"
+      );
+
+    console.log(
+      "3 - firebaseAdmin helper imported"
+    );
+
+    const firebaseApp =
+      await getFirebaseApp();
+
+    console.log(
+      "4 - Firebase app initialized"
+    );
+
+    const decoded =
+      await getAuth(firebaseApp)
+        .verifyIdToken(
+          credentials.idToken
+        );
+
+    console.log(
+      "5 - Token verified"
     );
 
     console.log(
