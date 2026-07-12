@@ -2,6 +2,8 @@ import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { getAuth } from "firebase-admin/auth";
+import { getFirebaseApp } from "@/lib/firebaseAdmin";
 
 import { PrismaAdapter }
   from "@next-auth/prisma-adapter";
@@ -223,11 +225,236 @@ export const authOptions: NextAuthOptions = {
 
       },
 
-      async authorize() {
+async authorize(credentials) {
 
-        return null;
+  // Ensure an idToken was provided
+  if (!credentials?.idToken) {
 
-      },
+    console.warn(
+      "Firebase credentials.authorize called without idToken"
+    );
+
+    return null;
+
+  }
+
+  try {
+
+    // Get your existing Firebase Admin app
+    const firebaseApp =
+      getFirebaseApp();
+
+    // Verify the Firebase ID token
+    const decoded =
+      await getAuth(firebaseApp)
+        .verifyIdToken(
+          credentials.idToken
+        );
+
+    if (!decoded) {
+
+      console.warn(
+        "Firebase token verification returned no decoded token"
+      );
+
+      return null;
+
+    }
+
+    // Require an email
+    if (!decoded.email) {
+
+      console.warn(
+        "Firebase token is missing email claim",
+        decoded
+      );
+
+      return null;
+
+    }
+
+    // Require verified email
+    if (!decoded.email_verified) {
+
+      console.warn(
+        "Firebase email is not verified:",
+        decoded.email
+      );
+
+      return null;
+
+    }
+
+    const now =
+      new Date();
+
+    // Find or create the Prisma user
+    const user =
+      await prisma.user.upsert({
+
+        where: {
+
+          email:
+            decoded.email,
+
+        },
+
+        update: {
+
+          name:
+            decoded.name ?? null,
+
+          image:
+            decoded.picture ?? null,
+
+          emailVerified:
+            now,
+
+        },
+
+        create: {
+
+          email:
+            decoded.email,
+
+          name:
+            decoded.name ?? null,
+
+          image:
+            decoded.picture ?? null,
+
+          emailVerified:
+            now,
+
+        },
+
+      });
+
+    // Determine provider
+    const rawProvider =
+      decoded.firebase?.sign_in_provider
+      ?? "";
+
+    const provider =
+      rawProvider.replace(
+        ".com",
+        ""
+      ) || "firebase";
+
+    // Link provider account
+    try {
+
+      await prisma.account.upsert({
+
+        where: {
+
+          provider_providerAccountId: {
+
+            provider,
+
+            providerAccountId:
+              decoded.uid,
+
+          },
+
+        },
+
+        update: {},
+
+        create: {
+
+          userId:
+            user.id,
+
+          type:
+            "oauth",
+
+          provider,
+
+          providerAccountId:
+            decoded.uid,
+
+        },
+
+      });
+
+    } catch (accountErr) {
+
+      console.warn(
+        "Account upsert failed, attempting fallback:",
+        accountErr
+      );
+
+      const existing =
+        await prisma.account.findFirst({
+
+          where: {
+
+            provider,
+
+            providerAccountId:
+              decoded.uid,
+
+          },
+
+        });
+
+      if (!existing) {
+
+        await prisma.account.create({
+
+          data: {
+
+            userId:
+              user.id,
+
+            type:
+              "oauth",
+
+            provider,
+
+            providerAccountId:
+              decoded.uid,
+
+          },
+
+        });
+
+      }
+
+    }
+
+    // Return the NextAuth user
+    return {
+
+      id:
+        user.id,
+
+      email:
+        user.email,
+
+      name:
+        user.name ?? undefined,
+
+      image:
+        user.image ?? undefined,
+
+      role: user.role,
+
+    };
+
+  } catch (err) {
+
+    console.error(
+      "Error in Firebase CredentialsProvider.authorize:",
+      err
+    );
+
+    return null;
+
+  }
+
+},
 
     }),
 

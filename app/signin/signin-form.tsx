@@ -124,38 +124,76 @@ export default function SignInPage() {
 
   async function handleAppleLogin() {
 
-    if (isNativeApp) {
+  if (isNativeApp) {
 
-      try {
+    try {
 
-        const result =
-          await FirebaseAuthentication.signInWithApple();
+      const result =
+        await FirebaseAuthentication.signInWithApple();
 
-        console.log(
-          "Native Apple Result:",
-          result
-        );
+      console.log(
+        "Native Apple Result:",
+        result
+      );
 
-      } catch (err) {
+      const idToken =
+        result.credential?.idToken;
 
-        console.error(
-          "Apple Sign-In Error:",
-          err
+      if (!idToken) {
+
+        throw new Error(
+          "No Firebase ID token returned."
         );
 
       }
 
-      return;
+      const response =
+        await signIn(
+          "firebase",
+          {
+            idToken,
+            redirect: false,
+            callbackUrl,
+          }
+        );
+
+      console.log(
+        "NextAuth Firebase Response:",
+        response
+      );
+
+      if (response?.error) {
+
+        throw new Error(
+          response.error
+        );
+
+      }
+
+      window.location.href =
+        response?.url || callbackUrl;
+
+    } catch (err) {
+
+      console.error(
+        "Apple Sign-In Error:",
+        err
+      );
+
     }
 
-    await signIn(
-      "apple",
-      {
-        callbackUrl,
-      }
-    );
+    return;
+
   }
 
+  await signIn(
+    "apple",
+    {
+      callbackUrl,
+    }
+  );
+
+}
   return (
 
     <main className="min-h-screen relative overflow-hidden bg-black flex items-center justify-center px-4">
