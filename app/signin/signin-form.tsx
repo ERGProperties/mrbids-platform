@@ -126,12 +126,24 @@ export default function SignInPage() {
 
     if (isNativeApp) {
 
-      await Browser.open({
+      try {
 
-        url:
-          `https://mrbids.com/api/auth/signin/apple?callbackUrl=${encodeURIComponent(fullCallbackUrl)}`,
+        const result =
+          await FirebaseAuthentication.signInWithApple();
 
-      });
+        console.log(
+          "Native Apple Result:",
+          result
+        );
+
+      } catch (err) {
+
+        console.error(
+          "Apple Sign-In Error:",
+          err
+        );
+
+      }
 
       return;
     }
