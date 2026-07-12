@@ -54,16 +54,17 @@ export default function MobileBottomNav() {
         right-0
         z-50
         border-t
-        border-gray-200
-        bg-white/95
-        backdrop-blur-xl
-        px-2
+        border-gray-800
+        bg-black/95
+        backdrop-blur-2xl
+        shadow-[0_-8px_30px_rgba(0,0,0,0.45)]
+        px-3
         pb-[env(safe-area-inset-bottom)]
         md:hidden
       "
     >
 
-      <div className="mx-auto flex max-w-md items-center justify-between py-1.5">
+      <div className="mx-auto flex max-w-md items-end justify-between py-2">
 
         {navItems.map((item) => {
 
@@ -83,10 +84,8 @@ export default function MobileBottomNav() {
                 items-center
                 justify-center
                 gap-1
-                text-[11px]
-                font-medium
+                min-w-[58px]
                 transition
-                min-w-[56px]
               "
             >
 
@@ -94,21 +93,24 @@ export default function MobileBottomNav() {
 
                 <div
                   className="
+                    -mt-5
                     flex
-                    h-11
-                    w-11
+                    h-14
+                    w-14
                     items-center
                     justify-center
-                    rounded-xl
-                    bg-black
-                    text-white
-                    shadow-md
+                    rounded-2xl
+                    bg-white
+                    text-black
+                    shadow-xl
+                    ring-4
+                    ring-black
                     transition
                     active:scale-95
                   "
                 >
 
-                  <Icon size={20} />
+                  <Icon size={24} />
 
                 </div>
 
@@ -117,32 +119,38 @@ export default function MobileBottomNav() {
                 <div
                   className={`
                     flex
-                    h-9
-                    w-9
+                    h-10
+                    w-10
                     items-center
                     justify-center
-                    rounded-lg
-                    transition
+                    rounded-xl
+                    transition-all
+                    duration-200
                     ${
                       isActive
-                        ? "bg-black text-white"
-                        : "text-gray-500"
+                        ? "bg-white/10 text-white"
+                        : "text-gray-500 hover:text-gray-300"
                     }
                   `}
                 >
 
-                  <Icon size={20} />
+                  <Icon size={21} />
 
                 </div>
 
               )}
 
               <span
-                className={
-                  isActive
-                    ? "text-black"
-                    : "text-gray-500"
-                }
+                className={`
+                  text-[11px]
+                  font-medium
+                  transition-colors
+                  ${
+                    isActive
+                      ? "text-white"
+                      : "text-gray-500"
+                  }
+                `}
               >
 
                 {item.label}
