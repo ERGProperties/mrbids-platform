@@ -1,20 +1,18 @@
-import {
-  cert,
-  getApps,
-  initializeApp,
-  getApp,
-} from "firebase-admin/app";
-
 import fs from "fs";
 
-let firebaseApp: ReturnType<
-  typeof getApp
-> | null = null;
+import type { App }
+  from "firebase-admin/app";
 
-export function getFirebaseApp() {
+let firebaseApp:
+  | App
+  | null = null;
+
+export async function getFirebaseApp() {
 
   if (firebaseApp) {
+
     return firebaseApp;
+
   }
 
   const serviceAccountPath =
@@ -26,23 +24,37 @@ export function getFirebaseApp() {
     throw new Error(
       "FIREBASE_SERVICE_ACCOUNT_PATH missing"
     );
+
   }
 
   const serviceAccount =
     JSON.parse(
+
       fs.readFileSync(
         serviceAccountPath,
         "utf8"
       )
+
+    );
+
+  // Lazy-load firebase-admin only when needed
+  const firebaseAdmin =
+    await import(
+      "firebase-admin/app"
     );
 
   firebaseApp =
-    getApps().length
-      ? getApp()
-      : initializeApp({
+    firebaseAdmin.getApps().length
+      ? firebaseAdmin.getApp()
+      : firebaseAdmin.initializeApp({
+
           credential:
-            cert(serviceAccount),
+            firebaseAdmin.cert(
+              serviceAccount
+            ),
+
         });
 
   return firebaseApp;
+
 }

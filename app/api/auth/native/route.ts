@@ -49,12 +49,12 @@ if (
 
     }
 
-    const firebaseApp =
-      getFirebaseApp();
+const firebaseApp =
+  await getFirebaseApp();
 
-    const decoded =
-      await getAuth(firebaseApp)
-        .verifyIdToken(idToken);
+const decoded =
+  await getAuth(firebaseApp)
+    .verifyIdToken(idToken);
 
     return NextResponse.json({
 

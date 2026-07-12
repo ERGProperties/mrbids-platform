@@ -24,12 +24,12 @@ export async function sendPushNotification({
 
   try {
 
-    const app =
-      getFirebaseApp();
+const app =
+  await getFirebaseApp();
 
-    await getMessaging(
-      app
-    ).send({
+await getMessaging(
+  app
+).send({
       token,
 
       notification: {

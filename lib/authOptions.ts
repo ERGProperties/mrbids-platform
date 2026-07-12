@@ -2,8 +2,6 @@ import EmailProvider from "next-auth/providers/email";
 import GoogleProvider from "next-auth/providers/google";
 import AppleProvider from "next-auth/providers/apple";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getAuth } from "firebase-admin/auth";
-import { getFirebaseApp } from "@/lib/firebaseAdmin";
 
 import { PrismaAdapter }
   from "@next-auth/prisma-adapter";
@@ -250,15 +248,24 @@ async authorize(credentials) {
   try {
 
     // Get your existing Firebase Admin app
-    const firebaseApp =
-      getFirebaseApp();
+const { getAuth } =
+  await import(
+    "firebase-admin/auth"
+  );
 
-    // Verify the Firebase ID token
-    const decoded =
-      await getAuth(firebaseApp)
-        .verifyIdToken(
-          credentials.idToken
-        );
+const { getFirebaseApp } =
+  await import(
+    "@/lib/firebaseAdmin"
+  );
+
+const firebaseApp =
+  await getFirebaseApp();
+
+const decoded =
+  await getAuth(firebaseApp)
+    .verifyIdToken(
+      credentials.idToken
+    );
 
     console.log(
       "✅ Firebase token verified:",
