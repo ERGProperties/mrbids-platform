@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "com.mrbids.app",
-  appName: "MrBids",
+  appId: "com.mrbids.MrBids",
+  appName: "MrBids Auctions",
 
   webDir: "out",
 
@@ -14,6 +14,15 @@ const config: CapacitorConfig = {
 
   ios: {
     scheme: "mrbids",
+  },
+
+  plugins: {
+    FirebaseAuthentication: {
+      providers: [
+        "apple.com",
+        "google.com",
+      ],
+    },
   },
 };
 
