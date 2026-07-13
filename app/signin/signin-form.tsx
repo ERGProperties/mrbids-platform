@@ -128,16 +128,21 @@ export default function SignInPage() {
 
     try {
 
-      const result =
-        await FirebaseAuthentication.signInWithApple();
+const result =
+  await FirebaseAuthentication.signInWithApple();
 
-      console.log(
-        "Native Apple Result:",
-          JSON.stringify(result, null, 2)
+const tokenResult =
+  await FirebaseAuthentication.getIdToken({
+    forceRefresh: true,
+  });
+
+console.log(
+  "Firebase ID Token Result:",
+  tokenResult
 );
 
-      const idToken =
-        result.credential?.idToken;
+const idToken =
+  tokenResult.token;
 
       if (!idToken) {
 
