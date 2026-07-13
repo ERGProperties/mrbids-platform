@@ -20,6 +20,8 @@ import { useSession } from "next-auth/react";
 
 import { useSearchParams } from "next/navigation";
 
+import AppDownloadSection from "@/components/AppDownloadSection";
+
 declare const fbq: any;
 
 const trackViewContent = (
@@ -667,6 +669,11 @@ fbq('track', 'Purchase', {
         )}
 
       </div>
+
+<AppDownloadSection
+  title="Never Miss the Final Seconds"
+  description="Get instant outbid alerts, auction ending notifications, and bid from anywhere with the official MrBids app."
+/>
 
         {/* CURRENT BID */}
         <div className="mt-10">

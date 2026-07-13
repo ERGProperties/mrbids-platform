@@ -12,7 +12,7 @@ import LiveMarketplaceGrid from "@/components/LiveMarketplaceGrid";
 
 import GoogleAdsConversion from "@/components/GoogleAdsConversion";
 
-import AppDownloadSection from "@/components/AppDownloadSection";
+import AppDownloadBanner from "@/components/AppDownloadBanner";
 
 const activityFeed = [
   "Luxury watch sold for $2,450",
@@ -262,7 +262,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-<AppDownloadSection />
+<AppDownloadBanner />
 
 {/* ACTIVITY FEED */}
 <section className="border-y bg-black text-white">

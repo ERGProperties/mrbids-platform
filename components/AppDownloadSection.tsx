@@ -1,89 +1,75 @@
+"use client";
+
+import { Capacitor } from "@capacitor/core";
+import { useMemo } from "react";
 import Link from "next/link";
 import { APP_LINKS } from "@/lib/app-links";
 
-export default function AppDownloadSection() {
+type Props = {
+  title?: string;
+  description?: string;
+};
+
+export default function AppDownloadSection({
+  title = "Download the Official MrBids App",
+  description = "Bid live, receive instant notifications, and never miss an auction.",
+}: Props) {
+  const isNativeApp = useMemo(
+    () => Capacitor.isNativePlatform(),
+    []
+  );
+
+  // Hide the download section when the user is already
+  // using the native iOS or Android app.
+  if (isNativeApp) {
+    return null;
+  }
+
   return (
-    <section className="border-y bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-6 py-16">
+    <section className="rounded-3xl border bg-gradient-to-br from-gray-50 to-white p-8">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
 
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-xl">
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-4 py-2">
-            <span className="text-sm font-semibold text-blue-700">
-              📱 Now Available on iPhone & Android
-            </span>
-          </div>
-
-          <h2 className="mt-6 text-4xl md:text-5xl font-bold tracking-tight">
-            Take LIVE Auctions Anywhere
-          </h2>
-
-          <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-            Bid in real time, receive instant outbid notifications, watch auctions
-            end live, and list items for sale directly from your phone.
+          <p className="text-sm font-semibold uppercase tracking-wider text-blue-600">
+            AVAILABLE NOW
           </p>
 
-          <div className="mt-10 flex flex-wrap justify-center gap-5">
+          <h2 className="mt-3 text-3xl font-bold">
+            {title}
+          </h2>
 
-            <Link
-              href={APP_LINKS.ios}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src="/images/app-store-badge.svg"
-                alt="Download on the App Store"
-                className="h-14 w-auto transition-transform hover:scale-105"
-              />
-            </Link>
+          <p className="mt-4 text-gray-600">
+            {description}
+          </p>
 
-            <Link
-              href={APP_LINKS.android}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src="/images/google-play-badge.png"
-                alt="Get it on Google Play"
-                className="h-14 w-auto transition-transform hover:scale-105"
-              />
-            </Link>
+        </div>
 
-          </div>
+        <div className="flex flex-col gap-4 mt-6">
 
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <Link
+            href={APP_LINKS.ios}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="/images/app-store-badge.svg"
+              alt="Download on the App Store"
+              className="w-44 h-auto"
+            />
+          </Link>
 
-            <div>
-              <div className="text-4xl mb-3">🔔</div>
-              <h3 className="font-semibold text-lg">
-                Instant Notifications
-              </h3>
-              <p className="mt-2 text-gray-600">
-                Never miss an outbid alert or auction ending.
-              </p>
-            </div>
-
-            <div>
-              <div className="text-4xl mb-3">⚡</div>
-              <h3 className="font-semibold text-lg">
-                Bid Faster
-              </h3>
-              <p className="mt-2 text-gray-600">
-                Place bids in seconds from anywhere.
-              </p>
-            </div>
-
-            <div>
-              <div className="text-4xl mb-3">🏆</div>
-              <h3 className="font-semibold text-lg">
-                Win More Auctions
-              </h3>
-              <p className="mt-2 text-gray-600">
-                Stay connected until the final countdown.
-              </p>
-            </div>
-
-          </div>
+          <Link
+            href={APP_LINKS.android}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="/images/google-play-badge.png"
+              alt="Get it on Google Play"
+              className="w-44 h-auto"
+            />
+          </Link>
 
         </div>
 
