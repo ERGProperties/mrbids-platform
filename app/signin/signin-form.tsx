@@ -133,8 +133,8 @@ export default function SignInPage() {
 
       console.log(
         "Native Apple Result:",
-        result
-      );
+          JSON.stringify(result, null, 2)
+);
 
       const idToken =
         result.credential?.idToken;
