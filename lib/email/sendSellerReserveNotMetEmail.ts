@@ -1,20 +1,16 @@
 import { resend, EMAIL_FROM } from "./mailer";
 import { emailFooter } from "./templates/emailFooter";
 
-export async function sendSellerWinnerEmail({
+export async function sendSellerReserveNotMetEmail({
   to,
   address,
-  winningBid,
-  buyerName,
-  buyerEmail,
+  highestBid,
   auctionUrl,
   coverImage,
 }: {
   to: string;
   address: string;
-  winningBid: number;
-  buyerName: string;
-  buyerEmail: string;
+  highestBid: number;
   auctionUrl: string;
   coverImage?: string;
 }) {
@@ -66,23 +62,40 @@ export async function sendSellerWinnerEmail({
             <tr>
               <td style="padding:34px 28px;">
 
-                <h1 style="font-size:22px; font-weight:700; margin-top:0;">
-                  Your auction has ended
+                <h1 style="margin:0 0 14px; font-size:24px; font-weight:700;">
+                  Auction Ended — Reserve Not Met
                 </h1>
 
-                <p style="font-size:16px; color:#444;">
-                  Your auction has a winning bidder:
+                <p style="font-size:16px; color:#444; line-height:1.6;">
+                  Your auction has ended, but the reserve price was not met.
                 </p>
 
-                <p style="font-size:18px; font-weight:600; margin:20px 0;">
+                <p style="font-size:18px; font-weight:700; margin:24px 0;">
                   ${address}
                 </p>
 
-                <p style="font-size:16px; font-weight:600;">
-                  Final bid: $${winningBid.toLocaleString()}
+                <div style="margin:28px 0; padding:22px; background:#fafafa; border-radius:12px;">
+
+                  <p style="margin:0; font-size:14px; color:#666;">
+                    Highest Bid Received
+                  </p>
+
+                  <p style="margin:8px 0 0; font-size:30px; font-weight:700;">
+                    $${highestBid.toLocaleString()}
+                  </p>
+
+                </div>
+
+                <p style="font-size:15px; color:#555; line-height:1.7;">
+                  Because your reserve price was not met, the auction closed without an automatic sale.
                 </p>
 
-                <div style="text-align:center; margin:30px 0;">
+                <p style="font-size:15px; color:#555; line-height:1.7;">
+                  You may choose to relist the item or contact the highest bidder outside the platform if appropriate.
+                </p>
+
+                <div style="text-align:center; margin:34px 0;">
+
                   <a
                     href="${auctionUrl}"
                     style="
@@ -98,33 +111,8 @@ export async function sendSellerWinnerEmail({
                   >
                     View Auction
                   </a>
-                </div>
-
-                <hr style="margin:30px 0; border:none; border-top:1px solid #eee;" />
-
-                <p style="font-size:15px;">
-                  <strong>Winning Bidder</strong>
-                </p>
-
-                <div style="margin:20px 0; padding:16px; background:#f9f9f9; border-radius:8px;">
-
-                  <p style="margin:0; font-size:14px;">
-                    <strong>Name:</strong> ${buyerName}
-                  </p>
-
-                  <p style="margin:6px 0 0; font-size:14px;">
-                    <strong>Email:</strong>
-
-                    <a href="mailto:${buyerEmail}">
-                      ${buyerEmail}
-                    </a>
-                  </p>
 
                 </div>
-
-                <p style="font-size:13px; color:#777;">
-                  Please contact the buyer directly to arrange payment, pickup, shipping, or any remaining transaction details.
-                </p>
 
               </td>
             </tr>
@@ -143,7 +131,7 @@ export async function sendSellerWinnerEmail({
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject: "Auction complete — winning bidder details",
+    subject: "Auction Ended — Reserve Not Met",
     html,
   });
 }

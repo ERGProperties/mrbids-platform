@@ -1,49 +1,34 @@
 import { resend, EMAIL_FROM } from "./mailer";
+import { emailFooter } from "./templates/emailFooter";
 
 export async function sendAuctionWonEmail({
   to,
   address,
   winningBid,
-
   sellerName,
   sellerEmail,
-
   auctionUrl,
-
   coverImage,
-
   shippingCost,
   shippingLabel,
-
   freeShipping,
   localPickup,
-
 }: {
   to: string;
-
   address: string;
-
   winningBid: number;
-
   sellerName: string;
   sellerEmail: string;
-
   auctionUrl: string;
-
   coverImage?: string;
-
   shippingCost?: number;
   shippingLabel?: string;
-
   freeShipping?: boolean;
   localPickup?: boolean;
 }) {
+  const shippingAmount = (shippingCost || 0) / 100;
 
-  const shippingAmount =
-    (shippingCost || 0) / 100;
-
-  const totalDue =
-    winningBid + shippingAmount;
+  const totalDue = winningBid + shippingAmount;
 
   const html = `
   <div style="margin:0; padding:0; background:#f4f4f5; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
@@ -150,10 +135,7 @@ export async function sendAuctionWonEmail({
                       : `
                   <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                     <span style="font-size:15px; color:#555;">
-                      ${
-                        shippingLabel ||
-                        "Shipping"
-                      }
+                      ${shippingLabel || "Shipping"}
                     </span>
 
                     <span style="font-size:15px; font-weight:600;">
@@ -249,20 +231,7 @@ export async function sendAuctionWonEmail({
               </td>
             </tr>
 
-            <!-- FOOTER -->
-            <tr>
-              <td style="padding:22px; text-align:center; border-top:1px solid #f1f1f1;">
-
-                <p style="font-size:13px; color:#555;">
-                  MrBids — Live marketplace auctions
-                </p>
-
-                <p style="font-size:12px; color:#888;">
-                  Secure real-time bidding powered by MrBids
-                </p>
-
-              </td>
-            </tr>
+            ${emailFooter()}
 
           </table>
 
@@ -275,13 +244,8 @@ export async function sendAuctionWonEmail({
 
   await resend.emails.send({
     from: EMAIL_FROM,
-
     to,
-
-    subject:
-      "🎉 You won the auction — Complete Payment",
-
+    subject: "🎉 You won the auction — Complete Payment",
     html,
   });
-
 }

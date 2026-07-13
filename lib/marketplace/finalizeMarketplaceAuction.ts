@@ -16,6 +16,12 @@ import { sendPushNotification }
 import { createNotification }
   from "@/lib/notifications/createNotification";
 
+import { sendReserveNotMetEmail }
+  from "@/lib/email/sendReserveNotMetEmail";
+
+import { sendSellerReserveNotMetEmail }
+  from "@/lib/email/sendSellerReserveNotMetEmail";
+
 export async function finalizeMarketplaceAuction(
   auctionId: string
 ) {
@@ -73,10 +79,179 @@ export async function finalizeMarketplaceAuction(
       },
 
       data: {
-        status:
-          "RESERVE_NOT_MET",
+        status: "RESERVE_NOT_MET",
       },
     });
+
+    // HIGHEST BIDDER
+    const highestBidder =
+      await prisma.user.findUnique({
+        where: {
+          id: highestBid.bidderId,
+        },
+      });
+
+    if (highestBidder?.email) {
+
+      await sendReserveNotMetEmail({
+        to: highestBidder.email,
+
+        address: auction.title,
+
+        highestBid: highestBid.amount,
+
+        auctionUrl:
+          `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
+
+        coverImage:
+          auction.coverImage ||
+          auction.images?.[0] ||
+          undefined,
+      });
+
+      const bidderPushSubs =
+        await prisma.pushSubscription.findMany({
+          where: {
+            userId: highestBidder.id,
+          },
+        });
+
+      for (const sub of bidderPushSubs) {
+
+        try {
+
+          await sendPushNotification({
+            token: sub.endpoint,
+
+            title: "Reserve Not Met",
+
+            body:
+              `${auction.title} ended without meeting the reserve price.`,
+
+            url:
+              `/marketplace-auctions/${auction.id}`,
+          });
+
+        } catch (err) {
+
+          console.error(
+            "PUSH SEND ERROR:",
+            err
+          );
+
+        }
+
+      }
+
+      await createNotification({
+        userId: highestBidder.id,
+
+        title:
+          "Reserve Not Met",
+
+        message:
+          `You had the highest bid on ${auction.title}, but the reserve price was not met.`,
+
+        auctionId: auction.id,
+
+        type: "SYSTEM",
+
+        link:
+          `/marketplace-auctions/${auction.id}`,
+
+        metadata: {
+          highestBid:
+            highestBid.amount,
+        },
+      });
+
+    }
+
+    // SELLER
+    if (auction.seller?.email) {
+
+      await sendSellerReserveNotMetEmail({
+        to:
+          auction.seller.email,
+
+        address:
+          auction.title,
+
+        highestBid:
+          highestBid.amount,
+
+        auctionUrl:
+          `${process.env.NEXT_PUBLIC_APP_URL}/marketplace-auctions/${auction.id}`,
+
+        coverImage:
+          auction.coverImage ||
+          auction.images?.[0] ||
+          undefined,
+      });
+
+      const sellerPushSubs =
+        await prisma.pushSubscription.findMany({
+          where: {
+            userId:
+              auction.seller.id,
+          },
+        });
+
+      for (const sub of sellerPushSubs) {
+
+        try {
+
+          await sendPushNotification({
+            token:
+              sub.endpoint,
+
+            title:
+              "Reserve Not Met",
+
+            body:
+              `${auction.title} ended without meeting the reserve price.`,
+
+            url:
+              `/marketplace-auctions/${auction.id}`,
+          });
+
+        } catch (err) {
+
+          console.error(
+            "PUSH SEND ERROR:",
+            err
+          );
+
+        }
+
+      }
+
+      await createNotification({
+        userId:
+          auction.seller.id,
+
+        title:
+          "Reserve Not Met",
+
+        message:
+          `Your auction ended without meeting the reserve price.`,
+
+        auctionId:
+          auction.id,
+
+        type:
+          "SYSTEM",
+
+        link:
+          `/marketplace-auctions/${auction.id}`,
+
+        metadata: {
+          highestBid:
+            highestBid.amount,
+        },
+      });
+
+    }
 
     return;
   }

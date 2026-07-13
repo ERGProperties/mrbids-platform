@@ -1,4 +1,5 @@
 import { resend, EMAIL_FROM } from "./mailer";
+import { emailFooter } from "./templates/emailFooter";
 
 export async function sendPaymentReminderEmail({
   to,
@@ -110,20 +111,7 @@ export async function sendPaymentReminderEmail({
               </td>
             </tr>
 
-            <!-- FOOTER -->
-            <tr>
-              <td style="padding:22px; text-align:center; border-top:1px solid #f1f1f1;">
-
-                <p style="font-size:13px; color:#555;">
-                  MrBids — Real-time marketplace auctions
-                </p>
-
-                <p style="font-size:12px; color:#888;">
-                  Secure real-time bidding powered by MrBids
-                </p>
-
-              </td>
-            </tr>
+            ${emailFooter()}
 
           </table>
 
@@ -137,8 +125,7 @@ export async function sendPaymentReminderEmail({
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject:
-      "Complete your MrBids auction payment",
+    subject: "Complete your MrBids auction payment",
     html,
   });
 
