@@ -1,21 +1,17 @@
-import Link from "next/link";
-
 import { getServerSession } from "next-auth";
-
 import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
-
 import { authOptions } from "@/lib/authOptions";
 
-export default async function SellerDashboardPage() {
+import DashboardStats from "@/components/seller/DashboardStats";
+import QuickActions from "@/components/seller/QuickActions";
 
-  const session = await getServerSession(
-    authOptions
-  );
+export default async function SellerDashboardPage() {
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
-    redirect("/coming-soon");
+    redirect("/signin");
   }
 
   const user = await prisma.user.findUnique({
@@ -23,6 +19,62 @@ export default async function SellerDashboardPage() {
       email: session.user.email,
     },
   });
+
+  if (!user) {
+    redirect("/signin");
+  }
+
+  if (!user.isMarketplaceSeller) {
+    redirect("/marketplace-sell");
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+const tomorrow = new Date(today);
+tomorrow.setDate(tomorrow.getDate() + 1);
+
+const [
+  activeAuctions,
+  completedAuctions,
+  endingToday,
+  totalBids,
+] = await Promise.all([
+
+  prisma.marketplaceAuction.count({
+    where: {
+      sellerId: user.id,
+      status: "LIVE",
+    },
+  }),
+
+  prisma.marketplaceAuction.count({
+    where: {
+      sellerId: user.id,
+      status: "ENDED",
+    },
+  }),
+
+  prisma.marketplaceAuction.count({
+    where: {
+      sellerId: user.id,
+      status: "LIVE",
+      endAt: {
+        gte: today,
+        lt: tomorrow,
+      },
+    },
+  }),
+
+  prisma.marketplaceBid.count({
+    where: {
+      auction: {
+        sellerId: user.id,
+      },
+    },
+  }),
+
+]);
 
   if (!user) {
     redirect("/coming-soon");
@@ -74,6 +126,12 @@ export default async function SellerDashboardPage() {
                 {user.name || "Marketplace Seller"}
               </h1>
 
+              {user.username && (
+                <p className="mt-3 text-xl text-gray-500 font-medium">
+                  @{user.username}
+                </p>
+              )}
+
               <div className="mt-5 flex flex-wrap gap-3">
 
                 <span className="px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
@@ -108,31 +166,24 @@ export default async function SellerDashboardPage() {
               Seller Bio
             </p>
 
-            <div className="border rounded-2xl p-6 text-gray-700 leading-relaxed text-lg">
-              {user.sellerBio ||
-                "No seller bio yet."}
+            <div className="border rounded-2xl bg-gray-50 p-6 text-gray-700 leading-relaxed text-lg">
+              {user.sellerBio || "No seller bio yet."}
             </div>
 
           </div>
 
-          {/* CTA */}
-          <div className="mt-14 flex flex-wrap gap-4">
+          {/* DASHBOARD STATS */}
+          <DashboardStats
+            activeAuctions={activeAuctions}
+            endingToday={endingToday}
+            completedAuctions={completedAuctions}
+            totalBids={totalBids}
+          />
 
-            <Link
-              href="/seller/create-auction"
-              className="px-8 py-4 rounded-full bg-black text-white font-medium hover:opacity-90 transition"
-            >
-              Create Marketplace Auction
-            </Link>
-
-            <Link
-              href="/live"
-              className="px-8 py-4 rounded-full border font-medium hover:bg-gray-50 transition"
-            >
-              Browse LIVE Auctions
-            </Link>
-
-          </div>
+          {/* QUICK ACTIONS */}
+          <QuickActions
+            username={user.username}
+          />
 
         </div>
 
