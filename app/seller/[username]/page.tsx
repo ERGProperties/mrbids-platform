@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
+import MarketplaceAuctionCard from "@/components/MarketplaceAuctionCard";
 
 type Props = {
   params: {
@@ -27,6 +28,9 @@ export default async function SellerStorefront({
           endAt: "asc",
         },
         take: 12,
+        include: {
+          seller: true,
+        },
       },
     },
   });
@@ -37,7 +41,6 @@ export default async function SellerStorefront({
 
   return (
     <main className="min-h-screen bg-gray-50">
-
       <div className="max-w-7xl mx-auto px-6 py-12">
 
         {/* HEADER */}
@@ -194,65 +197,18 @@ export default async function SellerStorefront({
 
           ) : (
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-              {user.marketplaceAuctions.map((auction) => (
+  {user.marketplaceAuctions.map((auction) => (
 
-                <div
-                  key={auction.id}
-                  className="rounded-3xl overflow-hidden border bg-white shadow-sm hover:shadow-lg transition"
-                >
+    <MarketplaceAuctionCard
+      key={auction.id}
+      auction={auction}
+    />
 
-                  {auction.coverImage ? (
+  ))}
 
-                    <img
-                      src={auction.coverImage}
-                      alt={auction.title}
-                      className="aspect-square w-full object-cover"
-                    />
-
-                  ) : (
-
-                    <div className="aspect-square bg-gray-200" />
-
-                  )}
-
-                  <div className="p-6">
-
-                    <h3 className="font-semibold text-lg line-clamp-2">
-                      {auction.title}
-                    </h3>
-
-                    <div className="mt-4 flex justify-between text-sm">
-
-                      <span className="text-gray-500">
-                        Current Bid
-                      </span>
-
-                      <span className="font-bold">
-                        ${auction.currentBid}
-                      </span>
-
-                    </div>
-
-                    <div className="mt-6">
-
-                      <Link
-                        href={`/marketplace-auctions/${auction.id}`}
-                        className="block text-center rounded-xl bg-black text-white py-3 font-medium hover:opacity-90 transition"
-                      >
-                        View Auction
-                      </Link>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
+</div>
 
           )}
 
