@@ -53,9 +53,9 @@ export default async function SellerStorefront({
 
           <div className="px-8 pb-10">
 
-            <div className="-mt-16 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+            <div className="-mt-16 flex justify-center">
 
-              <div className="flex items-end gap-6">
+              <div className="flex flex-col items-center text-center gap-6 lg:flex-row lg:items-end lg:text-left">
 
                 {user.avatarUrl ? (
                   <img
@@ -67,21 +67,21 @@ export default async function SellerStorefront({
                   <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200" />
                 )}
 
-                <div className="pb-2">
+                <div className="pb-2 flex-1">
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-col items-center lg:flex-row lg:items-center gap-3">
 
-                    <h1 className="text-4xl font-bold">
-                      @{user.username}
-                    </h1>
+  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold break-words">
+    @{user.username}
+  </h1>
 
-                    {user.username === "mrbids" && (
-                      <span className="rounded-full bg-blue-600 text-white text-xs font-semibold px-3 py-1">
-                        OFFICIAL
-                      </span>
-                    )}
+  {user.username === "mrbids" && (
+    <span className="rounded-full bg-blue-600 text-white text-xs font-semibold px-3 py-1">
+      OFFICIAL
+    </span>
+  )}
 
-                  </div>
+</div>
 
                   {user.name && (
                     <p className="mt-1 text-xl text-gray-700">
@@ -90,9 +90,11 @@ export default async function SellerStorefront({
                   )}
 
                   {user.sellerCategory && (
-                    <p className="mt-2 uppercase tracking-wider text-sm text-gray-500">
-                      {user.sellerCategory}
-                    </p>
+                    <div className="mt-5">
+                      <span className="inline-flex px-5 py-2 rounded-full bg-black text-white text-sm font-medium">
+                        {user.sellerCategory}
+                      </span>
+                    </div>
                   )}
 
                 </div>
