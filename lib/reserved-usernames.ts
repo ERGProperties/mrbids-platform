@@ -1,5 +1,5 @@
 export const RESERVED_USERNAMES = [
-  "mrbids",
+  // "mrbids",
 
   "admin",
   "administrator",
