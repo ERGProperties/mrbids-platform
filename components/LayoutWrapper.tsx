@@ -44,75 +44,62 @@ export default function LayoutWrapper({
             />
           </Link>
 
-          {/* NAV */}
-          <nav className="flex items-center gap-2 sm:gap-8">
+{/* NAV */}
+<nav className="flex items-center gap-2 sm:gap-8">
 
-            <Link
-              href="/live"
-              className="hidden sm:block text-sm font-medium text-gray-700 hover:text-gray-900"
-            >
-              LIVE
-            </Link>
+  <Link
+    href="/live"
+    className="hidden sm:block text-sm font-medium text-gray-700 hover:text-gray-900"
+  >
+    LIVE
+  </Link>
 
-            <Link
-              href="/categories"
-              className="text-sm font-medium text-gray-700 hover:text-gray-900 hidden sm:block"
-            >
-              Categories
-            </Link>
+  {/* NOTIFICATION BELL */}
+  <NotificationBell />
 
-            <Link
-              href="/real-estate"
-              className="hidden sm:block text-sm font-medium text-gray-700 hover:text-gray-900"
-            >
-              Real Estate
-            </Link>
+  {status === "loading" ? null : session ? (
 
-            {/* NOTIFICATION BELL */}
-            <NotificationBell />
+    <div className="flex items-center gap-3">
 
-            {status === "loading" ? null : session ? (
+      <Link
+        href="/seller/dashboard"
+        className="hidden sm:block text-sm font-medium text-gray-700 hover:text-gray-900"
+      >
+        Dashboard
+      </Link>
 
-              <div className="flex items-center gap-3">
+      <Link
+        href="/marketplace-sell"
+        className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-xs sm:text-sm font-medium hover:opacity-90 transition"
+      >
+        Sell
+      </Link>
 
-                <Link
-                  href="/marketplace-sell"
-                  className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-xs sm:text-sm font-medium hover:opacity-90 transition"
-                >
-                  <span className="sm:hidden">
-                    Sell
-                  </span>
+      <button
+        onClick={() =>
+          signOut({
+            callbackUrl: "/",
+          })
+        }
+        className="text-sm font-medium text-gray-700 hover:text-gray-900"
+      >
+        Logout
+      </button>
 
-                  <span className="hidden sm:inline">
-                    Create an Auction
-                  </span>
-                </Link>
+    </div>
 
-                <button
-                  onClick={() =>
-                    signOut({
-                      callbackUrl: "/",
-                    })
-                  }
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
-                >
-                  Logout
-                </button>
+  ) : (
 
-              </div>
+    <Link
+      href="/signin?callbackUrl=/live"
+      className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
+    >
+      Sign In
+    </Link>
 
-            ) : (
+  )}
 
-              <Link
-                href="/signin?callbackUrl=/live"
-                className="px-4 sm:px-5 py-2 rounded-full bg-black text-white text-sm font-medium hover:opacity-90 transition"
-              >
-                Sign In
-              </Link>
-
-            )}
-
-          </nav>
+</nav>
 
         </div>
 
