@@ -36,6 +36,7 @@ export default function MarketplaceSellPage() {
     useRouter();
 
   const {
+    data: session,
     status,
   } = useSession();
 
@@ -136,11 +137,26 @@ async function handleImageUpload(
     e.preventDefault();
 
 if (status !== "authenticated") {
-
   router.push(
     "/signin?callbackUrl=/marketplace-sell"
   );
+  return;
+}
 
+const profileRes = await fetch("/api/user/me");
+
+if (!profileRes.ok) {
+  throw new Error("Unable to verify seller profile.");
+}
+
+const profile = await profileRes.json();
+
+if (
+  !profile.username ||
+  !profile.sellerBio ||
+  !profile.sellerCategory
+) {
+  router.push("/account/profile");
   return;
 }
 
