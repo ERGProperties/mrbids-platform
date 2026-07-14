@@ -1,6 +1,10 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import { prisma } from "@/lib/prisma";
+import {
+  normalizeUsername,
+  validateUsername,
+} from "@/lib/usernames";
 
 export async function POST(req: Request) {
   try {
@@ -13,21 +17,72 @@ export async function POST(req: Request) {
       );
     }
 
-    const { name, bio, avatarUrl } = await req.json();
+    const {
+      username,
+      name,
+      sellerBio,
+      sellerCategory,
+      avatarUrl,
+    } = await req.json();
 
-    // 🚨 Basic validation
-    if (!name || !bio) {
+    // Basic validation
+    if (
+      !username ||
+      !name ||
+      !sellerBio ||
+      !sellerCategory
+    ) {
       return Response.json(
-        { error: "Name and bio are required" },
+        {
+          error:
+            "Username, name, seller bio and seller category are required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const normalizedUsername =
+      normalizeUsername(username);
+
+    const validation =
+      validateUsername(normalizedUsername);
+
+    if (!validation.valid) {
+      return Response.json(
+        { error: validation.message },
+        { status: 400 }
+      );
+    }
+
+    const existing =
+      await prisma.user.findUnique({
+        where: {
+          username: normalizedUsername,
+        },
+      });
+
+    if (
+      existing &&
+      existing.email !== session.user.email
+    ) {
+      return Response.json(
+        {
+          error:
+            "That username is already taken.",
+        },
         { status: 400 }
       );
     }
 
     await prisma.user.update({
-      where: { email: session.user.email },
+      where: {
+        email: session.user.email,
+      },
       data: {
+        username: normalizedUsername,
         name,
-        bio,
+        sellerBio,
+        sellerCategory,
         avatarUrl,
       },
     });
@@ -37,10 +92,16 @@ export async function POST(req: Request) {
     });
 
   } catch (err) {
-    console.error("PROFILE UPDATE ERROR:", err);
+    console.error(
+      "PROFILE UPDATE ERROR:",
+      err
+    );
 
     return Response.json(
-      { error: "Failed to update profile" },
+      {
+        error:
+          "Failed to update profile",
+      },
       { status: 500 }
     );
   }

@@ -144,7 +144,7 @@ return (
           <div className="mt-8 flex flex-wrap gap-4">
 
             <Link
-              href="/sell"
+              href="/marketplace-sell"
               className="inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-black text-white text-lg font-semibold hover:opacity-90 transition"
             >
               Create Marketplace Auction

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 declare const fbq: any;
@@ -10,18 +10,66 @@ export default function ProfileForm({ user }: { user: any }) {
 
   const router = useRouter();
 
-  const [name, setName] = useState(
-    user.name || ""
-  );
+const [username, setUsername] = useState(
+  user.username || ""
+);
 
-  const [bio, setBio] = useState(
-    user.bio || ""
-  );
+const [name, setName] = useState(
+  user.name || ""
+);
 
-  const [avatarUrl, setAvatarUrl] =
-    useState(
-      user.avatarUrl || ""
-    );
+const [sellerBio, setSellerBio] = useState(
+  user.sellerBio || ""
+);
+
+const [sellerCategory, setSellerCategory] = useState(
+  user.sellerCategory || ""
+);
+
+const [avatarUrl, setAvatarUrl] = useState(
+  user.avatarUrl || ""
+);
+
+const [checkingUsername, setCheckingUsername] =
+  useState(false);
+
+const [usernameAvailable, setUsernameAvailable] =
+  useState<boolean | null>(null);
+
+const [usernameMessage, setUsernameMessage] =
+  useState("");
+
+useEffect(() => {
+  if (!username.trim()) {
+    setUsernameAvailable(null);
+    setUsernameMessage("");
+    return;
+  }
+
+  const timeout = setTimeout(async () => {
+    setCheckingUsername(true);
+
+    try {
+      const res = await fetch(
+        `/api/username/check?username=${encodeURIComponent(username)}`
+      );
+
+      const data = await res.json();
+
+      setUsernameAvailable(data.available);
+      setUsernameMessage(data.message);
+    } catch {
+      setUsernameAvailable(false);
+      setUsernameMessage(
+        "Unable to check username."
+      );
+    }
+
+    setCheckingUsername(false);
+  }, 400);
+
+  return () => clearTimeout(timeout);
+}, [username]);
 
   const [loading, setLoading] =
     useState(false);
@@ -91,11 +139,14 @@ export default function ProfileForm({ user }: { user: any }) {
               "application/json",
           },
 
-          body: JSON.stringify({
-            name,
-            bio,
-            avatarUrl,
-          }),
+body: JSON.stringify({
+  username,
+  name,
+  sellerBio,
+  sellerCategory,
+  avatarUrl,
+}),
+
         }
       );
 
@@ -218,6 +269,61 @@ export default function ProfileForm({ user }: { user: any }) {
 
       </div>
 
+{/* USERNAME */}
+<div>
+
+  <label className="block text-sm font-medium mb-1">
+    Username
+  </label>
+
+  <div className="flex items-center border rounded-xl p-3">
+    <span className="text-gray-400 mr-1">@</span>
+
+    <input
+      value={username}
+      onChange={(e) =>
+        setUsername(e.target.value)
+      }
+      className="w-full outline-none"
+      placeholder="yourname"
+      autoComplete="off"
+      spellCheck={false}
+    />
+  </div>
+
+  <p className="text-sm text-gray-500 mt-2">
+    Your storefront:
+    <span className="font-medium ml-1">
+      mrbids.com/@{username || "yourname"}
+    </span>
+  </p>
+
+<div className="mt-2 min-h-[24px]">
+
+  {checkingUsername && (
+    <p className="text-sm text-gray-500">
+      Checking username...
+    </p>
+  )}
+
+  {!checkingUsername &&
+    usernameMessage && (
+      <p
+        className={`text-sm ${
+          usernameAvailable
+            ? "text-green-600"
+            : "text-red-600"
+        }`}
+      >
+        {usernameAvailable ? "✓ " : "✕ "}
+        {usernameMessage}
+      </p>
+    )}
+
+</div>
+
+</div>
+
       {/* NAME */}
       <div>
 
@@ -243,21 +349,83 @@ export default function ProfileForm({ user }: { user: any }) {
         </label>
 
         <textarea
-          value={bio}
+          value={sellerBio}
           onChange={(e) =>
-            setBio(e.target.value)
+            setSellerBio(e.target.value)
           }
           className="w-full border rounded-xl p-3 h-28"
         />
 
       </div>
 
+{/* SELLER CATEGORY */}
+<div>
+
+  <label className="block text-sm font-medium mb-1">
+    Seller Category
+  </label>
+
+  <select
+    value={sellerCategory}
+    onChange={(e) =>
+      setSellerCategory(e.target.value)
+    }
+    className="w-full border rounded-xl p-3"
+  >
+    <option value="">Select a category</option>
+
+    <option value="Collectibles">
+      Collectibles
+    </option>
+
+    <option value="Electronics">
+      Electronics
+    </option>
+
+    <option value="Jewelry">
+      Jewelry
+    </option>
+
+    <option value="Luxury Items">
+      Luxury Items
+    </option>
+
+    <option value="Home & Garden">
+      Home & Garden
+    </option>
+
+    <option value="Tools">
+      Tools
+    </option>
+
+    <option value="Fashion">
+      Fashion
+    </option>
+
+    <option value="Sports">
+      Sports
+    </option>
+
+    <option value="Storage Finds">
+      Storage Finds
+    </option>
+
+    <option value="General Merchandise">
+      General Merchandise
+    </option>
+  </select>
+
+</div>
+
       {/* BUTTON */}
-      <button
-        type="submit"
-        disabled={
-          loading || uploading
-        }
+<button
+  type="submit"
+  disabled={
+    loading ||
+    uploading ||
+    checkingUsername ||
+    usernameAvailable === false
+  }
         className="w-full bg-black text-white py-3 rounded-xl disabled:opacity-60"
       >
 
