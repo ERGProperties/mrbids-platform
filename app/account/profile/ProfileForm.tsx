@@ -10,6 +10,10 @@ export default function ProfileForm({ user }: { user: any }) {
 
   const router = useRouter();
 
+const params = new URLSearchParams(window.location.search);
+
+const returnTo = params.get("returnTo");
+
 const [username, setUsername] = useState(
   user.username || ""
 );
@@ -178,10 +182,13 @@ body: JSON.stringify({
         }
       );
 
-      setSuccess(true);
+setSuccess(true);
 
-      // 🔥 CRITICAL FIX: Refresh server data
-      router.refresh();
+if (returnTo) {
+  router.push(returnTo);
+} else {
+  router.refresh();
+}
 
     } catch (err) {
 
