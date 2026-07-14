@@ -20,24 +20,46 @@ export default async function SellerStorefront({
       username,
     },
     include: {
-      marketplaceAuctions: {
-        where: {
-          status: "LIVE",
-        },
-        orderBy: {
-          endAt: "asc",
-        },
-        take: 12,
-        include: {
-          seller: true,
-        },
-      },
+  marketplaceAuctions: {
+    orderBy: {
+      createdAt: "desc",
     },
+    include: {
+      seller: true,
+    },
+  },
+},
   });
 
   if (!user) {
     notFound();
   }
+
+const liveAuctions = user.marketplaceAuctions
+  .filter(
+    (auction) => auction.status === "LIVE"
+  )
+  .sort((a, b) => {
+    if (!a.endAt || !b.endAt) return 0;
+
+    return (
+      new Date(a.endAt).getTime() -
+      new Date(b.endAt).getTime()
+    );
+  });
+
+const completedSales = user.marketplaceAuctions.filter(
+  (auction) =>
+    auction.status === "ENDED" &&
+    auction.winnerId
+).length;
+
+const totalAuctions = user.marketplaceAuctions.length;
+
+const totalBids = user.marketplaceAuctions.reduce(
+  (sum, auction) => sum + (auction.bidCount ?? 0),
+  0
+);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -89,6 +111,10 @@ export default async function SellerStorefront({
                     </p>
                   )}
 
+<p className="mt-2 text-sm text-gray-500">
+  Member since {new Date(user.createdAt).getFullYear()}
+</p>
+
                   {user.sellerCategory && (
                     <div className="mt-5">
                       <span className="inline-flex px-5 py-2 rounded-full bg-black text-white text-sm font-medium">
@@ -105,49 +131,49 @@ export default async function SellerStorefront({
 
             {/* Stats */}
 
-            <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 border-t pt-8">
+<div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 border-t pt-8">
 
-              <div>
-                <p className="text-3xl font-bold">
-                  {user.marketplaceAuctions.length}
-                </p>
+  <div>
+    <p className="text-3xl font-bold">
+      {liveAuctions.length}
+    </p>
 
-                <p className="text-gray-500 text-sm mt-1">
-                  Live Auctions
-                </p>
-              </div>
+    <p className="text-gray-500 text-sm mt-1">
+      Live Auctions
+    </p>
+  </div>
 
-              <div>
-                <p className="text-3xl font-bold">
-                  {new Date(user.createdAt).getFullYear()}
-                </p>
+  <div>
+    <p className="text-3xl font-bold">
+      {completedSales}
+    </p>
 
-                <p className="text-gray-500 text-sm mt-1">
-                  Member Since
-                </p>
-              </div>
+    <p className="text-gray-500 text-sm mt-1">
+      Completed Sales
+    </p>
+  </div>
 
-              <div>
-                <p className="text-3xl font-bold">
-                  0
-                </p>
+  <div>
+    <p className="text-3xl font-bold">
+      {totalBids}
+    </p>
 
-                <p className="text-gray-500 text-sm mt-1">
-                  Completed Sales
-                </p>
-              </div>
+    <p className="text-gray-500 text-sm mt-1">
+      Total Bids
+    </p>
+  </div>
 
-              <div>
-                <p className="text-3xl font-bold">
-                  —
-                </p>
+  <div>
+  <p className="text-3xl font-bold">
+    {totalAuctions}
+  </p>
 
-                <p className="text-gray-500 text-sm mt-1">
-                  Followers
-                </p>
-              </div>
+  <p className="text-gray-500 text-sm mt-1">
+    Total Auctions
+  </p>
+</div>
 
-            </div>
+</div>
 
             {/* About */}
 
@@ -183,7 +209,7 @@ export default async function SellerStorefront({
 
           </div>
 
-          {user.marketplaceAuctions.length === 0 ? (
+          {liveAuctions.length === 0 ? (
 
             <div className="rounded-3xl border bg-white p-16 text-center">
 
@@ -201,7 +227,7 @@ export default async function SellerStorefront({
 
 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
-  {user.marketplaceAuctions.map((auction) => (
+  {liveAuctions.map((auction) => (
 
     <MarketplaceAuctionCard
       key={auction.id}
