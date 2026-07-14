@@ -2,7 +2,7 @@
 
 import imageCompression from "browser-image-compression";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -39,6 +39,30 @@ export default function MarketplaceSellPage() {
     data: session,
     status,
   } = useSession();
+
+useEffect(() => {
+  async function checkSellerProfile() {
+    if (status !== "authenticated") return;
+
+    const res = await fetch("/api/user/me");
+
+    if (!res.ok) return;
+
+    const profile = await res.json();
+
+    if (
+      !profile.username ||
+      !profile.sellerBio ||
+      !profile.sellerCategory
+    ) {
+      router.replace(
+        "/account/profile?returnTo=/marketplace-sell"
+      );
+    }
+  }
+
+  checkSellerProfile();
+}, [status, router]);
 
   const [loading, setLoading] =
     useState(false);
