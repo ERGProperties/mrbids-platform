@@ -189,7 +189,7 @@ export default async function DashboardPage() {
 
             <div className="-mt-16 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
 
-              <div className="flex items-end gap-6">
+              <div className="flex flex-col items-center text-center gap-6 lg:flex-row lg:items-end lg:text-left">
 
                 {user.avatarUrl ? (
 
@@ -207,13 +207,14 @@ export default async function DashboardPage() {
 
                 )}
 
-                <div className="pb-2">
+                <div className="pb-2 flex-1">
 
                   <p className="text-sm uppercase tracking-[0.2em] text-gray-500 font-medium">
                     Seller Center
                   </p>
 
-                  <h1 className="mt-2 text-4xl md:text-5xl font-semibold text-gray-900">
+                  <h1 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 break-words">
+
                     {user.name || "Marketplace Seller"}
                   </h1>
 
