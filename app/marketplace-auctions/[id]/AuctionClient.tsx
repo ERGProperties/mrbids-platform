@@ -22,6 +22,8 @@ import { useSearchParams } from "next/navigation";
 
 import AppDownloadSection from "@/components/AppDownloadSection";
 
+import SellerCard from "@/components/SellerCard";
+
 declare const fbq: any;
 
 const trackViewContent = (
@@ -607,55 +609,15 @@ fbq('track', 'Purchase', {
           {auction.title}
         </h1>
 
-        {/* SELLER */}
-        <div className="mt-8">
+{/* SELLER */}
 
-          <p className="text-sm text-gray-500 mb-3">
-            Seller
-          </p>
+<div className="mt-8">
 
-          <div className="flex items-center gap-4">
+  <SellerCard
+    seller={auction.seller}
+  />
 
-            {auction.seller?.avatarUrl ? (
-
-              <img
-                src={
-                  auction.seller.avatarUrl
-                }
-                alt={
-                  auction.seller.name ||
-                  "Seller"
-                }
-                className="w-14 h-14 rounded-full object-cover border"
-              />
-
-            ) : (
-
-              <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-500">
-                {auction.seller?.name?.charAt(0) || "M"}
-              </div>
-
-            )}
-
-            <div>
-
-              <p className="font-semibold text-lg">
-                {auction.seller?.name || "Marketplace Seller"}
-              </p>
-
-              {auction.seller?.tiktokUsername && (
-
-                <p className="text-gray-500">
-                  {auction.seller.tiktokUsername}
-                </p>
-
-              )}
-
-            </div>
-
-          </div>
-
-        </div>
+</div>
 
         {/* COUNTDOWN */}
         <div className="mt-8">
