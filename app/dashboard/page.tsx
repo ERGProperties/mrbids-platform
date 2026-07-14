@@ -297,6 +297,7 @@ export default async function DashboardPage() {
   <QuickActions
     username={user.username}
   />
+</div>
 
         {/* STRIPE CONNECT STATUS */}
 <div
