@@ -64,17 +64,17 @@ export default function QuickActions({
         </Link>
 
         <Link
-          href="/live"
+          href="/dashboard#seller-payouts"
           className="rounded-3xl border bg-white p-6 shadow-sm hover:shadow-md transition"
         >
-          <div className="text-3xl mb-4">🔥</div>
+          <div className="text-3xl mb-4">💳</div>
 
           <h3 className="text-lg font-semibold">
-            Browse LIVE
+            Seller Payouts
           </h3>
 
           <p className="mt-2 text-sm text-gray-500">
-            See what buyers are bidding on.
+            Manage your Stripe account and payouts.
           </p>
         </Link>
 

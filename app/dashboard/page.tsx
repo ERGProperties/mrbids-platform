@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
 
 import { redirect } from "next/navigation";
-
 import Link from "next/link";
 
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/authOptions";
-
 import { prisma } from "@/lib/prisma";
 
 import GoogleRegistrationConversion from "@/components/GoogleRegistrationConversion";
-
 import FulfillmentControls from "@/components/dashboard/FulfillmentControls";
-
 import StripeConnectStatus from "@/components/dashboard/StripeConnectStatus";
+
+import DashboardStats from "@/components/seller/DashboardStats";
+import QuickActions from "@/components/seller/QuickActions";
 
 export const metadata: Metadata = {
   title: "Dashboard | MrBids",
@@ -23,7 +22,6 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-
   const session =
     await getServerSession(
       authOptions
@@ -36,37 +34,39 @@ export default async function DashboardPage() {
   const userId =
     session.user.id;
 
+  const user =
+    await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+  if (!user) {
+    redirect("/signin");
+  }
+
   const purchases =
     await prisma.marketplaceAuction.findMany({
       where: {
-        winnerId:
-          userId,
+        winnerId: userId,
       },
-
       orderBy: {
-        updatedAt:
-          "desc",
+        updatedAt: "desc",
       },
-
       take: 10,
     });
 
   const sellerAuctions =
     await prisma.marketplaceAuction.findMany({
       where: {
-        sellerId:
-          userId,
+        sellerId: userId,
       },
-
       include: {
         winner: true,
       },
-
       orderBy: {
-        updatedAt:
-          "desc",
+        updatedAt: "desc",
       },
-
       take: 20,
     });
 
@@ -75,18 +75,16 @@ export default async function DashboardPage() {
       where: {
         userId,
       },
-
       include: {
         auction: true,
       },
-
       orderBy: {
-        createdAt:
-          "desc",
+        createdAt: "desc",
       },
-
       take: 20,
     });
+
+  /* Existing Dashboard Stats */
 
   const totalPurchases =
     purchases.length;
@@ -94,8 +92,7 @@ export default async function DashboardPage() {
   const totalSales =
     sellerAuctions.filter(
       (auction) =>
-        auction.status ===
-        "ENDED"
+        auction.status === "ENDED"
     ).length;
 
   const totalRevenue =
@@ -108,21 +105,73 @@ export default async function DashboardPage() {
       .reduce(
         (sum, auction) =>
           sum +
-          (auction.currentBid ||
-            0),
+          (auction.currentBid || 0),
         0
       );
 
   const unpaidSales =
     sellerAuctions.filter(
       (auction) =>
-        auction.status ===
-          "ENDED" &&
+        auction.status === "ENDED" &&
         auction.paymentStatus !==
           "PAID"
     ).length;
 
-return (
+  /* Seller Overview */
+
+  const activeAuctions =
+    sellerAuctions.filter(
+      (auction) =>
+        auction.status === "LIVE"
+    ).length;
+
+  const completedAuctions =
+    totalSales;
+
+  const endingToday =
+    sellerAuctions.filter(
+      (auction) => {
+        if (
+          auction.status !== "LIVE" ||
+          !auction.endAt
+        ) {
+          return false;
+        }
+
+        const today =
+          new Date();
+
+        today.setHours(
+          0,
+          0,
+          0,
+          0
+        );
+
+        const tomorrow =
+          new Date(today);
+
+        tomorrow.setDate(
+          tomorrow.getDate() + 1
+        );
+
+        return (
+          auction.endAt >=
+            today &&
+          auction.endAt <
+            tomorrow
+        );
+      }
+    ).length;
+
+  const totalBids =
+    sellerAuctions.reduce(
+      (sum, auction) =>
+        sum + auction.bidCount,
+      0
+    );
+
+  return (
   <>
     <GoogleRegistrationConversion />
 
@@ -130,32 +179,130 @@ return (
 
       <div className="max-w-7xl mx-auto px-6 py-24">
 
-        {/* HEADER */}
-        <div className="mb-12">
+        {/* SELLER HEADER */}
+        <div className="mb-12 rounded-3xl border border-gray-200 bg-white overflow-hidden">
 
-          <h1 className="text-4xl md:text-5xl font-semibold text-gray-900">
-            Marketplace Dashboard
-          </h1>
+          {/* Banner */}
+          <div className="h-40 bg-gradient-to-r from-black via-gray-900 to-gray-800" />
 
-          <p className="mt-4 text-lg text-gray-600">
-            Manage your purchases, auctions, payments, shipping, fulfillment, and seller payouts.
-          </p>
+          <div className="px-8 pb-10">
 
-          <div className="mt-8 flex flex-wrap gap-4">
+            <div className="-mt-16 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
 
-            <Link
-              href="/marketplace-sell"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-black text-white text-lg font-semibold hover:opacity-90 transition"
-            >
-              Create Marketplace Auction
-            </Link>
+              <div className="flex items-end gap-6">
+
+                {user.avatarUrl ? (
+
+                  <img
+                    src={user.avatarUrl}
+                    alt={user.name || "Seller"}
+                    className="w-32 h-32 rounded-full border-4 border-white bg-white object-cover"
+                  />
+
+                ) : (
+
+                  <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200 flex items-center justify-center text-4xl font-semibold text-gray-500">
+                    {user.name?.charAt(0) || "M"}
+                  </div>
+
+                )}
+
+                <div className="pb-2">
+
+                  <p className="text-sm uppercase tracking-[0.2em] text-gray-500 font-medium">
+                    Seller Center
+                  </p>
+
+                  <h1 className="mt-2 text-4xl md:text-5xl font-semibold text-gray-900">
+                    {user.name || "Marketplace Seller"}
+                  </h1>
+
+                  {user.username && (
+                    <p className="mt-2 text-xl text-gray-500">
+                      @{user.username}
+                    </p>
+                  )}
+
+                  {user.sellerCategory && (
+                    <div className="mt-4">
+                      <span className="inline-flex px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
+                        {user.sellerCategory}
+                      </span>
+                    </div>
+                  )}
+
+                </div>
+
+              </div>
+
+              <div className="flex flex-wrap gap-4">
+
+                <Link
+                  href="/marketplace-sell"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-black text-white font-semibold hover:opacity-90 transition"
+                >
+                  Sell
+                </Link>
+
+                <Link
+                  href="/account/profile"
+                  className="inline-flex items-center justify-center px-8 py-4 rounded-2xl border border-gray-300 font-semibold hover:bg-gray-50 transition"
+                >
+                  Edit Profile
+                </Link>
+
+                {user.username && (
+                  <Link
+                    href={`/seller/${user.username}`}
+                    className="inline-flex items-center justify-center px-8 py-4 rounded-2xl border border-gray-300 font-semibold hover:bg-gray-50 transition"
+                  >
+                    View Storefront
+                  </Link>
+                )}
+
+              </div>
+
+            </div>
+
+            <div className="mt-10">
+
+              <p className="text-sm uppercase tracking-[0.2em] text-gray-500 font-medium mb-4">
+                Seller Bio
+              </p>
+
+              <div className="rounded-2xl bg-gray-50 border border-gray-200 p-6">
+
+                <p className="text-lg leading-relaxed text-gray-700">
+                  {user.sellerBio || "Complete your seller profile to tell buyers about yourself."}
+                </p>
+
+              </div>
+
+            </div>
 
           </div>
 
         </div>
 
+{/* SELLER OVERVIEW */}
+<DashboardStats
+  activeAuctions={activeAuctions}
+  endingToday={endingToday}
+  completedAuctions={completedAuctions}
+  totalBids={totalBids}
+/>
+
+{/* QUICK ACTIONS */}
+<div className="mt-10 mb-10">
+  <QuickActions
+    username={user.username}
+  />
+
         {/* STRIPE CONNECT STATUS */}
-        <div className="mb-10 bg-white border border-gray-200 rounded-2xl p-8">
+<div
+  id="seller-payouts"
+  className="mb-10 bg-white border border-gray-200 rounded-2xl p-8"
+>
 
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
 
