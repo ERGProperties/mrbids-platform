@@ -17,10 +17,6 @@ import {
 } from "@capacitor/core";
 
 import {
-  Browser,
-} from "@capacitor/browser";
-
-import {
   FirebaseAuthentication,
 } from "@capacitor-firebase/authentication";
 
@@ -100,27 +96,80 @@ export default function SignInPage() {
     setLoading(false);
   }
 
-  async function handleGoogleLogin() {
+async function handleGoogleLogin() {
 
-    if (isNativeApp) {
+  if (isNativeApp) {
 
-      await Browser.open({
+    try {
 
-        url:
-          `https://mrbids.com/api/auth/signin/google?callbackUrl=${encodeURIComponent(fullCallbackUrl)}`,
+      await FirebaseAuthentication.signInWithGoogle();
 
-      });
+      const tokenResult =
+        await FirebaseAuthentication.getIdToken({
+          forceRefresh: true,
+        });
 
-      return;
+      console.log(
+        "Firebase Google ID Token Result:",
+        tokenResult
+      );
+
+      const idToken =
+        tokenResult.token;
+
+      if (!idToken) {
+
+        throw new Error(
+          "No Firebase ID token returned."
+        );
+
+      }
+
+      const response =
+        await signIn(
+          "firebase",
+          {
+            idToken,
+            redirect: false,
+            callbackUrl,
+          }
+        );
+
+      console.log(
+        "NextAuth Firebase Response:",
+        response
+      );
+
+      if (response?.error) {
+
+        throw new Error(
+          response.error
+        );
+
+      }
+
+      window.location.href =
+        response?.url || callbackUrl;
+
+    } catch (err) {
+
+      console.error(
+        "Google Sign-In Error:",
+        err
+      );
+
     }
 
-    await signIn(
-      "google",
-      {
-        callbackUrl,
-      }
-    );
+    return;
   }
+
+  await signIn(
+    "google",
+    {
+      callbackUrl,
+    }
+  );
+}
 
   async function handleAppleLogin() {
 

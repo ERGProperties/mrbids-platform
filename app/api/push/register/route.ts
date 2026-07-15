@@ -23,20 +23,27 @@ export async function POST(req: Request) {
       );
     }
 
-    const { token } =
-      await req.json();
+const {
+  token,
+  platform,
+} = await req.json();
 
-    if (!token) {
+if (!token) {
 
-      return Response.json(
-        {
-          error: "Token required",
-        },
-        {
-          status: 400,
-        }
-      );
+  return Response.json(
+    {
+      error: "Token required",
+    },
+    {
+      status: 400,
     }
+  );
+}
+
+const pushPlatform =
+  platform === "FCM"
+    ? "FCM"
+    : "WEB";
 
     const user =
       await prisma.user.findUnique({
@@ -66,15 +73,26 @@ export async function POST(req: Request) {
         userId: user.id,
       },
 
-      create: {
-        userId: user.id,
+update: {
+  userId: user.id,
+  platform: pushPlatform,
+},
 
-        endpoint: token,
+create: {
+  userId: user.id,
+  endpoint: token,
+  platform: pushPlatform,
 
-        p256dh: "firebase",
+  p256dh:
+    pushPlatform === "WEB"
+      ? ""
+      : null,
 
-        auth: "firebase",
-      },
+  auth:
+    pushPlatform === "WEB"
+      ? ""
+      : null,
+},
     });
 
     return Response.json({
