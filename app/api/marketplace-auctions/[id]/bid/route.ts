@@ -556,3 +556,5 @@ await prisma.notificationLog.create({
   );
 
 }
+
+}
