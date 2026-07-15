@@ -536,24 +536,16 @@ await prisma.notificationLog.create({
 
   console.error("========== BID API ERROR ==========");
 
-  console.error(error);
+console.error("BID API ERROR:", error);
 
-  if (error instanceof Error) {
-    console.error("Message:", error.message);
-    console.error("Stack:", error.stack);
+return NextResponse.json(
+  {
+    error: "Something went wrong",
+  },
+  {
+    status: 500,
   }
-
-  return NextResponse.json(
-    {
-      error:
-        error instanceof Error
-          ? error.message
-          : "Something went wrong",
-    },
-    {
-      status: 500,
-    }
-  );
+);
 
 }
 
