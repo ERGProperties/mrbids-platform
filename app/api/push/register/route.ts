@@ -41,6 +41,10 @@ export async function POST(req: Request) {
 
     }
 
+    console.log(
+      "📲 Registering push token..."
+    );
+
     const user =
       await prisma.user.findUnique({
         where: {
@@ -62,6 +66,7 @@ export async function POST(req: Request) {
     }
 
     await prisma.pushSubscription.upsert({
+
       where: {
         endpoint: token,
       },
@@ -76,7 +81,12 @@ export async function POST(req: Request) {
         p256dh: "",
         auth: "",
       },
+
     });
+
+    console.log(
+      "✅ Push token saved successfully."
+    );
 
     return Response.json({
       success: true,
@@ -85,7 +95,7 @@ export async function POST(req: Request) {
   } catch (err) {
 
     console.error(
-      "PUSH REGISTER ERROR:",
+      "❌ PUSH REGISTER ERROR:",
       err
     );
 
