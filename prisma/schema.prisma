@@ -234,10 +234,15 @@ model PushSubscription {
   id        String   @id @default(cuid())
   userId    String
   endpoint  String   @unique
-  p256dh    String
-  auth      String
+
+  platform  String   @default("WEB")
+
+  p256dh    String?
+  auth      String?
+
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Account {

@@ -21,29 +21,25 @@ export async function POST(req: Request) {
           status: 401,
         }
       );
+
     }
 
-const {
-  token,
-  platform,
-} = await req.json();
+    const {
+      token,
+    } = await req.json();
 
-if (!token) {
+    if (!token) {
 
-  return Response.json(
-    {
-      error: "Token required",
-    },
-    {
-      status: 400,
+      return Response.json(
+        {
+          error: "Token required",
+        },
+        {
+          status: 400,
+        }
+      );
+
     }
-  );
-}
-
-const pushPlatform =
-  platform === "FCM"
-    ? "FCM"
-    : "WEB";
 
     const user =
       await prisma.user.findUnique({
@@ -62,6 +58,7 @@ const pushPlatform =
           status: 404,
         }
       );
+
     }
 
     await prisma.pushSubscription.upsert({
@@ -71,21 +68,13 @@ const pushPlatform =
 
       update: {
         userId: user.id,
-        platform: pushPlatform,
       },
 
       create: {
         userId: user.id,
         endpoint: token,
-        platform: pushPlatform,
-        p256dh:
-          pushPlatform === "WEB"
-            ? ""
-            : null,
-        auth:
-          pushPlatform === "WEB"
-            ? ""
-            : null,
+        p256dh: "",
+        auth: "",
       },
     });
 
@@ -109,5 +98,7 @@ const pushPlatform =
         status: 500,
       }
     );
+
   }
+
 }
