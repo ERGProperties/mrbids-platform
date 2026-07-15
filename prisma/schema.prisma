@@ -211,13 +211,10 @@ model User {
   tiktokUsername           String?
   stripeAccountId          String?
   stripeOnboardingComplete Boolean              @default(false)
-
   username                 String?              @unique
-
   onboardingCompleted      Boolean              @default(false)
   onboardingStep           Int                  @default(1)
-
-accounts                 Account[]
+  accounts                 Account[]
   auctions                 Auction[]            @relation("SellerAuctions")
   wonAuctions              Auction[]            @relation("AuctionWinner")
   bids                     Bid[]
@@ -233,21 +230,14 @@ accounts                 Account[]
   watchlist                Watchlist[]
 }
 
-enum PushPlatform {
-  WEB
-  FCM
-}
-
 model PushSubscription {
-  id         String       @id @default(cuid())
-  userId     String
-  endpoint   String       @unique
-  platform   PushPlatform @default(WEB)
-  p256dh     String?
-  auth       String?
-  createdAt  DateTime     @default(now())
-
-  user User @relation(fields: [userId], references: [id])
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Account {
