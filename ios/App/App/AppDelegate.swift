@@ -13,26 +13,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
 
         FirebaseApp.configure()
-
-        application.registerForRemoteNotifications()
+        print("✅ Firebase configured")
 
         return true
-    }
-
-    func application(
-        _ application: UIApplication,
-        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
-    ) {
-
-        print("✅ APNs Device Token: \(deviceToken as NSData)")
-    }
-
-    func application(
-        _ application: UIApplication,
-        didFailToRegisterForRemoteNotificationsWithError error: Error
-    ) {
-
-        print("❌ APNs Registration Failed: \(error)")
     }
 
     func applicationWillResignActive(_ application: UIApplication) {}
@@ -44,6 +27,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {}
 
     func applicationWillTerminate(_ application: UIApplication) {}
+
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+
+        let token = deviceToken.map {
+            String(format: "%02.2hhx", $0)
+        }.joined()
+
+        print("✅ APNs Device Token:", token)
+
+        NotificationCenter.default.post(
+            name: Notification.Name(CAPNotifications.DidRegisterForRemoteNotificationsWithDeviceToken.name()),
+            object: deviceToken
+        )
+    }
+
+    func application(
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
+    ) {
+
+        print("❌ APNs Registration Failed:", error)
+
+        NotificationCenter.default.post(
+            name: Notification.Name(CAPNotifications.DidFailToRegisterForRemoteNotificationsWithError.name()),
+            object: error
+        )
+    }
 
     func application(
         _ app: UIApplication,
