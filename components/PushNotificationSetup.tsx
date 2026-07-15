@@ -10,6 +10,10 @@ import {
   PushNotifications,
 } from "@capacitor/push-notifications";
 
+import {
+  FirebaseMessaging,
+} from "@capacitor-firebase/messaging";
+
 export default function PushNotificationSetup() {
 
   useEffect(() => {
@@ -21,147 +25,145 @@ export default function PushNotificationSetup() {
 
     console.log("✅ Running on native platform.");
 
-    // Prevent the WebView from rendering underneath
-    // the iPhone status bar.
     StatusBar.setOverlaysWebView({
       overlay: false,
     });
 
     const registerPush = async () => {
 
-      console.log("🔔 Starting push registration...");
+      try {
 
-      let permStatus =
-        await PushNotifications.checkPermissions();
+        console.log("🔔 Starting push registration...");
 
-      console.log("📋 Current permission:", permStatus);
-
-      if (
-        permStatus.receive === "prompt"
-      ) {
-
-        console.log("📲 Requesting notification permission...");
-
-        permStatus =
-          await PushNotifications.requestPermissions();
+        let permission =
+          await FirebaseMessaging.checkPermissions();
 
         console.log(
-          "📋 Permission after request:",
-          permStatus
+          "📋 Firebase permission:",
+          permission
         );
-      }
 
-      if (
-        permStatus.receive !== "granted"
-      ) {
+        if (
+          permission.receive === "prompt"
+        ) {
+
+          permission =
+            await FirebaseMessaging.requestPermissions();
+
+          console.log(
+            "📋 Firebase permission after request:",
+            permission
+          );
+
+        }
+
+        if (
+          permission.receive !== "granted"
+        ) {
+
+          console.log(
+            "❌ Notification permission denied."
+          );
+
+          return;
+
+        }
 
         console.log(
-          "❌ Push notification permission denied."
+          "✅ Notification permission granted."
         );
 
-        return;
+        await PushNotifications.register();
+
+        console.log(
+          "✅ APNs registration requested."
+        );
+
+        const result =
+          await FirebaseMessaging.getToken();
+
+        console.log(
+          "🔥 FCM TOKEN:",
+          result.token
+        );
+
+        const response =
+          await fetch(
+            "/api/push/register",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify({
+                token: result.token,
+              }),
+            }
+          );
+
+        console.log(
+          "📡 Register API Status:",
+          response.status
+        );
+
+        console.log(
+          await response.json()
+        );
+
+      } catch (err) {
+
+        console.error(
+          "❌ Push setup failed:",
+          err
+        );
+
       }
-
-      console.log("✅ Permission granted.");
-
-      // Register listeners BEFORE calling register()
-      PushNotifications.addListener(
-        "registration",
-        async (token) => {
-
-          console.log("================================");
-          console.log("🎉 REGISTRATION EVENT RECEIVED");
-          console.log(token);
-          console.log("TOKEN:", token.value);
-          console.log("================================");
-
-          try {
-
-            const response =
-              await fetch(
-                "/api/push/register",
-                {
-                  method: "POST",
-
-                  headers: {
-                    "Content-Type":
-                      "application/json",
-                  },
-
-                  body: JSON.stringify({
-                    token: token.value,
-                  }),
-                }
-              );
-
-            console.log(
-              "📡 Register API status:",
-              response.status
-            );
-
-            const data =
-              await response.json();
-
-            console.log(
-              "📡 Register API response:",
-              data
-            );
-
-          } catch (err) {
-
-            console.error(
-              "❌ Failed to save push token:",
-              err
-            );
-          }
-
-        }
-      );
-
-      PushNotifications.addListener(
-        "registrationError",
-        (error) => {
-
-          console.error(
-            "❌ Push registration error:",
-            error
-          );
-        }
-      );
-
-      PushNotifications.addListener(
-        "pushNotificationReceived",
-        (notification) => {
-
-          console.log(
-            "📩 Push notification received:",
-            notification
-          );
-        }
-      );
-
-      PushNotifications.addListener(
-        "pushNotificationActionPerformed",
-        (notification) => {
-
-          console.log(
-            "👆 Push notification tapped:",
-            notification
-          );
-        }
-      );
-
-      console.log("📲 Calling PushNotifications.register()...");
-
-      await PushNotifications.register();
-
-      console.log("✅ PushNotifications.register() returned.");
 
     };
+
+    PushNotifications.addListener(
+      "pushNotificationReceived",
+      (notification) => {
+
+        console.log(
+          "📩 Push notification received:",
+          notification
+        );
+
+      }
+    );
+
+    PushNotifications.addListener(
+      "pushNotificationActionPerformed",
+      (notification) => {
+
+        console.log(
+          "👆 Push notification tapped:",
+          notification
+        );
+
+      }
+    );
+
+    FirebaseMessaging.addListener(
+      "tokenReceived",
+      (event) => {
+
+        console.log(
+          "🔥 New FCM Token:",
+          event.token
+        );
+
+      }
+    );
 
     registerPush();
 
   }, []);
 
   return null;
+
 }
