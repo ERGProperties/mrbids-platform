@@ -24,30 +24,54 @@ export async function sendPushNotification({
 
   try {
 
-const app =
-  await getFirebaseApp();
+    const app =
+      await getFirebaseApp();
 
-await getMessaging(
-  app
-).send({
-      token,
+    console.log("========== SENDING PUSH ==========");
 
-      notification: {
-        title,
-        body,
-      },
-
-      data: {
-        url:
-          url || "/",
-      },
+    console.log({
+      token:
+        token.substring(0, 20) + "...",
+      title,
+      body,
+      url,
     });
+
+    const response =
+      await getMessaging(app).send({
+        token,
+
+        notification: {
+          title,
+          body,
+        },
+
+        data: {
+          url:
+            url || "/",
+        },
+      });
+
+    console.log(
+      "✅ PUSH SENT SUCCESSFULLY:",
+      response
+    );
 
   } catch (err: any) {
 
     console.error(
-      "PUSH SEND ERROR:",
+      "❌ PUSH SEND ERROR:",
       err
+    );
+
+    console.error(
+      "Firebase Error Code:",
+      err?.errorInfo?.code
+    );
+
+    console.error(
+      "Firebase Error Message:",
+      err?.errorInfo?.message
     );
 
     const errorCode =
@@ -72,7 +96,7 @@ await getMessaging(
         });
 
         console.log(
-          "Removed invalid push token"
+          "🗑 Removed invalid push token"
         );
 
       } catch (deleteErr) {
@@ -81,7 +105,11 @@ await getMessaging(
           "Failed removing invalid token:",
           deleteErr
         );
+
       }
+
     }
+
   }
+
 }
