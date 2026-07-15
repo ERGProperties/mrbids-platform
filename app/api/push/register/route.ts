@@ -71,28 +71,22 @@ const pushPlatform =
 
       update: {
         userId: user.id,
+        platform: pushPlatform,
       },
 
-update: {
-  userId: user.id,
-  platform: pushPlatform,
-},
-
-create: {
-  userId: user.id,
-  endpoint: token,
-  platform: pushPlatform,
-
-  p256dh:
-    pushPlatform === "WEB"
-      ? ""
-      : null,
-
-  auth:
-    pushPlatform === "WEB"
-      ? ""
-      : null,
-},
+      create: {
+        userId: user.id,
+        endpoint: token,
+        platform: pushPlatform,
+        p256dh:
+          pushPlatform === "WEB"
+            ? ""
+            : null,
+        auth:
+          pushPlatform === "WEB"
+            ? ""
+            : null,
+      },
     });
 
     return Response.json({
