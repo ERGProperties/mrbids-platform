@@ -5,23 +5,35 @@ export async function GET() {
   try {
     const app = await getFirebaseApp();
 
-    // This forces Firebase Admin to initialize.
-    getMessaging(app);
+    const response = await getMessaging(app).send({
+      token: "elmueiDufkhvnvqiaxFFJO:APA91bEH4UsYEjcOZz6bGViv_Xgxy18sm9WaxO8XjP_QVUPWWcK3KFnYEk-oDFnfpS7nliVbd4HjjPNIpbFYpy2QWapNz2YuWdkN1Vi1nB8q_c7jkyCfNdY",
+      notification: {
+        title: "Firebase Test",
+        body: "Testing Firebase Admin authentication",
+      },
+    });
 
     return Response.json({
       success: true,
-      project: app.options.projectId,
+      response,
     });
+
   } catch (err: any) {
+
     console.error(err);
 
     return Response.json(
       {
         success: false,
-        error: err.message,
-        code: err.code,
+        code: err?.errorInfo?.code,
+        message: err?.errorInfo?.message,
+        raw: err?.message,
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
+
   }
+
 }
