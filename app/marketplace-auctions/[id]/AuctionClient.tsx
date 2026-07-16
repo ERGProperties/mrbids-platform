@@ -493,6 +493,19 @@ fbq('track', 'Purchase', {
       {/* LEFT */}
       <div>
 
+<button
+  onClick={() => {
+    if (window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/live");
+    }
+  }}
+  className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-black transition"
+>
+  ← Back to LIVE
+</button>
+
 {auction.images?.length > 0 ? (
 
   <div>
@@ -596,19 +609,6 @@ fbq('track', 'Purchase', {
   </div>
 
 )}
-
-<button
-  onClick={() => {
-    if (window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/live");
-    }
-  }}
-  className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-black transition"
->
-  ← Live Auctions
-</button>
 
         <div className="flex items-center gap-3 mb-5">
 
