@@ -10,6 +10,9 @@ import {
 
 import { useRouter } from "next/navigation";
 
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 import useSWR, {
   mutate,
 } from "swr";
@@ -622,9 +625,9 @@ fbq('track', 'Purchase', {
 
         </div>
 
-        <h1 className="text-5xl font-semibold leading-tight">
-          {auction.title}
-        </h1>
+<h1 className="text-3xl sm:text-5xl font-semibold leading-snug">
+  {auction.title}
+</h1>
 
 {/* SELLER */}
 
@@ -762,79 +765,16 @@ fbq('track', 'Purchase', {
             Description
           </p>
 
-          <div className="text-lg text-gray-700 leading-relaxed border rounded-2xl p-6">
-            {auction.description ||
-              "No description provided."}
-          </div>
-
-        </div>
-
-        {/* BID HISTORY */}
-        <div className="mt-10">
-
-          <div className="flex items-center justify-between mb-4">
-
-            <p className="text-sm text-gray-500">
-              Recent Bids
-            </p>
-
-            <button
-              onClick={toggleWatchlist}
-              disabled={watchlistLoading}
-              className="text-sm font-medium"
-            >
-              {isSaved
-                ? "★ Saved"
-                : "☆ Watchlist"}
-            </button>
-
-          </div>
-
-          <div className="border rounded-2xl divide-y overflow-hidden">
-
-            {formattedBids.length === 0 ? (
-
-              <div className="p-6 text-gray-500">
-                No bids yet.
-              </div>
-
-            ) : (
-
-              formattedBids.map(
-                (bid: any) => (
-
-                  <div
-                    key={bid.id}
-                    className="flex items-center justify-between p-5"
-                  >
-
-                    <div>
-
-                      <p className="font-medium">
-                        {bid.displayName}
-                      </p>
-
-                      <p className="text-sm text-gray-500">
-                        {new Date(
-                          bid.createdAt
-                        ).toLocaleString()}
-                      </p>
-
-                    </div>
-
-                    <p className="text-xl font-semibold">
-                      $
-                      {bid.amount.toLocaleString()}
-                    </p>
-
-                  </div>
-
-                )
-              )
-
-            )}
-
-          </div>
+<div className="border rounded-2xl p-6 bg-white">
+  <div className="prose prose-gray max-w-none prose-headings:font-semibold prose-p:leading-relaxed prose-li:leading-relaxed prose-strong:text-black prose-ul:list-disc prose-ul:pl-6">
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+    >
+      {auction.description ||
+        "No description provided."}
+    </ReactMarkdown>
+  </div>
+</div>
 
         </div>
 
@@ -944,6 +884,75 @@ onChange={(e) =>
           </div>
 
         )}
+
+       {/* BID HISTORY */}
+        <div className="mt-14">
+
+          <div className="flex items-center justify-between mb-4">
+
+            <p className="text-sm text-gray-500">
+              Recent Bids
+            </p>
+
+            <button
+              onClick={toggleWatchlist}
+              disabled={watchlistLoading}
+              className="text-sm font-medium"
+            >
+              {isSaved
+                ? "★ Saved"
+                : "☆ Watchlist"}
+            </button>
+
+          </div>
+
+          <div className="border rounded-2xl divide-y overflow-hidden">
+
+            {formattedBids.length === 0 ? (
+
+              <div className="p-6 text-gray-500">
+                No bids yet.
+              </div>
+
+            ) : (
+
+              formattedBids.map(
+                (bid: any) => (
+
+                  <div
+                    key={bid.id}
+                    className="flex items-center justify-between p-5"
+                  >
+
+                    <div>
+
+                      <p className="font-medium">
+                        {bid.displayName}
+                      </p>
+
+                      <p className="text-sm text-gray-500">
+                        {new Date(
+                          bid.createdAt
+                        ).toLocaleString()}
+                      </p>
+
+                    </div>
+
+                    <p className="text-xl font-semibold">
+                      $
+                      {bid.amount.toLocaleString()}
+                    </p>
+
+                  </div>
+
+                )
+              )
+
+            )}
+
+          </div>
+
+        </div>
 
         {/* ERROR */}
         {error && (
