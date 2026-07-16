@@ -19,7 +19,6 @@ export async function getFirebaseApp() {
   const serviceAccount =
     JSON.parse(serviceAccountJson);
 
-  // Lazy-load firebase-admin only when needed
   const firebaseAdmin =
     await import("firebase-admin/app");
 
@@ -27,10 +26,10 @@ export async function getFirebaseApp() {
     firebaseAdmin.getApps().length
       ? firebaseAdmin.getApp()
       : firebaseAdmin.initializeApp({
-          credential:
-            firebaseAdmin.cert(
-              serviceAccount
-            ),
+          credential: firebaseAdmin.cert(serviceAccount),
+
+          projectId:
+            serviceAccount.project_id,
         });
 
   return firebaseApp;
