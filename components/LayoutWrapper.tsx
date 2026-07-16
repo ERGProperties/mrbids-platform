@@ -49,7 +49,7 @@ export default function LayoutWrapper({
 
   <Link
     href="/live"
-    className="hidden sm:block text-sm font-medium text-gray-700 hover:text-gray-900"
+    className="text-sm font-medium text-gray-700 hover:text-gray-900"
   >
     LIVE
   </Link>
