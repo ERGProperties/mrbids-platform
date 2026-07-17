@@ -70,7 +70,20 @@ const totalBids = user.marketplaceAuctions.reduce(
 
           {/* Banner */}
 
-          <div className="h-44 bg-gradient-to-r from-black via-gray-900 to-gray-800" />
+{user.bannerUrl ? (
+
+  <div
+    className="h-44 bg-cover bg-center"
+    style={{
+      backgroundImage: `url(${user.bannerUrl})`,
+    }}
+  />
+
+) : (
+
+  <div className="h-44 bg-gradient-to-r from-black via-gray-900 to-gray-800" />
+
+)}
 
           <div className="px-8 pb-10">
 

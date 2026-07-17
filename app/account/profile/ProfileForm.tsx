@@ -34,6 +34,10 @@ const [avatarUrl, setAvatarUrl] = useState(
   user.avatarUrl || ""
 );
 
+const [bannerUrl, setBannerUrl] = useState(
+  user.bannerUrl || ""
+);
+
 const [checkingUsername, setCheckingUsername] =
   useState(false);
 
@@ -149,6 +153,7 @@ body: JSON.stringify({
   sellerBio,
   sellerCategory,
   avatarUrl,
+  bannerUrl,
 }),
 
         }
@@ -275,6 +280,65 @@ if (returnTo) {
         )}
 
       </div>
+
+{/* STOREFRONT BANNER */}
+<div>
+
+  <label className="block text-sm font-medium mb-2">
+    Storefront Banner
+  </label>
+
+  <p className="text-sm text-gray-500 mb-3">
+    Recommended size: 1600 × 400 pixels
+  </p>
+
+  <input
+    type="file"
+    accept="image/*"
+    onChange={async (e) => {
+
+      const file = e.target.files?.[0];
+
+      if (!file) return;
+
+      setUploading(true);
+
+      try {
+
+        const url =
+          await handleImageUpload(file);
+
+        setBannerUrl(url);
+
+      } catch (err) {
+
+        console.error(
+          "Banner upload failed:",
+          err
+        );
+
+        setError(
+          "Banner upload failed"
+        );
+
+      }
+
+      setUploading(false);
+
+    }}
+    className="w-full border rounded-xl p-3"
+  />
+
+  {bannerUrl && (
+
+    <img
+      src={bannerUrl}
+      className="mt-4 w-full h-32 rounded-xl border object-cover"
+    />
+
+  )}
+
+</div>
 
 {/* USERNAME */}
 <div>

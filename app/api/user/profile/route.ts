@@ -23,6 +23,7 @@ export async function POST(req: Request) {
       sellerBio,
       sellerCategory,
       avatarUrl,
+      bannerUrl,
     } = await req.json();
 
     // Basic validation
@@ -84,6 +85,7 @@ export async function POST(req: Request) {
         sellerBio,
         sellerCategory,
         avatarUrl,
+        bannerUrl,
       },
     });
 
