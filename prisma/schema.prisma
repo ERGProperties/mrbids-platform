@@ -204,6 +204,7 @@ model User {
   createdAt                DateTime             @default(now())
   isVerifiedBidder         Boolean              @default(false)
   avatarUrl                String?
+  bannerUrl                String?
   bio                      String?
   isMarketplaceSeller      Boolean              @default(false)
   sellerBio                String?
