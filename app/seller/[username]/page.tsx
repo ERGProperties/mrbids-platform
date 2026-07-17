@@ -76,7 +76,7 @@ const totalBids = user.marketplaceAuctions.reduce(
 
 <div className="-mt-16 flex justify-center">
 
-  <div className="flex flex-col lg:flex-row items-center gap-8">
+  <div className="flex flex-col items-center">
 
     {user.avatarUrl ? (
       <img
@@ -88,24 +88,22 @@ const totalBids = user.marketplaceAuctions.reduce(
       <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200" />
     )}
 
-    <div className="text-center lg:text-left">
+    <div className="mt-4 text-center">
 
-      <div className="flex items-center justify-center lg:justify-start gap-4">
+      <h1 className="text-3xl sm:text-4xl font-bold">
+        @{user.username}
+      </h1>
 
-        <h1 className="text-3xl sm:text-4xl font-bold">
-          @{user.username}
-        </h1>
-
-        {user.username === "mrbids" && (
-          <span className="ml-3 inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
+      {user.username === "mrbids" && (
+        <div className="mt-3">
+          <span className="inline-flex rounded-full bg-blue-600 px-4 py-1 text-xs font-semibold tracking-wide text-white">
             OFFICIAL
           </span>
-        )}
-
-      </div>
+        </div>
+      )}
 
       {user.name && (
-        <p className="mt-2 text-xl text-gray-700">
+        <p className="mt-4 text-xl text-gray-700">
           {user.name}
         </p>
       )}
