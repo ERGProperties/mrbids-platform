@@ -97,13 +97,11 @@ const totalBids = user.marketplaceAuctions.reduce(
           @{user.username}
         </h1>
 
-        {user.username === "mrbids" && (
-          <span className="inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
-            OFFICIAL
-          </span>
-        )}
-
-      </div>
+{user.username === "mrbids" && (
+  <span className="ml-3 inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
+    OFFICIAL
+  </span>
+)}
 
       {user.name && (
         <p className="mt-2 text-xl text-gray-700">
