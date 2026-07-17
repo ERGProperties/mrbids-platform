@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { prisma } from "@/lib/prisma";
@@ -91,35 +90,29 @@ const totalBids = user.marketplaceAuctions.reduce(
 
     <div className="text-center lg:text-left">
 
-      <div className="flex items-center justify-center lg:justify-start gap-3">
+      <div className="flex items-center justify-center lg:justify-start gap-4">
 
         <h1 className="text-3xl sm:text-4xl font-bold">
           @{user.username}
         </h1>
 
-<div className="flex items-center justify-center lg:justify-start gap-4">
+        {user.username === "mrbids" && (
+          <span className="ml-3 inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
+            OFFICIAL
+          </span>
+        )}
 
-  <h1 className="text-3xl sm:text-4xl font-bold">
-    @{user.username}
-  </h1>
+      </div>
 
-  {user.username === "mrbids" && (
-    <span className="ml-3 inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
-      OFFICIAL
-    </span>
-  )}
+      {user.name && (
+        <p className="mt-2 text-xl text-gray-700">
+          {user.name}
+        </p>
+      )}
 
-</div>
-
-{user.name && (
-  <p className="mt-2 text-xl text-gray-700">
-    {user.name}
-  </p>
-)}
-
-<p className="mt-2 text-sm text-gray-500">
-  Member since {new Date(user.createdAt).getFullYear()}
-</p>
+      <p className="mt-2 text-sm text-gray-500">
+        Member since {new Date(user.createdAt).getFullYear()}
+      </p>
 
       {user.sellerCategory && (
         <div className="mt-5">
