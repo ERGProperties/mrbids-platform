@@ -179,111 +179,128 @@ export default async function DashboardPage() {
 
       <div className="max-w-7xl mx-auto px-6 py-24">
 
-        {/* SELLER HEADER */}
-        <div className="mb-12 rounded-3xl border border-gray-200 bg-white overflow-hidden">
+{/* SELLER HEADER */}
+<div className="mb-12 overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
 
-          {/* Banner */}
-          <div className="h-40 bg-gradient-to-r from-black via-gray-900 to-gray-800" />
+  {/* Banner */}
+  {user.bannerUrl ? (
 
-          <div className="px-8 pb-10">
+    <div
+      className="h-48 bg-cover bg-center"
+      style={{
+        backgroundImage: `url(${user.bannerUrl})`,
+      }}
+    />
 
-            <div className="-mt-16 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+  ) : (
 
-              <div className="flex flex-col items-center text-center gap-6 lg:flex-row lg:items-end lg:text-left">
+    <div className="h-48 bg-gradient-to-r from-black via-gray-900 to-gray-800" />
 
-                {user.avatarUrl ? (
+  )}
 
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.name || "Seller"}
-                    className="w-32 h-32 rounded-full border-4 border-white bg-white object-cover"
-                  />
+  <div className="px-8 pb-10">
 
-                ) : (
+    <div className="-mt-20 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
 
-                  <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200 flex items-center justify-center text-4xl font-semibold text-gray-500">
-                    {user.name?.charAt(0) || "M"}
-                  </div>
+      {/* Seller Info */}
+      <div className="flex flex-col items-center lg:flex-row lg:items-end gap-6">
 
-                )}
+        {user.avatarUrl ? (
 
-                <div className="pb-2 flex-1">
+          <img
+            src={user.avatarUrl}
+            alt={user.name || "Seller"}
+            className="w-36 h-36 rounded-full border-4 border-white bg-white object-cover shadow-lg"
+          />
 
-                  <p className="text-sm uppercase tracking-[0.2em] text-gray-500 font-medium">
-                    Seller Center
-                  </p>
+        ) : (
 
-                  <h1 className="mt-2 text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 break-words">
-
-                    {user.name || "Marketplace Seller"}
-                  </h1>
-
-                  {user.username && (
-                    <p className="mt-2 text-xl text-gray-500">
-                      @{user.username}
-                    </p>
-                  )}
-
-                  {user.sellerCategory && (
-                    <div className="mt-4">
-                      <span className="inline-flex px-4 py-2 rounded-full bg-black text-white text-sm font-medium">
-                        {user.sellerCategory}
-                      </span>
-                    </div>
-                  )}
-
-                </div>
-
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-
-                <Link
-                  href="/marketplace-sell"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-black text-white font-semibold hover:opacity-90 transition"
-                >
-                  Sell
-                </Link>
-
-                <Link
-                  href="/account/profile"
-                  className="inline-flex items-center justify-center px-8 py-4 rounded-2xl border border-gray-300 font-semibold hover:bg-gray-50 transition"
-                >
-                  Edit Profile
-                </Link>
-
-                {user.username && (
-                  <Link
-                    href={`/seller/${user.username}`}
-                    className="inline-flex items-center justify-center px-8 py-4 rounded-2xl border border-gray-300 font-semibold hover:bg-gray-50 transition"
-                  >
-                    View Storefront
-                  </Link>
-                )}
-
-              </div>
-
-            </div>
-
-            <div className="mt-10">
-
-              <p className="text-sm uppercase tracking-[0.2em] text-gray-500 font-medium mb-4">
-                Seller Bio
-              </p>
-
-              <div className="rounded-2xl bg-gray-50 border border-gray-200 p-6">
-
-                <p className="text-lg leading-relaxed text-gray-700">
-                  {user.sellerBio || "Complete your seller profile to tell buyers about yourself."}
-                </p>
-
-              </div>
-
-            </div>
-
+          <div className="w-36 h-36 rounded-full border-4 border-white bg-gray-200 flex items-center justify-center text-4xl font-semibold text-gray-500 shadow-lg">
+            {user.name?.charAt(0) || "M"}
           </div>
 
+        )}
+
+        <div className="text-center lg:text-left">
+
+          <p className="text-xs uppercase tracking-[0.3em] text-gray-500 font-semibold">
+            Seller Center
+          </p>
+
+          <h1 className="mt-2 text-4xl font-bold text-gray-900">
+            {user.name || "Marketplace Seller"}
+          </h1>
+
+          {user.username && (
+            <p className="mt-2 text-xl text-gray-500">
+              @{user.username}
+            </p>
+          )}
+
+          {user.sellerCategory && (
+            <div className="mt-5">
+              <span className="inline-flex rounded-full bg-black px-5 py-2 text-sm font-medium text-white">
+                {user.sellerCategory}
+              </span>
+            </div>
+          )}
+
         </div>
+
+      </div>
+
+      {/* Actions */}
+      <div className="flex flex-wrap justify-center lg:justify-end gap-4">
+
+        <Link
+          href="/marketplace-sell"
+          className="inline-flex items-center justify-center rounded-2xl bg-black px-8 py-4 font-semibold text-white hover:opacity-90 transition"
+        >
+          Sell
+        </Link>
+
+        <Link
+          href="/account/profile"
+          className="inline-flex items-center justify-center rounded-2xl border border-gray-300 px-8 py-4 font-semibold hover:bg-gray-50 transition"
+        >
+          Edit Profile
+        </Link>
+
+        {user.username && (
+          <Link
+            href={`/seller/${user.username}`}
+            className="inline-flex items-center justify-center rounded-2xl border border-gray-300 px-8 py-4 font-semibold hover:bg-gray-50 transition"
+          >
+            View Storefront
+          </Link>
+        )}
+
+      </div>
+
+    </div>
+
+    {/* Seller Bio */}
+
+    <div className="mt-10 border-t border-gray-100 pt-8">
+
+      <p className="mb-4 text-sm font-semibold uppercase tracking-[0.3em] text-gray-500">
+        Seller Bio
+      </p>
+
+      <div className="rounded-2xl border border-gray-200 bg-gray-50 p-6">
+
+        <p className="text-lg leading-8 text-gray-700">
+          {user.sellerBio ||
+            "Complete your seller profile to tell buyers about yourself."}
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
 
 {/* SELLER OVERVIEW */}
 <DashboardStats
