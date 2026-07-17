@@ -21,19 +21,30 @@ export async function GET(
           id: params.id,
         },
 
-        include: {
-          seller: true,
-
-          bids: {
-            orderBy: {
-              createdAt: "desc",
-            },
-
-            include: {
-              bidder: true,
-            },
-          },
+include: {
+  seller: {
+    include: {
+      marketplaceAuctions: {
+        where: {
+          status: "LIVE",
         },
+        select: {
+          id: true,
+        },
+      },
+    },
+  },
+
+  bids: {
+    orderBy: {
+      createdAt: "desc",
+    },
+
+    include: {
+      bidder: true,
+    },
+  },
+},
       });
 
     if (!auction) {
