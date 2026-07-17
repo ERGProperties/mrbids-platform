@@ -82,10 +82,10 @@ const totalBids = user.marketplaceAuctions.reduce(
       <img
         src={user.avatarUrl}
         alt={user.name ?? username}
-        className="w-32 h-32 rounded-full border-4 border-white object-cover bg-white"
+        className="w-36 h-36 rounded-full border-4 border-white object-cover bg-white"
       />
     ) : (
-      <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200" />
+      <div className="w-36 h-36 rounded-full border-4 border-white bg-gray-200" />
     )}
 
     <div className="mt-4 text-center">
@@ -128,7 +128,7 @@ const totalBids = user.marketplaceAuctions.reduce(
 
             {/* Stats */}
 
-<div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6 border-t pt-8">
+<div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-6 border-t pt-6">
 
   <div>
     <p className="text-3xl font-bold">
