@@ -75,63 +75,59 @@ const totalBids = user.marketplaceAuctions.reduce(
 
           <div className="px-8 pb-10">
 
-            <div className="-mt-16 flex justify-center">
+<div className="-mt-16 flex justify-center">
 
-              <div className="flex flex-col items-center text-center gap-6 lg:flex-row lg:items-end lg:text-left">
+  <div className="flex flex-col lg:flex-row items-center gap-8">
 
-                {user.avatarUrl ? (
-                  <img
-                    src={user.avatarUrl}
-                    alt={user.name ?? username}
-                    className="w-32 h-32 rounded-full border-4 border-white object-cover bg-white"
-                  />
-                ) : (
-                  <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200" />
-                )}
-
-                <div className="pb-2 flex-1">
-
-<div className="flex flex-col items-center lg:items-start">
-
-  <div className="flex items-center justify-center lg:justify-start gap-2 flex-wrap">
-
-    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
-      @{user.username}
-    </h1>
-
-    {user.username === "mrbids" && (
-      <span className="inline-flex items-center rounded-full bg-blue-600 text-white text-[10px] font-semibold px-2 py-1 whitespace-nowrap">
-        OFFICIAL
-      </span>
+    {user.avatarUrl ? (
+      <img
+        src={user.avatarUrl}
+        alt={user.name ?? username}
+        className="w-32 h-32 rounded-full border-4 border-white object-cover bg-white"
+      />
+    ) : (
+      <div className="w-32 h-32 rounded-full border-4 border-white bg-gray-200" />
     )}
+
+    <div className="text-center lg:text-left">
+
+      <div className="flex items-center justify-center lg:justify-start gap-3">
+
+        <h1 className="text-3xl sm:text-4xl font-bold">
+          @{user.username}
+        </h1>
+
+        {user.username === "mrbids" && (
+          <span className="inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-xs font-semibold text-white">
+            OFFICIAL
+          </span>
+        )}
+
+      </div>
+
+      {user.name && (
+        <p className="mt-2 text-xl text-gray-700">
+          {user.name}
+        </p>
+      )}
+
+      <p className="mt-2 text-sm text-gray-500">
+        Member since {new Date(user.createdAt).getFullYear()}
+      </p>
+
+      {user.sellerCategory && (
+        <div className="mt-5">
+          <span className="inline-flex rounded-full bg-black px-5 py-2 text-sm font-medium text-white">
+            {user.sellerCategory}
+          </span>
+        </div>
+      )}
+
+    </div>
 
   </div>
 
 </div>
-
-                  {user.name && (
-                    <p className="mt-1 text-xl text-gray-700">
-                      {user.name}
-                    </p>
-                  )}
-
-<p className="mt-2 text-sm text-gray-500">
-  Member since {new Date(user.createdAt).getFullYear()}
-</p>
-
-                  {user.sellerCategory && (
-                    <div className="mt-5">
-                      <span className="inline-flex px-5 py-2 rounded-full bg-black text-white text-sm font-medium">
-                        {user.sellerCategory}
-                      </span>
-                    </div>
-                  )}
-
-                </div>
-
-              </div>
-
-            </div>
 
             {/* Stats */}
 
