@@ -27,26 +27,22 @@ const categories = [
   {
     title: "Jewelry",
     slug: "jewelry",
-    image:
-      "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/jewelry.png",
   },
   {
     title: "Electronics",
     slug: "electronics",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/electronics.png",
   },
   {
     title: "Collectibles",
     slug: "collectibles",
-    image:
-      "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/halloween-collectibles.png",
   },
   {
     title: "Liquidation",
     slug: "liquidation",
-    image:
-      "https://images.unsplash.com/photo-1553413077-190dd305871c?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/liquidation.png",
   },
 ];
 
