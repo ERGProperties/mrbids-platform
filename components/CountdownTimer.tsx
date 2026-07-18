@@ -114,18 +114,29 @@ export default function CountdownTimer({
 
   return (
 
-    <div className="border rounded-2xl p-6">
+  <div className="flex items-center gap-2">
 
-      <p className="text-sm text-gray-500 mb-2">
-        Time Remaining
-      </p>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-5 w-5 text-red-400"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={2}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 8v4l3 3M12 2a10 10 0 100 20 10 10 0 000-20z"
+      />
+    </svg>
 
-      <p className="text-3xl font-semibold">
-        {timeLeft}
-      </p>
+    <span className="text-base font-semibold tracking-wide text-white">
+      {timeLeft}
+    </span>
 
-    </div>
+  </div>
 
-  );
+);
 
 }

@@ -18,208 +18,267 @@ export default function MarketplaceAuctionCard({
       : 0;
 
   return (
-    <Link
-      href={`/marketplace-auctions/${auction.id}`}
-      className="group border rounded-3xl overflow-hidden hover:shadow-xl transition bg-white flex flex-col"
-    >
+<Link
+  href={`/marketplace-auctions/${auction.id}`}
+className="
+  group
+  flex flex-col
+  overflow-hidden
+  rounded-3xl
+  border border-zinc-800
+  bg-[#18181b]
+  shadow-lg
+  transition-all
+  duration-500
+  hover:-translate-y-2
+  hover:border-zinc-600
+  hover:shadow-[0_20px_50px_rgba(0,0,0,0.45)]
+"
+>
 
       {/* IMAGE */}
-      <div className="aspect-[4/5] md:aspect-square bg-gray-100 overflow-hidden relative">
+<div className="relative aspect-[3/4] overflow-hidden bg-zinc-900">
 
-        {auction.coverImage ? (
+  {auction.coverImage ? (
 
-          <img
-            src={auction.coverImage}
-            alt={auction.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
-          />
+    <>
+      <img
+        src={auction.coverImage}
+        alt={auction.title}
+        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+      />
 
-        ) : (
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
-          <div className="w-full h-full bg-gray-100" />
+<div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#18181b] to-transparent" />
+    </>
 
-        )}
+  ) : (
 
-        {/* STATUS BADGE */}
-        <div className="absolute top-4 right-4">
+    <div className="flex h-full w-full items-center justify-center bg-zinc-900 text-zinc-600">
+      No Image Available
+    </div>
 
-          {auction.status === "LIVE" && (
+  )}
 
-            <span className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-semibold animate-pulse">
-              LIVE
-            </span>
+  {/* STATUS BADGES */}
+<div className="absolute left-4 top-4 flex flex-col gap-2">
 
-          )}
+  {auction.status === "LIVE" && (
+    <span className="rounded-full bg-red-500 px-3 py-1 text-xs font-bold tracking-wide text-white shadow-lg shadow-red-500/40">
+      🔴 LIVE
+    </span>
+  )}
 
-          {auction.status === "SCHEDULED" && (
+  {auction.status === "SCHEDULED" && (
+    <span className="rounded-full bg-yellow-400 px-3 py-1 text-xs font-bold text-black">
+      SCHEDULED
+    </span>
+  )}
 
-            <span className="px-3 py-1 rounded-full bg-yellow-500 text-white text-xs font-semibold">
-              SCHEDULED
-            </span>
+  {auction.status === "ENDED" && (
+    <span className="rounded-full bg-zinc-700 px-3 py-1 text-xs font-bold text-white">
+      ENDED
+    </span>
+  )}
 
-          )}
+  {auction.freeShipping && (
+    <span className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white">
+      🚚 FREE SHIPPING
+    </span>
+  )}
 
-          {auction.status === "ENDED" && (
+  {auction.reservePrice ? (
+  auction.currentBid >= auction.reservePrice ? (
+    <span className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold text-white">
+      ✅ RESERVE MET
+    </span>
+  ) : (
+    <span className="rounded-full bg-amber-500 px-3 py-1 text-xs font-bold text-black">
+      🔒 RESERVE NOT MET
+    </span>
+  )
+) : (
+  <span className="rounded-full bg-blue-500 px-3 py-1 text-xs font-bold text-white">
+    ⚡ NO RESERVE
+  </span>
+)}
 
-            <span className="px-3 py-1 rounded-full bg-gray-700 text-white text-xs font-semibold">
-              ENDED
-            </span>
+  {auction.bidCount > 10 && (
+    <span className="rounded-full bg-orange-500 px-3 py-1 text-xs font-bold text-white">
+      🔥 HOT AUCTION
+    </span>
+  )}
 
-          )}
+</div>
 
-        </div>
-
-      </div>
+</div>
 
       {/* CONTENT */}
       <div className="p-5 md:p-6 flex flex-col flex-1">
 
         {/* CATEGORY */}
-        <div className="mb-4">
+<div className="mb-4">
+  <span className="inline-flex rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-wide text-black">
+    {auction.category}
+  </span>
+</div>
 
-          <span className="px-3 py-1 rounded-full bg-black text-white text-xs font-medium">
-            {auction.category}
-          </span>
+{/* TITLE */}
+<h2 className="min-h-[72px] text-2xl font-bold leading-tight text-white">
+  {auction.title}
+</h2>
 
-        </div>
+{/* SELLER */}
+<div className="mt-5 flex items-center gap-3">
 
-        {/* TITLE */}
-        <h2 className="text-xl md:text-2xl font-semibold leading-snug min-h-[72px]">
-          {auction.title}
-        </h2>
+  {auction.seller?.avatarUrl ? (
 
-        {/* SELLER */}
-        <div className="mt-5 flex items-center gap-3">
+    <img
+      src={auction.seller.avatarUrl}
+      alt={auction.seller.name || "Seller"}
+      className="h-10 w-10 rounded-full border border-zinc-700 object-cover"
+    />
 
-          {auction.seller?.avatarUrl ? (
+  ) : (
 
-            <img
-              src={
-                auction.seller.avatarUrl
-              }
-              alt={
-                auction.seller.name ||
-                "Seller"
-              }
-              className="w-10 h-10 rounded-full object-cover border"
-            />
+    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-800 text-sm font-bold text-zinc-300">
+      {auction.seller?.name?.charAt(0) || "M"}
+    </div>
 
-          ) : (
+  )}
 
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-semibold text-gray-500">
-              {auction.seller?.name?.charAt(0) ||
-                "M"}
-            </div>
+  <div className="flex-1">
 
-          )}
+  <div className="flex items-center gap-2">
 
-          <div>
+    <p className="text-sm font-semibold text-white">
+      {auction.seller?.name || "Marketplace Seller"}
+    </p>
 
-            <p className="font-medium text-sm md:text-base">
-              {auction.seller?.name ||
-                "Marketplace Seller"}
-            </p>
+    {auction.seller?.username === "mrbids" && (
+      <span
+        className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[11px] font-bold text-white"
+        title="Official MrBids Seller"
+      >
+        ✓
+      </span>
+    )}
 
-            {auction.seller
-              ?.tiktokUsername && (
+  </div>
 
-              <p className="text-xs md:text-sm text-gray-500">
-                {
-                  auction.seller
-                    .tiktokUsername
-                }
-              </p>
+  {auction.seller?.tiktokUsername && (
+    <p className="mt-1 text-xs text-zinc-400">
+      @{auction.seller.tiktokUsername.replace(/^@/, "")}
+    </p>
+  )}
 
-            )}
+</div>
 
-          </div>
-
-        </div>
+</div>
 
 {/* CURRENT BID */}
-<div className="mt-6">
+<div className="mt-5 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
 
-  <p className="text-sm text-gray-500 mb-1">
+  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
     Current Bid
   </p>
 
-  <p className="text-2xl md:text-3xl font-semibold">
-    $
-    {auction.currentBid?.toLocaleString()}
+  <p className="mt-1 text-4xl font-extrabold tracking-tight text-white">
+    ${auction.currentBid?.toLocaleString()}
   </p>
 
-  {auction.endAt && (
+{auction.endAt && (
+  <div className="mt-4 border-t border-zinc-800 pt-4">
 
-    <div className="mt-3 inline-flex items-center px-3 py-2 rounded-full bg-red-50 border border-red-100">
+    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500">
+      Auction Ends
+    </p>
 
-      <span className="text-sm font-medium text-red-700">
-        Ends In:
+    <CountdownTimer
+      endAt={new Date(auction.endAt).toISOString()}
+    />
+
+    <div className="mt-3 flex items-center gap-2 text-sm text-orange-400">
+      <span>🔥</span>
+      <span className="font-medium">
+        {auction.bidCount ?? 0} {auction.bidCount === 1 ? "Bid" : "Bids"}
       </span>
+    </div>
 
-      <div className="ml-2">
-        <CountdownTimer
-          endAt={new Date(
-            auction.endAt
-          ).toISOString()}
-        />
+  </div>
+)}
+
+</div>
+
+        {/* RETAIL / SAVINGS */}
+<div className="mt-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-5">
+
+  {auction.retailPrice ? (
+
+    <div className="grid grid-cols-2 gap-6">
+
+      <div>
+
+        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
+          Retail
+        </p>
+
+        <p className="mt-1 text-xl font-bold text-emerald-200">
+          ${auction.retailPrice.toLocaleString()}
+        </p>
+
       </div>
 
+      <div className="text-right">
+
+        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
+          Savings
+        </p>
+
+        <p className="mt-1 text-xl font-bold text-emerald-200">
+          ${savings.toLocaleString()}
+        </p>
+
+      </div>
+
+    </div>
+
+  ) : (
+
+    <div className="py-3 text-center text-sm font-medium text-emerald-300">
+      Retail price unavailable
     </div>
 
   )}
 
 </div>
 
-        {/* RETAIL PRICE */}
-        <div className="mt-5 border rounded-2xl p-4 bg-green-50 border-green-200 min-h-[102px] flex items-center">
+{/* BUTTON */}
+<div className="mt-6">
 
-          {auction.retailPrice ? (
+  <div
+    className="
+      w-full
+      rounded-full
+      bg-white
+      py-3
+      text-center
+      text-sm
+      font-semibold
+      text-black
+      transition-all
+      duration-300
+      group-hover:bg-red-500
+      group-hover:text-white
+      group-hover:shadow-lg
+      group-hover:shadow-red-500/30
+    "
+  >
+    View Auction →
+  </div>
 
-            <div className="flex items-center justify-between gap-4 w-full">
-
-              <div>
-
-                <p className="text-xs text-green-700 mb-1 font-medium">
-                  Retail
-                </p>
-
-                <p className="text-lg md:text-xl font-semibold text-green-900">
-                  $
-                  {auction.retailPrice.toLocaleString()}
-                </p>
-
-              </div>
-
-              <div className="text-right">
-
-                <p className="text-xs text-green-700 mb-1 font-medium">
-                  Savings
-                </p>
-
-                <p className="text-lg md:text-xl font-semibold text-green-900">
-
-                  $
-                  {savings.toLocaleString()}
-
-                </p>
-
-              </div>
-
-            </div>
-
-          ) : (
-
-            <div className="w-full flex items-center justify-center">
-
-              <p className="text-sm text-green-700 font-medium text-center">
-                Retail price unavailable
-              </p>
-
-            </div>
-
-          )}
-
-        </div>
+</div>
 
       </div>
 
