@@ -206,11 +206,13 @@ export default async function HomePage() {
             {/* RIGHT */}
             <div className="relative">
               <div className="relative rounded-[2rem] overflow-hidden shadow-2xl">
+
                 <img
-                  src="https://images.unsplash.com/photo-1607082350899-7e105aa886ae?q=80&w=1600&auto=format&fit=crop"
-                  alt="LIVE Auctions"
-                  className="w-full h-[420px] sm:h-[520px] md:h-[720px] object-cover"
-                />
+  src="/images/hero.png"
+  alt="MrBids Live Auctions"
+  className="w-full h-[420px] sm:h-[520px] md:h-[720px] object-contain bg-black"
+  draggable={false}
+/>
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
