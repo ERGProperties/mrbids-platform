@@ -153,6 +153,8 @@ const totalBids = user.marketplaceAuctions.reduce(
     Live Auctions
   </p>
 
+</div>
+
 <div className="rounded-2xl border border-gray-700 bg-black/30 p-5 text-center">
   <p className="text-4xl font-bold text-white">
     {completedSales}
