@@ -61,12 +61,12 @@ const totalBids = user.marketplaceAuctions.reduce(
 );
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-black">
       <div className="max-w-7xl mx-auto px-6 py-12">
 
         {/* HEADER */}
 
-        <div className="rounded-3xl border bg-white shadow-sm overflow-hidden">
+        <div className="overflow-hidden rounded-3xl border border-gray-800 bg-[#18181b] shadow-2xl">
 
           {/* Banner */}
 
@@ -85,7 +85,7 @@ const totalBids = user.marketplaceAuctions.reduce(
 
 )}
 
-          <div className="px-8 pb-10">
+          <div className="px-8 pb-10 text-white">
 
 <div className="-mt-16 flex justify-center">
 
@@ -116,12 +116,12 @@ const totalBids = user.marketplaceAuctions.reduce(
       )}
 
       {user.name && (
-        <p className="mt-4 text-xl text-gray-700">
+        <p className="mt-4 text-xl text-gray-200">
           {user.name}
         </p>
       )}
 
-      <p className="mt-2 text-sm text-gray-500">
+      <p className="mt-2 text-sm text-gray-400">
         Member since {new Date(user.createdAt).getFullYear()}
       </p>
 
@@ -141,44 +141,44 @@ const totalBids = user.marketplaceAuctions.reduce(
 
             {/* Stats */}
 
-<div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-6 border-t pt-6">
+<div className="mt-8 grid grid-cols-2 gap-5 border-t border-gray-700 pt-8 md:grid-cols-4">
 
-  <div>
-    <p className="text-3xl font-bold">
-      {liveAuctions.length}
-    </p>
+<div className="rounded-2xl border border-gray-700 bg-black/30 p-5 text-center">
 
-    <p className="text-gray-500 text-sm mt-1">
-      Live Auctions
-    </p>
-  </div>
+  <p className="text-4xl font-bold text-white">
+    {liveAuctions.length}
+  </p>
 
-  <div>
-    <p className="text-3xl font-bold">
-      {completedSales}
-    </p>
+  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+    Live Auctions
+  </p>
 
-    <p className="text-gray-500 text-sm mt-1">
-      Completed Sales
-    </p>
-  </div>
+<div className="rounded-2xl border border-gray-700 bg-black/30 p-5 text-center">
+  <p className="text-4xl font-bold text-white">
+    {completedSales}
+  </p>
 
-  <div>
-    <p className="text-3xl font-bold">
-      {totalBids}
-    </p>
+  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+    Completed Sales
+  </p>
+</div>
 
-    <p className="text-gray-500 text-sm mt-1">
-      Total Bids
-    </p>
-  </div>
+<div className="rounded-2xl border border-gray-700 bg-black/30 p-5 text-center">
+  <p className="text-4xl font-bold text-white">
+    {totalBids}
+  </p>
 
-  <div>
-  <p className="text-3xl font-bold">
+  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+    Total Bids
+  </p>
+</div>
+
+<div className="rounded-2xl border border-gray-700 bg-black/30 p-5 text-center">
+  <p className="text-4xl font-bold text-white">
     {totalAuctions}
   </p>
 
-  <p className="text-gray-500 text-sm mt-1">
+  <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
     Total Auctions
   </p>
 </div>
@@ -189,19 +189,19 @@ const totalBids = user.marketplaceAuctions.reduce(
 
             {user.sellerBio && (
 
-              <div className="mt-10 border-t pt-8">
+  <div className="mt-10 rounded-2xl border border-gray-700 bg-black/30 p-8">
 
-                <h2 className="text-xl font-semibold mb-4">
-                  About This Seller
-                </h2>
+    <h2 className="mb-5 text-xl font-semibold uppercase tracking-[0.2em] text-gray-300">
+      About This Seller
+    </h2>
 
-                <p className="text-lg text-gray-700 leading-8">
-                  {user.sellerBio}
-                </p>
+    <p className="text-lg leading-8 text-gray-200">
+      {user.sellerBio}
+    </p>
 
-              </div>
+  </div>
 
-            )}
+)}
 
           </div>
 
@@ -211,23 +211,39 @@ const totalBids = user.marketplaceAuctions.reduce(
 
         <div className="mt-12">
 
-          <div className="flex items-center justify-between mb-6">
+<div className="mb-8 flex items-center justify-between">
 
-            <h2 className="text-3xl font-bold">
-              Live Auctions
-            </h2>
+  <div className="flex items-center gap-4">
 
-          </div>
+    {liveAuctions.length > 0 && (
+      <span className="inline-flex items-center rounded-full bg-red-600 px-4 py-1 text-xs font-bold uppercase tracking-[0.25em] text-white animate-pulse">
+        LIVE
+      </span>
+    )}
+
+    <h2 className="text-3xl font-bold text-white">
+      Live Auctions
+    </h2>
+
+  </div>
+
+  {liveAuctions.length > 0 && (
+    <span className="rounded-full border border-gray-700 bg-[#18181b] px-4 py-2 text-sm font-semibold text-gray-300">
+      {liveAuctions.length} Active
+    </span>
+  )}
+
+</div>
 
           {liveAuctions.length === 0 ? (
 
-            <div className="rounded-3xl border bg-white p-16 text-center">
+            <div className="rounded-3xl border border-gray-800 bg-[#18181b] p-16 text-center">
 
-              <h3 className="text-2xl font-semibold">
+              <h3 className="text-2xl font-semibold text-white">
                 No Live Auctions
               </h3>
 
-              <p className="mt-4 text-gray-500">
+              <p className="mt-4 text-gray-400">
                 This seller doesn't have any live auctions at the moment.
               </p>
 
