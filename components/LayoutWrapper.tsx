@@ -35,12 +35,12 @@ export default function LayoutWrapper({
           {/* LOGO */}
           <Link href="/" className="flex items-center">
             <Image
-              src="/mrbids-logo-transparent.png"
+              src="/logo-header.png"
               alt="MrBids"
-              width={160}
-              height={40}
+              width={320}
+              height={80}
               priority
-              className="h-6 sm:h-8 w-auto"
+              className="h-10 sm:h-12 w-auto"
             />
           </Link>
 
