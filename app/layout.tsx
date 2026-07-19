@@ -25,37 +25,28 @@ export const metadata: Metadata = {
     "LIVE marketplace auctions starting at $1.",
 
   manifest:
-    "/manifest.json",
+    "/site.webmanifest",
 
   icons: {
     icon: [
       {
-        url:
-          "/favicon.ico",
+        url: "/favicon.ico",
       },
-
       {
-        url:
-          "/favicon-96x96.png",
-
-        sizes:
-          "96x96",
-
-        type:
-          "image/png",
+        url: "/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
       },
-
       {
-        url:
-          "/favicon.svg",
-
-        type:
-          "image/svg+xml",
+        url: "/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
       },
     ],
 
-    apple:
-      "/apple-touch-icon.png",
+    apple: "/apple-touch-icon.png",
+
+    shortcut: "/favicon.ico",
   },
 };
 
@@ -73,7 +64,7 @@ export default function RootLayout({
 
         <link
           rel="manifest"
-          href="/manifest.json"
+          href="/site.webmanifest"
         />
 
         <meta
@@ -103,7 +94,7 @@ export default function RootLayout({
 
         <link
           rel="apple-touch-icon"
-          href="/icon-192.png"
+          href="/apple-touch-icon.png"
         />
 
         {/* META PIXEL */}
@@ -115,7 +106,7 @@ export default function RootLayout({
 
           {`
             !function(f,b,e,v,n,t,s)
-            {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            {if(f.fbq)return;n=fbq=function(){n.callMethod?
             n.callMethod.apply(n,arguments):n.queue.push(arguments)};
             if(!f._fbq)f._fbq=n;
             n.push=n;
