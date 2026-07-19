@@ -13,6 +13,8 @@ export default function DeepLinkHandler() {
         console.log("========== APP URL OPEN ==========");
         console.log("Raw URL:", url);
 
+        console.log("Full Deep Link:", decodeURIComponent(url));
+
         const parsedUrl = new URL(url);
 
         console.log("Origin:", parsedUrl.origin);
