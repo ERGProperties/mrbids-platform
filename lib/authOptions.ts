@@ -86,9 +86,9 @@ export const authOptions: NextAuthOptions = {
                       <td style="padding:28px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
 
                         <img 
-                          src="https://mrbids.com/logo.png" 
+                          src="https://mrbids.com/header-logo.png" 
                           alt="MrBids"
-                          style="height:60px;"
+                          style="width:100%; max-width:420px; height:auto;"
                         />
 
                       </td>
