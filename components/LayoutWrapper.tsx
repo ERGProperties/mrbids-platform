@@ -3,7 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { useEffect } from "react";
+import { Capacitor } from "@capacitor/core";
+import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 
 import { useSession, signOut } from "next-auth/react"
 
@@ -22,15 +23,29 @@ export default function LayoutWrapper({
     status,
   } = useSession()
 
-console.log("===== LayoutWrapper =====");
-console.log("status:", status);
-console.log("session:", session);
+const handleLogout = async () => {
+  try {
+    // Native iOS / Android
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await FirebaseAuthentication.signOut();
+      } catch (err) {
+        console.error("Native sign out failed:", err);
+      }
+    }
 
-useEffect(() => {
-  console.log("===== Session Changed =====");
-  console.log("status:", status);
-  console.log("session:", session);
-}, [status, session]);
+    // Clear NextAuth session
+    await signOut({
+      redirect: false,
+    });
+
+    // Force a clean reload
+    window.location.href = "/";
+
+  } catch (err) {
+    console.error("Logout failed:", err);
+  }
+};
 
   return (
     <>
@@ -88,11 +103,7 @@ useEffect(() => {
       </Link>
 
       <button
-        onClick={() =>
-          signOut({
-            callbackUrl: "/",
-          })
-        }
+        onClick={handleLogout}
         className="text-sm font-medium text-gray-700 hover:text-gray-900"
       >
         Logout
