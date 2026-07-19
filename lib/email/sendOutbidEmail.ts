@@ -25,9 +25,13 @@ export async function sendOutbidEmail({
             <tr>
               <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
                 <img
-                  src="https://mrbids.com/logo.png"
+                  src="https://mrbids.com/logo-header.png"
                   alt="MrBids"
-                  style="height:60px;"
+                  style="
+                    width:100%;
+                    max-width:420px;
+                    height:auto;
+                  "
                 />
               </td>
             </tr>
@@ -61,11 +65,12 @@ export async function sendOutbidEmail({
               <td style="padding:34px 28px;">
 
                 <h1 style="margin:0 0 12px; font-size:22px; font-weight:700;">
-                  You've been outbid
+                  🔔 You've been outbid
                 </h1>
 
-                <p style="font-size:16px; color:#444; margin-bottom:20px;">
-                  Someone placed a higher bid on:
+                <p style="font-size:16px; color:#444; line-height:1.6;">
+                  Another bidder has placed a higher bid on the auction below.
+                  If you still want to win, place another bid before the auction ends.
                 </p>
 
                 <p style="font-size:18px; font-weight:600; margin:20px 0;">
@@ -73,7 +78,7 @@ export async function sendOutbidEmail({
                 </p>
 
                 <p style="font-size:15px; color:#666;">
-                  Jump back in before it's gone — auctions move fast.
+                  Auctions can change quickly—don't miss your chance to take the lead again.
                 </p>
 
                 <div style="text-align:center; margin:30px 0;">
@@ -95,7 +100,7 @@ export async function sendOutbidEmail({
                 </div>
 
                 <p style="font-size:13px; color:#888; text-align:center;">
-                  Stay competitive — this deal won’t wait.
+                  Good luck, and thanks for bidding with MrBids!
                 </p>
 
               </td>
@@ -115,7 +120,7 @@ export async function sendOutbidEmail({
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject: "You've been outbid — take it back",
+    subject: "🔔 You've been outbid on MrBids",
     html,
   });
 }

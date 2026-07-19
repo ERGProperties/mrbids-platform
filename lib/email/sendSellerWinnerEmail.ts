@@ -31,9 +31,13 @@ export async function sendSellerWinnerEmail({
             <tr>
               <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
                 <img
-                  src="https://mrbids.com/logo.png"
+                  src="https://mrbids.com/logo-header.png"
                   alt="MrBids"
-                  style="height:60px;"
+                  style="
+                    width:100%;
+                    max-width:420px;
+                    height:auto;
+                  "
                 />
               </td>
             </tr>
@@ -67,11 +71,12 @@ export async function sendSellerWinnerEmail({
               <td style="padding:34px 28px;">
 
                 <h1 style="font-size:22px; font-weight:700; margin-top:0;">
-                  Your auction has ended
+                  🎉 Your auction has a winning bidder!
                 </h1>
 
-                <p style="font-size:16px; color:#444;">
-                  Your auction has a winning bidder:
+                <p style="font-size:16px; color:#444; line-height:1.6;">
+                  Congratulations! Your auction has successfully ended with a winning bid.
+                  Below are the details of your completed auction.
                 </p>
 
                 <p style="font-size:18px; font-weight:600; margin:20px 0;">
@@ -143,7 +148,7 @@ export async function sendSellerWinnerEmail({
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject: "Auction complete — winning bidder details",
+    subject: "🎉 Your auction has a winning bidder!",
     html,
   });
 }

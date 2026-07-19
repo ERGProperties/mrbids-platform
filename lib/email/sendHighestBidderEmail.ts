@@ -27,9 +27,13 @@ export async function sendHighestBidderEmail({
             <tr>
               <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
                 <img
-                  src="https://mrbids.com/logo.png"
+                  src="https://mrbids.com/logo-header.png"
                   alt="MrBids"
-                  style="height:60px;"
+                  style="
+                    width:100%;
+                    max-width:420px;
+                    height:auto;
+                  "
                 />
               </td>
             </tr>
@@ -63,11 +67,11 @@ export async function sendHighestBidderEmail({
               <td style="padding:34px 28px;">
 
                 <h1 style="margin:0 0 12px; font-size:22px; font-weight:700;">
-                  You're in the lead 🎉
+                  🎉 You're currently winning!
                 </h1>
 
-                <p style="font-size:16px; color:#444;">
-                  You're currently the highest bidder on:
+                <p style="font-size:16px; color:#444; line-height:1.6;">
+                  Great news! You're currently the highest bidder on the auction below.
                 </p>
 
                 <p style="font-size:18px; font-weight:600; margin:20px 0;">
@@ -75,11 +79,11 @@ export async function sendHighestBidderEmail({
                 </p>
 
                 <p style="font-size:16px; color:#000; font-weight:600;">
-                  Your bid: $${bidAmount.toLocaleString()}
+                  Your highest bid: $${bidAmount.toLocaleString()}
                 </p>
 
                 <p style="font-size:14px; color:#666; margin-top:10px;">
-                  Stay alert — other bidders may try to take the lead.
+                  Keep an eye on this auction—another bidder could place a higher bid before it ends.
                 </p>
 
                 <div style="text-align:center; margin:30px 0;">
@@ -117,7 +121,7 @@ export async function sendHighestBidderEmail({
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject: "You're the highest bidder 🎉",
+    subject: "🎉 You're currently winning your MrBids auction!",
     html,
   });
 }

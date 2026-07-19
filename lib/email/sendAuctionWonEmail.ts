@@ -43,9 +43,13 @@ export async function sendAuctionWonEmail({
             <tr>
               <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
                 <img
-                  src="https://mrbids.com/logo.png"
+                  src="https://mrbids.com/logo-header.png"
                   alt="MrBids"
-                  style="height:60px;"
+                  style="
+                    width:100%;
+                    max-width:420px;
+                    height:auto;
+                  "
                 />
               </td>
             </tr>
@@ -79,11 +83,12 @@ export async function sendAuctionWonEmail({
               <td style="padding:34px 28px;">
 
                 <h1 style="font-size:24px; font-weight:700; margin-top:0;">
-                  🎉 You won the auction
+                  🎉 You won the auction!
                 </h1>
 
-                <p style="font-size:16px; color:#444;">
-                  Congratulations — you secured the winning bid on:
+                <p style="font-size:16px; color:#444; line-height:1.6;">
+                  Congratulations! Your winning bid has been accepted.
+                  Complete your payment below to finalize your purchase.
                 </p>
 
                 <p style="font-size:18px; font-weight:600; margin:20px 0;">
@@ -225,7 +230,7 @@ export async function sendAuctionWonEmail({
                 </div>
 
                 <p style="font-size:13px; color:#777;">
-                  Once payment is completed, coordinate directly with the seller regarding shipping, delivery, pickup, or transaction details.
+                  Once payment is completed, coordinate directly with the seller regarding shipping, delivery, pickup, or any remaining transaction details.
                 </p>
 
               </td>
@@ -245,7 +250,7 @@ export async function sendAuctionWonEmail({
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject: "🎉 You won the auction — Complete Payment",
+    subject: "🎉 Congratulations! You won your MrBids auction",
     html,
   });
 }

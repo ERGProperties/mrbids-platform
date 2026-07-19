@@ -27,9 +27,13 @@ export async function sendSellerReserveNotMetEmail({
             <tr>
               <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
                 <img
-                  src="https://mrbids.com/logo.png"
+                  src="https://mrbids.com/logo-header.png"
                   alt="MrBids"
-                  style="height:60px;"
+                  style="
+                    width:100%;
+                    max-width:420px;
+                    height:auto;
+                  "
                 />
               </td>
             </tr>
@@ -63,11 +67,11 @@ export async function sendSellerReserveNotMetEmail({
               <td style="padding:34px 28px;">
 
                 <h1 style="margin:0 0 14px; font-size:24px; font-weight:700;">
-                  Auction Ended — Reserve Not Met
+                  Reserve Price Not Met
                 </h1>
 
                 <p style="font-size:16px; color:#444; line-height:1.6;">
-                  Your auction has ended, but the reserve price was not met.
+                  Your auction has ended. Although bidding was active, the reserve price was not reached, so the auction closed without an automatic sale.
                 </p>
 
                 <p style="font-size:18px; font-weight:700; margin:24px 0;">
@@ -87,11 +91,7 @@ export async function sendSellerReserveNotMetEmail({
                 </div>
 
                 <p style="font-size:15px; color:#555; line-height:1.7;">
-                  Because your reserve price was not met, the auction closed without an automatic sale.
-                </p>
-
-                <p style="font-size:15px; color:#555; line-height:1.7;">
-                  You may choose to relist the item or contact the highest bidder outside the platform if appropriate.
+                  You can choose to relist the auction, adjust your reserve price for a future listing, or contact the highest bidder directly if you'd like to discuss completing the sale.
                 </p>
 
                 <div style="text-align:center; margin:34px 0;">
@@ -131,7 +131,7 @@ export async function sendSellerReserveNotMetEmail({
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject: "Auction Ended — Reserve Not Met",
+    subject: "Reserve price not met — your auction has ended",
     html,
   });
 }

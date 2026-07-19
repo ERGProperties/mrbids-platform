@@ -28,14 +28,18 @@ export async function sendPaymentReminderEmail({
             <tr>
               <td style="padding:32px 20px; text-align:center; border-bottom:1px solid #f1f1f1;">
                 <img
-                  src="https://mrbids.com/logo.png"
+                  src="https://mrbids.com/logo-header.png"
                   alt="MrBids"
-                  style="height:60px;"
+                  style="
+                    width:100%;
+                    max-width:420px;
+                    height:auto;
+                  "
                 />
               </td>
             </tr>
 
-            <!-- IMAGE -->
+            <!-- COVER IMAGE -->
             ${
               coverImage
                 ? `
@@ -57,11 +61,12 @@ export async function sendPaymentReminderEmail({
               <td style="padding:34px 28px;">
 
                 <h1 style="margin:0 0 14px; font-size:24px; font-weight:700;">
-                  Complete Your Payment
+                  💳 Complete Your Payment
                 </h1>
 
                 <p style="font-size:16px; color:#444; line-height:1.6;">
-                  You won this marketplace auction, but payment has not been completed yet.
+                  Congratulations on winning your auction! Your purchase is almost complete.
+                  Simply submit your payment below to finalize the transaction.
                 </p>
 
                 <div style="margin:28px 0; padding:22px; background:#fafafa; border-radius:12px;">
@@ -91,7 +96,7 @@ export async function sendPaymentReminderEmail({
                     style="
                       display:inline-block;
                       padding:16px 34px;
-                      background:#000;
+                      background:#16a34a;
                       color:#fff;
                       text-decoration:none;
                       border-radius:10px;
@@ -105,7 +110,7 @@ export async function sendPaymentReminderEmail({
                 </div>
 
                 <p style="font-size:14px; color:#777; line-height:1.6;">
-                  Sellers may relist unpaid auctions, so complete your purchase as soon as possible.
+                  To help ensure the item remains reserved for you, please complete your payment as soon as possible. If payment is not received, the seller may choose to relist the auction.
                 </p>
 
               </td>
@@ -125,7 +130,7 @@ export async function sendPaymentReminderEmail({
   await resend.emails.send({
     from: EMAIL_FROM,
     to,
-    subject: "Complete your MrBids auction payment",
+    subject: "💳 Complete your MrBids payment",
     html,
   });
 
