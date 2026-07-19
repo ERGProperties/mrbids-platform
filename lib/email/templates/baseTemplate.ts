@@ -34,10 +34,15 @@ export function baseTemplate({
               <tr>
                 <td style="padding:20px; text-align:center; border-bottom:1px solid #eee;">
                   <img
-                    src="https://mrbids.com/logo.png"
-                    alt="MrBids"
-                    style="height:40px;"
-                  />
+                    <img
+  src="https://mrbids.com/logo-header.png"
+  alt="MrBids"
+  style="
+    width:100%;
+    max-width:420px;
+    height:auto;
+  "
+/>
                 </td>
               </tr>
 
