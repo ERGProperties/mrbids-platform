@@ -3,6 +3,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { useEffect } from "react";
+
 import { useSession, signOut } from "next-auth/react"
 
 import MobileBottomNav from "./MobileBottomNav"
@@ -19,6 +21,16 @@ export default function LayoutWrapper({
     data: session,
     status,
   } = useSession()
+
+console.log("===== LayoutWrapper =====");
+console.log("status:", status);
+console.log("session:", session);
+
+useEffect(() => {
+  console.log("===== Session Changed =====");
+  console.log("status:", status);
+  console.log("session:", session);
+}, [status, session]);
 
   return (
     <>
