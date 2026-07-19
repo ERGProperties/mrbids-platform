@@ -12,7 +12,6 @@ export default function DeepLinkHandler() {
       try {
         console.log("========== APP URL OPEN ==========");
         console.log("Raw URL:", url);
-
         console.log("Full Deep Link:", decodeURIComponent(url));
 
         const parsedUrl = new URL(url);
@@ -25,26 +24,22 @@ export default function DeepLinkHandler() {
         const fullPath =
           `${parsedUrl.pathname}${parsedUrl.search}${parsedUrl.hash}`;
 
+        console.log("NAVIGATE CALLED:", fullPath);
         console.log("Navigating to:", fullPath);
 
         router.push(fullPath);
 
       } catch (err) {
-
         console.error("❌ Deep link error:", err);
-
       }
     };
 
     // App already running
-    const listener = App.addListener(
-      "appUrlOpen",
-      (event) => {
-        if (event.url) {
-          navigate(event.url);
-        }
+    const listener = App.addListener("appUrlOpen", (event) => {
+      if (event.url) {
+        navigate(event.url);
       }
-    );
+    });
 
     // App launched from a deep link
     App.getLaunchUrl().then((result) => {
@@ -54,20 +49,15 @@ export default function DeepLinkHandler() {
       }
     });
 
-// App resumed (for example after Safari closes)
-const resumeListener = App.addListener("resume", () => {
-  console.log("========== APP RESUMED ==========");
-
-  // Give Safari a moment to finish writing cookies
-  setTimeout(() => {
-    window.location.reload();
-  }, 500);
-});
+    // App resumed (logging only)
+    const resumeListener = App.addListener("resume", () => {
+      console.log("========== APP RESUMED ==========");
+    });
 
     return () => {
-  listener.then((handle) => handle.remove());
-  resumeListener.then((handle) => handle.remove());
-};
+      listener.then((handle) => handle.remove());
+      resumeListener.then((handle) => handle.remove());
+    };
   }, [router]);
 
   return null;
