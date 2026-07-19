@@ -37,7 +37,7 @@ const categories = [
   {
     title: "Collectibles",
     slug: "collectibles",
-    image: "/images/categories/halloween-collectibles.png",
+    image: "/images/categories/collectibles.png",
   },
   {
     title: "Liquidation",
