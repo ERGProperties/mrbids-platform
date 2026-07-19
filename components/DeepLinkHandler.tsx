@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { App } from "@capacitor/app";
 import { useRouter } from "next/navigation";
+import { getSession } from "next-auth/react";
 
 export default function DeepLinkHandler() {
   const router = useRouter();
@@ -54,9 +55,26 @@ export default function DeepLinkHandler() {
       }
     });
 
+// App resumed (for example after Safari closes)
+const resumeListener = App.addListener("resume", async () => {
+  console.log("========== APP RESUMED ==========");
+
+  try {
+    await getSession();
+
+    // Force the page to re-render using the refreshed session
+    router.refresh();
+
+    console.log("Session refresh complete.");
+  } catch (err) {
+    console.error("Session refresh failed:", err);
+  }
+});
+
     return () => {
-      listener.then((handle) => handle.remove());
-    };
+  listener.then((handle) => handle.remove());
+  resumeListener.then((handle) => handle.remove());
+};
   }, [router]);
 
   return null;
