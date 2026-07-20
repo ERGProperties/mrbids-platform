@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 
 import { useSession } from "next-auth/react";
 
+import RichTextEditor from "@/components/RichTextEditor";
+
 const SHIPPING_PRESETS = {
   small: {
     label: "Small Item",
@@ -344,29 +346,22 @@ if (
 
           </div>
 
-          {/* DESCRIPTION */}
-          <div>
+{/* DESCRIPTION */}
+<div>
+  <label className="block text-sm font-medium mb-3">
+    Description
+  </label>
 
-            <label className="block text-sm font-medium mb-3">
-              Description
-            </label>
-
-            <textarea
-              required
-              rows={6}
-              value={form.description}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  description:
-                    e.target.value,
-                })
-              }
-              className="w-full border rounded-2xl px-5 py-4 resize-none"
-              placeholder="Describe your item..."
-            />
-
-          </div>
+  <RichTextEditor
+    value={form.description}
+    onChange={(value) =>
+      setForm({
+        ...form,
+        description: value,
+      })
+    }
+  />
+</div>
 
           {/* COVER IMAGE */}
           <div>
