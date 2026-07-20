@@ -10,9 +10,6 @@ import {
 
 import { useRouter } from "next/navigation";
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-
 import useSWR, {
   mutate,
 } from "swr";
@@ -766,14 +763,14 @@ fbq('track', 'Purchase', {
           </p>
 
 <div className="border rounded-2xl p-6 bg-white">
-  <div className="prose prose-gray max-w-none prose-headings:font-semibold prose-p:leading-relaxed prose-li:leading-relaxed prose-strong:text-black prose-ul:list-disc prose-ul:pl-6">
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-    >
-      {auction.description ||
-        "No description provided."}
-    </ReactMarkdown>
-  </div>
+  <div
+    className="prose prose-gray max-w-none prose-headings:font-semibold prose-p:leading-relaxed prose-li:leading-relaxed prose-strong:text-black prose-ul:list-disc prose-ul:pl-6"
+    dangerouslySetInnerHTML={{
+      __html:
+        auction.description ||
+        "<p>No description provided.</p>",
+    }}
+  />
 </div>
 
         </div>
