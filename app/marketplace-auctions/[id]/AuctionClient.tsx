@@ -654,23 +654,88 @@ fbq('track', 'Purchase', {
   description="Get instant outbid alerts, auction ending notifications, and bid from anywhere with the official MrBids app."
 />
 
-        {/* CURRENT BID */}
-        <div className="mt-10">
+{/* CURRENT BID */}
+<div className="mt-10 border-2 border-black rounded-3xl p-8 bg-gradient-to-br from-gray-50 to-white shadow-lg">
 
-          <p className="text-sm text-gray-500 mb-2">
-            Current Bid
-          </p>
+  <p className="text-xs uppercase tracking-[0.2em] text-gray-500 font-semibold">
+    Current Bid
+  </p>
 
-          <p className="text-5xl font-semibold">
-            $
-            {auction.currentBid?.toLocaleString()}
-          </p>
+  <h2 className="text-6xl font-extrabold mt-3">
+    ${auction.currentBid?.toLocaleString()}
+  </h2>
 
-          <p className="mt-2 text-sm text-gray-500">
-            {auction.bidCount} bids
-          </p>
+  <div className="flex items-center justify-between mt-5">
 
-        </div>
+    <div>
+      <p className="text-sm text-gray-500">
+        Total Bids
+      </p>
+
+      <p className="text-2xl font-bold">
+        {auction.bidCount}
+      </p>
+    </div>
+
+    <div className="text-right">
+      <p className="text-sm text-gray-500">
+        Next Minimum Bid
+      </p>
+
+      <p className="text-2xl font-bold text-green-600">
+        ${minimumBid.toLocaleString()}
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+{/* BID INPUT */}
+{auction.status === "LIVE" && !isSeller && (
+  <div className="mt-10">
+    <div className="border-2 border-blue-600 rounded-3xl p-8 bg-blue-50 shadow-xl">
+
+      <h2 className="text-2xl font-bold text-center mb-2">
+        Place Your Bid
+      </h2>
+
+      <p className="text-center text-gray-600 mb-6">
+        Enter a bid of at least{" "}
+        <span className="font-bold text-blue-700">
+          ${minimumBid.toLocaleString()}
+        </span>
+      </p>
+
+      <input
+        type="number"
+        value={amount}
+        min={minimumBid}
+        step={auction.bidIncrement}
+        onChange={(e) => setAmount(e.target.value)}
+        placeholder={`${minimumBid}`}
+        className="w-full border-2 border-blue-300 rounded-2xl px-6 py-5 text-3xl font-bold text-center bg-white outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-200 transition"
+      />
+
+      <p className="mt-4 text-center text-sm text-gray-600">
+        Bids below{" "}
+        <span className="font-semibold text-black">
+          ${minimumBid.toLocaleString()}
+        </span>{" "}
+        will not be accepted.
+      </p>
+
+      <button
+        onClick={handleBid}
+        disabled={loading}
+        className="w-full mt-8 py-6 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold shadow-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+      >
+        {loading ? "Placing Bid..." : "🚀 Place Bid"}
+      </button>
+
+    </div>
+  </div>
+)}
 
         {/* RESERVE */}
         {auction.reservePrice && (
@@ -774,51 +839,6 @@ fbq('track', 'Purchase', {
 </div>
 
         </div>
-
-        {/* BID INPUT */}
-        {auction.status === "LIVE" && !isSeller && (
-
-          <div className="mt-10">
-
-            <div className="border rounded-2xl p-6">
-
-              <p className="text-sm text-gray-500 mb-2">
-                Minimum Bid
-              </p>
-
-              <p className="text-3xl font-semibold mb-5">
-                $
-                {minimumBid.toLocaleString()}
-              </p>
-
-              <input
-                type="number"
-                value={amount}
-onChange={(e) =>
-  setAmount(
-    e.target.value
-  )
-}
-                className="w-full border rounded-2xl px-5 py-4 text-2xl font-semibold outline-none focus:ring-2 focus:ring-black"
-              />
-
-              <button
-                onClick={handleBid}
-                disabled={loading}
-                className="w-full mt-5 py-5 rounded-full bg-black text-white font-medium hover:opacity-90 transition disabled:opacity-50"
-              >
-
-                {loading
-                  ? "Placing Bid..."
-                  : "Place Bid"}
-
-              </button>
-
-            </div>
-
-          </div>
-
-        )}
 
         {/* WINNER CHECKOUT */}
         {isWinner && !auction.shippingPaid && (
