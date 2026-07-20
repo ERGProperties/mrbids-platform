@@ -2,6 +2,8 @@ import CountdownTimer from "@/components/CountdownTimer";
 
 import Link from "next/link";
 
+import WatchlistHeart from "@/components/WatchlistHeart";
+
 export default function MarketplaceAuctionCard({
   auction,
 }: {
@@ -38,6 +40,9 @@ className="
 
       {/* IMAGE */}
 <div className="relative aspect-[3/4] overflow-hidden bg-zinc-900">
+
+{/* SAVE BUTTON */}
+<WatchlistHeart auctionId={auction.id} />
 
   {auction.coverImage ? (
 

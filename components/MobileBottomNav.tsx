@@ -33,7 +33,7 @@ export default function MobileBottomNav() {
       primary: true,
     },
     {
-      href: "/marketplace-auctions",
+      href: "/saved",
       label: "Saved",
       icon: Heart,
     },
