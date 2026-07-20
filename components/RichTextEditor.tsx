@@ -20,7 +20,7 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "min-h-[250px] border rounded-2xl p-5 focus:outline-none prose max-w-none",
+          "prose max-w-none min-h-[250px] p-5 focus:outline-none",
       },
     },
     onUpdate: ({ editor }) => {
@@ -32,9 +32,9 @@ export default function RichTextEditor({
     if (!editor) return;
 
     if (editor.getHTML() !== value) {
-      editor.commands.setContent(value || "", false);
+      editor.commands.setContent(value || "");
     }
-  }, [value, editor]);
+  }, [editor, value]);
 
   if (!editor) return null;
 
@@ -44,17 +44,21 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className="px-3 py-1 rounded border"
+          className={`px-3 py-1 rounded border ${
+            editor.isActive("bold") ? "bg-black text-white" : "bg-white"
+          }`}
         >
-          <b>B</b>
+          <strong>B</strong>
         </button>
 
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className="px-3 py-1 rounded border italic"
+          className={`px-3 py-1 rounded border ${
+            editor.isActive("italic") ? "bg-black text-white" : "bg-white"
+          }`}
         >
-          I
+          <em>I</em>
         </button>
 
         <button
@@ -62,7 +66,11 @@ export default function RichTextEditor({
           onClick={() =>
             editor.chain().focus().toggleHeading({ level: 2 }).run()
           }
-          className="px-3 py-1 rounded border"
+          className={`px-3 py-1 rounded border ${
+            editor.isActive("heading", { level: 2 })
+              ? "bg-black text-white"
+              : "bg-white"
+          }`}
         >
           H2
         </button>
@@ -70,7 +78,11 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className="px-3 py-1 rounded border"
+          className={`px-3 py-1 rounded border ${
+            editor.isActive("bulletList")
+              ? "bg-black text-white"
+              : "bg-white"
+          }`}
         >
           • List
         </button>
@@ -78,7 +90,11 @@ export default function RichTextEditor({
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className="px-3 py-1 rounded border"
+          className={`px-3 py-1 rounded border ${
+            editor.isActive("orderedList")
+              ? "bg-black text-white"
+              : "bg-white"
+          }`}
         >
           1. List
         </button>
