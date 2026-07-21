@@ -733,9 +733,89 @@ fbq('track', 'Purchase', {
         {loading ? "Placing Bid..." : "🚀 Place Bid"}
       </button>
 
+        {/* ERROR */}
+        {error && (
+
+          <div className="mt-6 border border-red-200 bg-red-50 text-red-600 rounded-2xl p-4">
+            {error}
+          </div>
+
+        )}
+
+        {/* SUCCESS */}
+        {success && (
+
+          <div className="mt-6 border border-green-200 bg-green-50 text-green-600 rounded-2xl p-4">
+            {success}
+          </div>
+
+        )}
+
     </div>
   </div>
 )}
+
+        {/* WINNER CHECKOUT */}
+        {isWinner && !auction.shippingPaid && (
+
+          <div className="mt-10 border rounded-3xl p-6 bg-green-50">
+
+            <h2 className="text-2xl font-semibold">
+              🏆 Auction Won!
+            </h2>
+
+            <p className="mt-3 text-gray-700">
+              Congratulations! Complete payment below to finalize your purchase.
+            </p>
+
+            <div className="mt-5 space-y-2">
+
+              <div className="flex justify-between">
+                <span>Winning Bid</span>
+
+                <span>
+                  $
+                  {auction.currentBid?.toLocaleString()}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Shipping</span>
+
+                <span>
+                  $
+                  {(
+                    (auction.shippingCost || 0) / 100
+                  ).toFixed(2)}
+                </span>
+              </div>
+
+              <div className="flex justify-between font-semibold text-lg pt-3 border-t">
+                <span>Total Due</span>
+
+                <span>
+                  $
+                  {totalDue.toLocaleString()}
+                </span>
+              </div>
+
+            </div>
+
+            <button
+              onClick={handleCheckout}
+              disabled={paymentLoading}
+              className="w-full mt-6 py-5 rounded-full bg-green-600 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
+            >
+
+              {paymentLoading
+                ? "Redirecting..."
+                : "Complete Payment"}
+
+            </button>
+
+          </div>
+
+        )}
 
         {/* RESERVE */}
         {auction.reservePrice && (
@@ -840,68 +920,6 @@ fbq('track', 'Purchase', {
 
         </div>
 
-        {/* WINNER CHECKOUT */}
-        {isWinner && !auction.shippingPaid && (
-
-          <div className="mt-10 border rounded-3xl p-6 bg-green-50">
-
-            <h2 className="text-2xl font-semibold">
-              🎉 You Won
-            </h2>
-
-            <p className="mt-3 text-gray-700">
-              Complete payment to finalize your purchase.
-            </p>
-
-            <div className="mt-5 space-y-2">
-
-              <div className="flex justify-between">
-                <span>Winning Bid</span>
-
-                <span>
-                  $
-                  {auction.currentBid?.toLocaleString()}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span>Shipping</span>
-
-                <span>
-                  $
-                  {(
-                    (auction.shippingCost || 0) / 100
-                  ).toFixed(2)}
-                </span>
-              </div>
-
-              <div className="flex justify-between font-semibold text-lg pt-3 border-t">
-                <span>Total Due</span>
-
-                <span>
-                  $
-                  {totalDue.toLocaleString()}
-                </span>
-              </div>
-
-            </div>
-
-            <button
-              onClick={handleCheckout}
-              disabled={paymentLoading}
-              className="w-full mt-6 py-5 rounded-full bg-green-600 text-white font-medium hover:opacity-90 transition disabled:opacity-50"
-            >
-
-              {paymentLoading
-                ? "Redirecting..."
-                : "Complete Payment"}
-
-            </button>
-
-          </div>
-
-        )}
-
        {/* BID HISTORY */}
         <div className="mt-14">
 
@@ -970,24 +988,6 @@ fbq('track', 'Purchase', {
           </div>
 
         </div>
-
-        {/* ERROR */}
-        {error && (
-
-          <div className="mt-6 border border-red-200 bg-red-50 text-red-600 rounded-2xl p-4">
-            {error}
-          </div>
-
-        )}
-
-        {/* SUCCESS */}
-        {success && (
-
-          <div className="mt-6 border border-green-200 bg-green-50 text-green-600 rounded-2xl p-4">
-            {success}
-          </div>
-
-        )}
 
       </div>
 
