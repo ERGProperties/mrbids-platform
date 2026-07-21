@@ -593,41 +593,91 @@ console.log(
     signIn: "/signin",
   },
 
-  callbacks: {
+callbacks: {
 
-    async jwt({
-      token,
-      user,
-    }) {
+  async jwt({
+    token,
+    user,
+  }) {
 
-      if (user) {
+    if (user) {
 
-        token.id =
-          user.id;
+      token.id =
+        user.id;
 
-        token.email =
-          user.email;
+      token.email =
+        user.email;
+
+      token.role =
+        user.role;
+    }
+
+    return token;
+  },
+
+  async session({
+    session,
+    token,
+  }) {
+
+    if (session.user) {
+
+      session.user.id =
+        token.id as string;
+
+      session.user.email =
+        token.email as string;
+
+      session.user.role =
+        token.role as string;
+    }
+
+    return session;
+  },
+
+  async redirect({
+    url,
+    baseUrl,
+  }) {
+
+    console.log(
+      "REDIRECT CALLBACK URL:",
+      url
+    );
+
+    console.log(
+      "REDIRECT CALLBACK BASE:",
+      baseUrl
+    );
+
+    if (url.startsWith("/")) {
+
+      return `${baseUrl}${url}`;
+    }
+
+    try {
+
+      const parsed =
+        new URL(url);
+
+      if (
+        parsed.origin === baseUrl
+      ) {
+
+        return url;
       }
 
-      return token;
-    },
+    } catch (err) {
 
-    async session({
-      session,
-      token,
-    }) {
+      console.error(
+        "Redirect Parse Error:",
+        err
+      );
+    }
 
-      if (session.user) {
-
-        session.user.id =
-          token.id as string;
-
-        session.user.email =
-          token.email as string;
-      }
-
-      return session;
-    },
+    return `${baseUrl}/`;
+  },
+},
 
     async redirect({
       url,
