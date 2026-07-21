@@ -63,6 +63,8 @@ export async function POST(
 
       category,
 
+      subcategory,
+
       retailPrice,
 
       coverImage,
@@ -138,6 +140,8 @@ export async function POST(
           description,
 
           category,
+
+          subcategory,
 
           // RETAIL PRICE
           retailPrice:

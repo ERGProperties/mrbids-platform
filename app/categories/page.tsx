@@ -4,64 +4,57 @@ const categories = [
   {
     title: "Jewelry",
     slug: "jewelry",
-    image:
-      "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/jewelry.png",
     description:
       "Luxury watches, chains, rings, diamonds, and rare jewelry auctions.",
   },
   {
     title: "Electronics",
     slug: "electronics",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/electronics.png",
     description:
       "Phones, laptops, gaming systems, cameras, and tech liquidation deals.",
   },
   {
     title: "Sneakers",
     slug: "sneakers",
-    image:
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/sneakers.png",
     description:
       "Rare sneaker drops, collectibles, and high-demand footwear auctions.",
   },
   {
     title: "Collectibles",
     slug: "collectibles",
-    image:
-      "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/collectibles.png",
     description:
       "Trading cards, memorabilia, antiques, and rare collectible finds.",
+    href: "/collectors",
   },
   {
     title: "Liquidation",
     slug: "liquidation",
-    image:
-      "https://images.unsplash.com/photo-1553413077-190dd305871c?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/liquidation.png",
     description:
       "Bulk inventory, pallets, closeouts, and liquidation merchandise.",
   },
   {
     title: "Luxury Items",
     slug: "luxury-items",
-    image:
-      "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/luxury-items.png",
     description:
       "Designer goods, premium accessories, luxury fashion, and rare pieces.",
   },
   {
     title: "Storage Finds",
     slug: "storage-finds",
-    image:
-      "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/storage-finds.png",
     description:
       "Unexpected treasures and storage-unit style auction discoveries.",
   },
   {
     title: "Real Estate",
     slug: "real-estate",
-    image:
-      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1200&auto=format&fit=crop",
+    image: "/images/categories/real-estate.png",
     description:
       "Investment properties, distressed homes, and seller-direct auctions.",
     href: "/real-estate",
@@ -97,7 +90,7 @@ export default function CategoriesPage() {
               <Link
                 key={category.title}
                 href={
-                  category.href ||
+                  category.href ??
                   `/marketplace-auctions?category=${category.slug}`
                 }
                 className="group border rounded-3xl overflow-hidden hover:shadow-2xl transition bg-white"

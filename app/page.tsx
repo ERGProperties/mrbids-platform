@@ -322,7 +322,11 @@ export default async function HomePage() {
               {categories.map((category) => (
                 <Link
                   key={category.title}
-                  href={`/marketplace-auctions?category=${category.slug}`}
+                  href={
+  category.slug === "collectibles"
+    ? "/collectors"
+    : `/marketplace-auctions?category=${category.slug}`
+}
                   className="group relative rounded-3xl overflow-hidden h-[320px]"
                 >
                   <img

@@ -17,7 +17,7 @@ export default function AppDownloadBanner() {
   }
 
   return (
-    <section className="border-y bg-gray-50">
+    <section className="border-y bg-gray-50 text-gray-900">
       <div className="max-w-7xl mx-auto px-6 py-8">
 
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -28,7 +28,7 @@ export default function AppDownloadBanner() {
               NOW AVAILABLE
             </p>
 
-            <h2 className="mt-2 text-2xl md:text-3xl font-bold">
+            <h2 className="mt-2 text-2xl md:text-3xl font-bold text-black">
               Download the Official MrBids App
             </h2>
 

@@ -10,6 +10,12 @@ import { useSession } from "next-auth/react";
 
 import RichTextEditor from "@/components/RichTextEditor";
 
+import {
+  MARKETPLACE_CATEGORIES,
+  getSubcategories,
+  type MarketplaceCategory,
+} from "@/lib/marketplaceCategories";
+
 const SHIPPING_PRESETS = {
   small: {
     label: "Small Item",
@@ -42,26 +48,26 @@ export default function MarketplaceSellPage() {
     status,
   } = useSession();
 
-useEffect(() => {
-  async function checkSellerProfile() {
-    if (status !== "authenticated") return;
+  useEffect(() => {
+    async function checkSellerProfile() {
+      if (status !== "authenticated") return;
 
-    const res = await fetch("/api/user/me");
+      const res = await fetch("/api/user/me");
 
-    if (!res.ok) return;
+      if (!res.ok) return;
 
-    const profile = await res.json();
+      const profile = await res.json();
 
-    if (
-      !profile.username ||
-      !profile.sellerBio ||
-      !profile.sellerCategory
-    ) {
-      router.replace(
-        "/account/profile?returnTo=/marketplace-sell"
-      );
+      if (
+        !profile.username ||
+        !profile.sellerBio ||
+        !profile.sellerCategory
+      ) {
+        router.replace(
+          "/account/profile?returnTo=/marketplace-sell"
+        );
+      }
     }
-  }
 
   checkSellerProfile();
 }, [status, router]);
@@ -80,6 +86,8 @@ useEffect(() => {
       title: "",
       description: "",
       category: "Jewelry",
+
+      subcategory: "",
 
       retailPrice: "",
 
@@ -253,6 +261,10 @@ if (
     }
   }
 
+const subcategories = getSubcategories(
+  form.category as MarketplaceCategory
+);
+
   return (
     <main className="min-h-screen bg-white">
 
@@ -329,22 +341,63 @@ if (
               onChange={(e) =>
                 setForm({
                   ...form,
-                  category:
-                    e.target.value,
+                  category: e.target.value,
+                  subcategory: "",
                 })
               }
               className="w-full border rounded-2xl px-5 py-4"
             >
-              <option>Jewelry</option>
-              <option>Electronics</option>
-              <option>Sneakers</option>
-              <option>Collectibles</option>
-              <option>Luxury Items</option>
-              <option>Storage Finds</option>
-              <option>Other</option>
+              {Object.keys(MARKETPLACE_CATEGORIES).map((category) => (
+                <option
+                  key={category}
+                  value={category}
+                >
+                  {category}
+                </option>
+              ))}
             </select>
 
           </div>
+
+          {/* TYPE */}
+          {subcategories.length > 0 && (
+            <div>
+
+              <label className="block text-sm font-medium mb-3">
+                {form.category === "Collectibles"
+                  ? "Collectible Type"
+                  : form.category === "Sneakers"
+                  ? "Brand"
+                  : `${form.category} Type`}
+              </label>
+
+              <select
+                value={form.subcategory}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    subcategory: e.target.value,
+                  })
+                }
+                className="w-full border rounded-2xl px-5 py-4"
+              >
+                <option value="">
+                  Select a Type
+                </option>
+
+                {subcategories.map((type) => (
+                  <option
+                    key={type}
+                    value={type}
+                  >
+                    {type}
+                  </option>
+                ))}
+
+              </select>
+
+            </div>
+          )}
 
 {/* DESCRIPTION */}
 <div>

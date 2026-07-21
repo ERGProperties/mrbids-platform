@@ -59,6 +59,7 @@ model MarketplaceAuction {
   title                    String
   description              String?
   category                 String
+  subcategory              String?
   images                   Json?
   coverImage               String?
   startingBid              Int
@@ -204,7 +205,6 @@ model User {
   createdAt                DateTime             @default(now())
   isVerifiedBidder         Boolean              @default(false)
   avatarUrl                String?
-  bannerUrl                String?
   bio                      String?
   isMarketplaceSeller      Boolean              @default(false)
   sellerBio                String?
@@ -215,6 +215,7 @@ model User {
   username                 String?              @unique
   onboardingCompleted      Boolean              @default(false)
   onboardingStep           Int                  @default(1)
+  bannerUrl                String?
   accounts                 Account[]
   auctions                 Auction[]            @relation("SellerAuctions")
   wonAuctions              Auction[]            @relation("AuctionWinner")
@@ -235,15 +236,11 @@ model PushSubscription {
   id        String   @id @default(cuid())
   userId    String
   endpoint  String   @unique
-
-  platform  String   @default("WEB")
-
-  p256dh    String?
-  auth      String?
-
+  p256dh    String
+  auth      String
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
+  platform  String   @default("WEB")
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Account {
@@ -278,6 +275,12 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model playing_with_neon {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value Float? @db.Real
 }
 
 enum Role {
