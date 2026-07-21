@@ -609,7 +609,7 @@ callbacks: {
         user.email;
 
       token.role =
-        user.role;
+        user.role as "USER" | "ADMIN";
     }
 
     return token;
@@ -629,7 +629,7 @@ callbacks: {
         token.email as string;
 
       session.user.role =
-        token.role as string;
+        token.role as "USER" | "ADMIN";
     }
 
     return session;
