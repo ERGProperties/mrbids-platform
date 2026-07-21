@@ -678,48 +678,4 @@ callbacks: {
     return `${baseUrl}/`;
   },
 },
-
-    async redirect({
-      url,
-      baseUrl,
-    }) {
-
-      console.log(
-        "REDIRECT CALLBACK URL:",
-        url
-      );
-
-      console.log(
-        "REDIRECT CALLBACK BASE:",
-        baseUrl
-      );
-
-      if (url.startsWith("/")) {
-
-        return `${baseUrl}${url}`;
-      }
-
-      try {
-
-        const parsed =
-          new URL(url);
-
-        if (
-          parsed.origin === baseUrl
-        ) {
-
-          return url;
-        }
-
-      } catch (err) {
-
-        console.error(
-          "Redirect Parse Error:",
-          err
-        );
-      }
-
-      return `${baseUrl}/`;
-    },
-  },
 };
