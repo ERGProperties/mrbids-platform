@@ -589,7 +589,7 @@ const subcategories = getSubcategories(
           <div>
 
             <label className="block text-sm font-medium mb-3">
-              Retail Price (Optional)
+              Estimated Market Value (Optional)
             </label>
 
             <input
@@ -603,7 +603,7 @@ const subcategories = getSubcategories(
                 })
               }
               className="w-full border rounded-2xl px-5 py-4"
-              placeholder="250"
+              placeholder="Example: 149.99"
             />
 
           </div>
