@@ -226,7 +226,9 @@ className="
       <div>
 
         <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
-          Retail
+          Estimated
+          <br />
+          Value
         </p>
 
         <p className="mt-1 text-xl font-bold text-emerald-200">
@@ -238,7 +240,7 @@ className="
       <div className="text-right">
 
         <p className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
-          Savings
+          Potential Savings
         </p>
 
         <p className="mt-1 text-xl font-bold text-emerald-200">
@@ -252,7 +254,7 @@ className="
   ) : (
 
     <div className="py-3 text-center text-sm font-medium text-emerald-300">
-      Retail price unavailable
+      Estimated value unavailable
     </div>
 
   )}
