@@ -657,13 +657,17 @@ fbq('track', 'Purchase', {
 {/* CURRENT BID */}
 <div className="mt-10 border-2 border-black rounded-3xl p-8 bg-gradient-to-br from-gray-50 to-white shadow-lg">
 
-  <p className="text-xs uppercase tracking-[0.2em] text-gray-500 font-semibold">
-    Current Bid
-  </p>
+<p className="text-xs uppercase tracking-[0.2em] text-gray-500 font-semibold">
+  {auction.bidCount === 0 ? "Starts At" : "Current Bid"}
+</p>
 
-  <h2 className="text-6xl font-extrabold mt-3">
-    ${auction.currentBid?.toLocaleString()}
-  </h2>
+<h2 className="text-6xl font-extrabold mt-3">
+  $
+  {(auction.bidCount === 0
+    ? auction.startingBid
+    : auction.currentBid
+  )?.toLocaleString()}
+</h2>
 
   <div className="flex items-center justify-between mt-5">
 

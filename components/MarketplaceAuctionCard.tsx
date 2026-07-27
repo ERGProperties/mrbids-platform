@@ -10,14 +10,19 @@ export default function MarketplaceAuctionCard({
   auction: any;
 }) {
 
-  const savings =
-    auction.retailPrice
-      ? Math.max(
-          auction.retailPrice -
-            auction.currentBid,
-          0
-        )
-      : 0;
+const displayPrice =
+  auction.bidCount > 0
+    ? auction.currentBid
+    : auction.startingBid;
+
+const savings =
+  auction.retailPrice
+    ? Math.max(
+        auction.retailPrice -
+          displayPrice,
+        0
+      )
+    : 0;
 
   return (
 <Link
@@ -182,37 +187,37 @@ className="
 
 </div>
 
-{/* CURRENT BID */}
+{/* PRICE */}
 <div className="mt-5 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
 
   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
-    Current Bid
+    {auction.bidCount > 0 ? "Current Bid" : "Starts At"}
   </p>
 
   <p className="mt-1 text-4xl font-extrabold tracking-tight text-white">
-    ${auction.currentBid?.toLocaleString()}
+    ${displayPrice.toLocaleString()}
   </p>
 
-{auction.endAt && (
-  <div className="mt-4 border-t border-zinc-800 pt-4">
+  {auction.endAt && (
+    <div className="mt-4 border-t border-zinc-800 pt-4">
 
-    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500">
-      Auction Ends
-    </p>
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500">
+        Auction Ends
+      </p>
 
-    <CountdownTimer
-      endAt={new Date(auction.endAt).toISOString()}
-    />
+      <CountdownTimer
+        endAt={new Date(auction.endAt).toISOString()}
+      />
 
-    <div className="mt-3 flex items-center gap-2 text-sm text-orange-400">
-      <span>🔥</span>
-      <span className="font-medium">
-        {auction.bidCount ?? 0} {auction.bidCount === 1 ? "Bid" : "Bids"}
-      </span>
+      <div className="mt-3 flex items-center gap-2 text-sm text-orange-400">
+        <span>🔥</span>
+        <span className="font-medium">
+          {auction.bidCount ?? 0} {auction.bidCount === 1 ? "Bid" : "Bids"}
+        </span>
+      </div>
+
     </div>
-
-  </div>
-)}
+  )}
 
 </div>
 

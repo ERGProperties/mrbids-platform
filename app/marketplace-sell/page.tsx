@@ -114,6 +114,10 @@ export default function MarketplaceSellPage() {
       freeShipping: false,
 
       localPickup: false,
+
+      restartMode: "NEVER",
+
+      restartDelayMinutes: 0,
     });
 
 // CLOUDINARY UPLOAD
@@ -831,10 +835,7 @@ const subcategories = getSubcategories(
               onChange={(e) =>
                 setForm({
                   ...form,
-                  durationMinutes:
-                    Number(
-                      e.target.value
-                    ),
+                  durationMinutes: Number(e.target.value),
                 })
               }
               className="w-full border rounded-2xl px-5 py-4"
@@ -873,6 +874,66 @@ const subcategories = getSubcategories(
               </option>
 
             </select>
+
+          </div>
+
+          {/* AUTOMATIC RESTART */}
+          <div>
+
+            <label className="block text-sm font-medium mb-3">
+              Automatic Restart
+            </label>
+
+            <select
+              value={form.restartMode}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  restartMode: e.target.value,
+                })
+              }
+              className="w-full border rounded-2xl px-5 py-4"
+            >
+
+              <option value="NEVER">
+                Never Restart
+              </option>
+
+              <option value="IF_RESERVE_NOT_MET">
+                Restart if Reserve Not Met
+              </option>
+
+              <option value="ALWAYS">
+                Always Restart
+              </option>
+
+            </select>
+
+          </div>
+
+          {/* RESTART DELAY */}
+          <div>
+
+            <label className="block text-sm font-medium mb-3">
+              Restart Delay (Minutes)
+            </label>
+
+            <input
+              type="number"
+              min={0}
+              value={form.restartDelayMinutes}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  restartDelayMinutes: Number(e.target.value),
+                })
+              }
+              className="w-full border rounded-2xl px-5 py-4"
+            />
+
+            <p className="mt-2 text-sm text-gray-500">
+              Set to 0 to restart immediately after the auction ends.
+            </p>
 
           </div>
 

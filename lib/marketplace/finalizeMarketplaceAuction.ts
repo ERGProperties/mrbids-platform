@@ -48,21 +48,82 @@ export async function finalizeMarketplaceAuction(
   const highestBid =
     auction.bids[0];
 
-  // NO BIDS
-  if (!highestBid) {
+// NO BIDS
+if (!highestBid) {
+
+  // AUTO RESTART
+  if (
+    auction.restartMode === "IF_RESERVE_NOT_MET" ||
+    auction.restartMode === "ALWAYS"
+  ) {
+
+    const newEndAt = new Date(
+      Date.now() + auction.durationMinutes * 60 * 1000
+    );
+
+// Remove all bids from the previous round
+await prisma.marketplaceBid.deleteMany({
+  where: {
+    auctionId: auction.id,
+  },
+});
 
     await prisma.marketplaceAuction.update({
       where: {
-        id: auctionId,
+        id: auction.id,
       },
 
       data: {
-        status: "ENDED",
+        status: "LIVE",
+
+        currentBid: 0,
+
+        bidCount: 0,
+
+        winnerId: null,
+
+        startAt: new Date(),
+
+        endAt: newEndAt,
+
+        auctionRound: {
+          increment: 1,
+        },
+
+        restartCount: {
+          increment: 1,
+        },
+
+        fifteenMinEndingSoonSent: false,
+
+        fiveMinEndingSoonSent: false,
+
+        oneHourEndingSoonSent: false,
       },
     });
 
+    console.log(
+      `Auction ${auction.id} automatically restarted with no bids (Round ${
+        auction.auctionRound + 1
+      }).`
+    );
+
     return;
   }
+
+  // END PERMANENTLY
+  await prisma.marketplaceAuction.update({
+    where: {
+      id: auctionId,
+    },
+
+    data: {
+      status: "ENDED",
+    },
+  });
+
+  return;
+}
 
   // RESERVE CHECK
   const reserveMet =
@@ -72,6 +133,66 @@ export async function finalizeMarketplaceAuction(
 
   // RESERVE NOT MET
   if (!reserveMet) {
+
+// AUTO RESTART
+if (
+  auction.restartMode === "IF_RESERVE_NOT_MET" ||
+  auction.restartMode === "ALWAYS"
+) {
+  const newEndAt = new Date(
+    Date.now() + auction.durationMinutes * 60 * 1000
+  );
+
+  // Remove all bids from the previous round
+  await prisma.marketplaceBid.deleteMany({
+    where: {
+      auctionId: auction.id,
+    },
+  });
+
+  // Restart the auction
+  await prisma.marketplaceAuction.update({
+    where: {
+      id: auction.id,
+    },
+
+    data: {
+      status: "LIVE",
+
+      currentBid: 0,
+
+      bidCount: 0,
+
+      winnerId: null,
+
+      startAt: new Date(),
+
+      endAt: newEndAt,
+
+      auctionRound: {
+        increment: 1,
+      },
+
+      restartCount: {
+        increment: 1,
+      },
+
+      fifteenMinEndingSoonSent: false,
+
+      fiveMinEndingSoonSent: false,
+
+      oneHourEndingSoonSent: false,
+    },
+  });
+
+  console.log(
+    `Auction ${auction.id} automatically restarted (Round ${
+      auction.auctionRound + 1
+    }).`
+  );
+
+  return;
+}
 
     await prisma.marketplaceAuction.update({
       where: {

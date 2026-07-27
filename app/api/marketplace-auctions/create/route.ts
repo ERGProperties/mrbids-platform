@@ -90,6 +90,10 @@ export async function POST(
 
       freeShipping,
 
+      restartMode,
+
+      restartDelayMinutes,
+
       localPickup,
 
     } = body;
@@ -196,6 +200,15 @@ export async function POST(
           // STORE DURATION
           durationMinutes:
             duration,
+
+          // AUTO RESTART
+          restartMode:
+            restartMode || "NEVER",
+
+          restartDelayMinutes:
+            Number(
+              restartDelayMinutes || 0
+            ),
 
           // SHIPPING
           shippingType:

@@ -94,6 +94,12 @@ model MarketplaceAuction {
   shippingPreset           String?
   shippingType             String?                  @default("preset")
   reservePrice             Int?
+
+  restartMode              RestartMode              @default(NEVER)
+  auctionRound             Int                      @default(1)
+  restartCount             Int                      @default(0)
+  restartDelayMinutes      Int                      @default(0)
+
   fifteenMinEndingSoonSent Boolean                  @default(false)
   fiveMinEndingSoonSent    Boolean                  @default(false)
   oneHourEndingSoonSent    Boolean                  @default(false)
@@ -300,6 +306,12 @@ enum MarketplaceAuctionStatus {
   ENDED
   SCHEDULED
   RESERVE_NOT_MET
+}
+
+enum RestartMode {
+  NEVER
+  IF_RESERVE_NOT_MET
+  ALWAYS
 }
 
 enum ServiceFeeStatus {
