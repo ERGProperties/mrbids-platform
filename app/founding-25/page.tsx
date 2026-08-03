@@ -405,12 +405,12 @@ export default function FoundingCreatorsPage() {
                 Branded Storefront
               </td>
 
-              <td className="text-center text-slate-500">
-                ✔
+              <td className="text-center">
+                <span className="text-2xl font-bold text-emerald-400">✓</span>
               </td>
 
-              <td className="text-center font-bold text-emerald-400">
-                ✔
+              <td className="text-center">
+                <span className="text-2xl font-bold text-emerald-400">✓</span>
               </td>
 
             </tr>
@@ -421,12 +421,12 @@ export default function FoundingCreatorsPage() {
                 Featured Placement
               </td>
 
-              <td className="text-center text-red-400">
-                —
+              <td className="text-center">
+                <span className="text-2xl font-bold text-red-500">✕</span>
               </td>
 
-              <td className="text-center font-bold text-emerald-400">
-                ✔
+              <td className="text-center">
+                <span className="text-2xl font-bold text-emerald-400">✓</span>
               </td>
 
             </tr>
@@ -437,12 +437,12 @@ export default function FoundingCreatorsPage() {
                 Reduced Selling Fees
               </td>
 
-              <td className="text-center text-red-400">
-                —
+              <td className="text-center">
+                <span className="text-2xl font-bold text-red-500">✕</span>
               </td>
 
-              <td className="text-center font-bold text-emerald-400">
-                ✔
+              <td className="text-center">
+                <span className="text-2xl font-bold text-emerald-400">✓</span>
               </td>
 
             </tr>
@@ -453,12 +453,12 @@ export default function FoundingCreatorsPage() {
                 Early Access to New Features
               </td>
 
-              <td className="text-center text-red-400">
-                —
+              <td className="text-center">
+                <span className="text-2xl font-bold text-red-500">✕</span>
               </td>
 
-              <td className="text-center font-bold text-emerald-400">
-                ✔
+              <td className="text-center">
+                <span className="text-2xl font-bold text-emerald-400">✓</span>
               </td>
 
             </tr>
@@ -469,12 +469,12 @@ export default function FoundingCreatorsPage() {
                 Direct Feedback with the Founding Team
               </td>
 
-              <td className="text-center text-red-400">
-                —
+              <td className="text-center">
+                <span className="text-2xl font-bold text-red-500">✕</span>
               </td>
 
-              <td className="text-center font-bold text-emerald-400">
-                ✔
+              <td className="text-center">
+                <span className="text-2xl font-bold text-emerald-400">✓</span>
               </td>
 
             </tr>
@@ -485,12 +485,12 @@ export default function FoundingCreatorsPage() {
                 Eligibility for Future Performance-Based Partnership Opportunities
               </td>
 
-              <td className="text-center text-red-400">
-                —
+              <td className="text-center">
+                <span className="text-2xl font-bold text-red-500">✕</span>
               </td>
 
-              <td className="text-center font-bold text-emerald-400">
-                ✔
+              <td className="text-center">
+                <span className="text-2xl font-bold text-emerald-400">✓</span>
               </td>
 
             </tr>
