@@ -13,9 +13,9 @@ export default function FoundingCreatorsPage() {
     <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(2,6,23,0.15),rgba(2,6,23,1))]" />
   </div>
 
-  <div className="relative mx-auto flex min-h-screen max-w-7xl items-center px-6 py-32">
+  <div className="relative mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl items-center px-6 pt-28 pb-24">
 
-    <div className="mx-auto max-w-4xl text-center">
+    <div className="mx-auto -mt-12 max-w-4xl text-center">
 
       {/* Badge */}
 
@@ -31,11 +31,11 @@ export default function FoundingCreatorsPage() {
 
       {/* Headline */}
 
-      <h1 className="text-5xl font-black leading-tight tracking-tight text-white md:text-7xl">
+      <h1 className="text-5xl font-black leading-[1.15] tracking-tight text-white md:text-7xl">
 
         Become One of the
 
-        <span className="mt-3 block bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-500 bg-clip-text text-transparent">
+        <span className="mt-6 block pb-3 bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-500 bg-clip-text text-transparent">
 
           MrBids Founding 25
 
@@ -72,47 +72,67 @@ export default function FoundingCreatorsPage() {
 
       </div>
 
-      {/* Trust Metrics */}
+      {/* ================= TRUST METRICS ================= */}
 
-      <div className="mt-24 grid grid-cols-1 gap-10 border-t border-slate-800 pt-12 md:grid-cols-3">
+<div className="mt-24 grid grid-cols-1 gap-8 border-t border-slate-800 pt-14 md:grid-cols-3">
 
-        <div>
+  {/* Founding Spots */}
 
-          <div className="text-4xl font-black text-emerald-400">
-            25
-          </div>
+  <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center backdrop-blur">
 
-          <div className="mt-2 text-sm uppercase tracking-[0.25em] text-slate-400">
-            Founding Creator Spots
-          </div>
+    <div className="text-5xl font-black text-emerald-400">
+      25
+    </div>
 
-        </div>
+    <div className="mt-3 text-lg font-bold text-white">
+      Founding Creator Spots
+    </div>
 
-        <div>
+    <p className="mt-3 text-sm leading-6 text-slate-400">
+      An exclusive group helping shape the future of the platform.
+    </p>
 
-          <div className="text-4xl font-black text-white">
-            Creator
-          </div>
+  </div>
 
-          <div className="mt-2 text-sm uppercase tracking-[0.25em] text-slate-400">
-            Owned Storefronts
-          </div>
+  {/* Storefront */}
 
-        </div>
+  <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center backdrop-blur">
 
-        <div>
+    <div className="mb-3 text-5xl">
+      🏪
+    </div>
 
-          <div className="text-4xl font-black text-white">
-            Performance
-          </div>
+    <div className="text-lg font-bold text-white">
+      Branded Storefronts
+    </div>
 
-          <div className="mt-2 text-sm uppercase tracking-[0.25em] text-slate-400">
-            Based Rewards
-          </div>
+    <p className="mt-3 text-sm leading-6 text-slate-400">
+      Every creator receives a personalized auction storefront built for their
+      community.
+    </p>
 
-        </div>
+  </div>
 
-      </div>
+  {/* Live Auctions */}
+
+  <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center backdrop-blur">
+
+    <div className="mb-3 text-5xl">
+      🔴
+    </div>
+
+    <div className="text-lg font-bold text-white">
+      LIVE Auctions
+    </div>
+
+    <p className="mt-3 text-sm leading-6 text-slate-400">
+      Create excitement with real-time bidding, countdown timers, and engaged
+      buyers.
+    </p>
+
+  </div>
+
+</div>
 
     </div>
 
@@ -788,59 +808,6 @@ export default function FoundingCreatorsPage() {
         We&apos;ll review every application personally and contact selected creators
         with next steps.
       </p>
-
-    </div>
-
-  </div>
-
-</section>
-
-{/* ================= FOOTER CTA ================= */}
-
-<section className="border-t border-slate-800 bg-slate-950 py-20">
-
-  <div className="mx-auto max-w-7xl px-6">
-
-    <div className="flex flex-col items-center justify-between gap-10 lg:flex-row">
-
-      <div>
-
-        <div className="text-3xl font-black text-white">
-          MrBids
-        </div>
-
-        <p className="mt-4 max-w-xl text-lg leading-8 text-slate-400">
-          Building the next generation creator-first auction marketplace,
-          where communities compete, engage, and discover unique products.
-        </p>
-
-      </div>
-
-      <div className="flex flex-wrap gap-8 text-slate-400">
-
-        <a href="/about" className="hover:text-white">
-          About
-        </a>
-
-        <a href="/terms" className="hover:text-white">
-          Terms
-        </a>
-
-        <a href="/privacy" className="hover:text-white">
-          Privacy
-        </a>
-
-        <a href="/contact" className="hover:text-white">
-          Contact
-        </a>
-
-      </div>
-
-    </div>
-
-    <div className="mt-14 border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
-
-      © {new Date().getFullYear()} MrBids. All rights reserved.
 
     </div>
 
