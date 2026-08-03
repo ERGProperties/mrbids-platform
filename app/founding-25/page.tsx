@@ -364,137 +364,142 @@ export default function FoundingCreatorsPage() {
       </h2>
 
       <p className="mt-8 text-xl leading-9 text-slate-300">
-        We&apos;re inviting a small group of creators to help shape MrBids from the beginning.
-        Founding Creators receive early benefits that won&apos;t be available through the standard onboarding process.
+        We&apos;re inviting a small group of creators to help shape MrBids from the
+        beginning. Founding Creators receive early benefits that won&apos;t be
+        available through the standard onboarding process.
       </p>
 
     </div>
 
     <div className="mt-20 overflow-hidden rounded-3xl border border-slate-800">
 
-      <table className="w-full">
+      <div className="overflow-x-auto">
 
-        <thead className="bg-slate-950">
+        <table className="min-w-[700px] w-full">
 
-          <tr>
+          <thead className="bg-slate-950">
 
-            <th className="px-8 py-6 text-left text-lg font-bold text-white">
-              Benefit
-            </th>
+            <tr>
 
-            <th className="px-8 py-6 text-center text-lg font-bold text-slate-400">
-              Standard Seller
-            </th>
+              <th className="px-8 py-6 text-left text-lg font-bold text-white">
+                Benefit
+              </th>
 
-            <th className="bg-emerald-500 px-8 py-6 text-center text-lg font-black text-slate-950">
-              Founding 25
-            </th>
+              <th className="px-8 py-6 text-center text-lg font-bold text-slate-400">
+                Standard Seller
+              </th>
 
-          </tr>
+              <th className="bg-emerald-500 px-8 py-6 text-center text-lg font-black text-slate-950">
+                Founding 25
+              </th>
 
-        </thead>
+            </tr>
 
-        <tbody className="divide-y divide-slate-800 bg-slate-900">
+          </thead>
 
-          <tr>
+          <tbody className="divide-y divide-slate-800 bg-slate-900">
 
-            <td className="px-8 py-6 text-white">
-              Branded Storefront
-            </td>
+            <tr>
 
-            <td className="text-center text-slate-500">
-              ✔
-            </td>
+              <td className="px-8 py-6 text-white">
+                Branded Storefront
+              </td>
 
-            <td className="text-center text-emerald-400 font-bold">
-              ✔
-            </td>
+              <td className="text-center text-slate-500">
+                ✔
+              </td>
 
-          </tr>
+              <td className="text-center font-bold text-emerald-400">
+                ✔
+              </td>
 
-          <tr>
+            </tr>
 
-            <td className="px-8 py-6 text-white">
-              Featured Placement
-            </td>
+            <tr>
 
-            <td className="text-center text-red-400">
-              —
-            </td>
+              <td className="px-8 py-6 text-white">
+                Featured Placement
+              </td>
 
-            <td className="text-center text-emerald-400 font-bold">
-              ✔
-            </td>
+              <td className="text-center text-red-400">
+                —
+              </td>
 
-          </tr>
+              <td className="text-center font-bold text-emerald-400">
+                ✔
+              </td>
 
-          <tr>
+            </tr>
 
-            <td className="px-8 py-6 text-white">
-              Reduced Selling Fees
-            </td>
+            <tr>
 
-            <td className="text-center text-red-400">
-              —
-            </td>
+              <td className="px-8 py-6 text-white">
+                Reduced Selling Fees
+              </td>
 
-            <td className="text-center text-emerald-400 font-bold">
-              ✔
-            </td>
+              <td className="text-center text-red-400">
+                —
+              </td>
 
-          </tr>
+              <td className="text-center font-bold text-emerald-400">
+                ✔
+              </td>
 
-          <tr>
+            </tr>
 
-            <td className="px-8 py-6 text-white">
-              Early Access to New Features
-            </td>
+            <tr>
 
-            <td className="text-center text-red-400">
-              —
-            </td>
+              <td className="px-8 py-6 text-white">
+                Early Access to New Features
+              </td>
 
-            <td className="text-center text-emerald-400 font-bold">
-              ✔
-            </td>
+              <td className="text-center text-red-400">
+                —
+              </td>
 
-          </tr>
+              <td className="text-center font-bold text-emerald-400">
+                ✔
+              </td>
 
-          <tr>
+            </tr>
 
-            <td className="px-8 py-6 text-white">
-              Direct Feedback with the Founding Team
-            </td>
+            <tr>
 
-            <td className="text-center text-red-400">
-              —
-            </td>
+              <td className="px-8 py-6 text-white">
+                Direct Feedback with the Founding Team
+              </td>
 
-            <td className="text-center text-emerald-400 font-bold">
-              ✔
-            </td>
+              <td className="text-center text-red-400">
+                —
+              </td>
 
-          </tr>
+              <td className="text-center font-bold text-emerald-400">
+                ✔
+              </td>
 
-          <tr>
+            </tr>
 
-            <td className="px-8 py-6 text-white">
-              Eligibility for Future Performance-Based Partnership Opportunities
-            </td>
+            <tr>
 
-            <td className="text-center text-red-400">
-              —
-            </td>
+              <td className="px-8 py-6 text-white">
+                Eligibility for Future Performance-Based Partnership Opportunities
+              </td>
 
-            <td className="text-center text-emerald-400 font-bold">
-              ✔
-            </td>
+              <td className="text-center text-red-400">
+                —
+              </td>
 
-          </tr>
+              <td className="text-center font-bold text-emerald-400">
+                ✔
+              </td>
 
-        </tbody>
+            </tr>
 
-      </table>
+          </tbody>
+
+        </table>
+
+      </div>
 
     </div>
 
