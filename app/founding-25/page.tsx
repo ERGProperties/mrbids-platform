@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Footer from "@/components/Footer";
 
 export default function FoundingCreatorsPage() {
   return (
@@ -914,11 +913,7 @@ export default function FoundingCreatorsPage() {
 
   </div>
 
-      </section>
-
-      {/* ================= SITE FOOTER ================= */}
-
-      <Footer />
+            </section>
 
     </>
   );
