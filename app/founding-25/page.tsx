@@ -5,72 +5,75 @@ export default function FoundingCreatorsPage() {
     <>
       {/* ================= HERO ================= */}
 
-<section className="relative overflow-hidden bg-slate-950">
+      <section className="relative overflow-hidden bg-slate-950">
 
-  {/* Background */}
-  <div className="absolute inset-0">
-    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.20),transparent_55%)]" />
-    <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(2,6,23,0.15),rgba(2,6,23,1))]" />
-  </div>
+        {/* Background */}
 
-  <div className="relative mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl items-center px-6 pt-28 pb-24">
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.20),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(2,6,23,0.15),rgba(2,6,23,1))]" />
+        </div>
 
-    <div className="mx-auto -mt-12 max-w-4xl text-center">
+        <div className="relative mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl items-center px-6 pt-24 pb-24 md:pt-28">
 
-      {/* Badge */}
+          <div className="mx-auto -mt-6 md:-mt-12 max-w-4xl text-center">
 
-      <div className="mb-8 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2 backdrop-blur">
+            {/* Badge */}
 
-        <span className="mr-2 text-lg">👑</span>
+            <div className="mb-8 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 md:px-6 backdrop-blur">
 
-        <span className="text-sm font-semibold uppercase tracking-[0.30em] text-emerald-300">
-          Exclusive Invitation • Only 25 Founding Creators
-        </span>
+              <span className="mr-2 text-base md:text-lg">
+                👑
+              </span>
 
-      </div>
+              <span className="text-xs font-semibold uppercase tracking-[0.20em] text-emerald-300 md:text-sm md:tracking-[0.30em]">
+                Exclusive Invitation • Only 25 Founding Creators
+              </span>
 
-      {/* Headline */}
+            </div>
 
-      <h1 className="text-5xl font-black leading-[1.15] tracking-tight text-white md:text-7xl">
+            {/* Headline */}
 
-        Become One of the
+            <h1 className="text-4xl font-black leading-[1.08] tracking-tight text-white sm:text-5xl md:text-7xl">
 
-        <span className="mt-6 block pb-3 bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-500 bg-clip-text text-transparent">
+              Become One of the
 
-          MrBids Founding 25
+              <span className="mt-5 block bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-500 bg-clip-text pb-2 text-transparent md:mt-6 md:pb-3">
 
-        </span>
+                MrBids Founding 25
 
-      </h1>
+              </span>
 
-      {/* Description */}
+            </h1>
 
-      <p className="mx-auto mt-10 max-w-3xl text-xl leading-9 text-slate-300 md:text-2xl">
+            {/* Description */}
 
-        Launch your own branded auction storefront, grow a loyal buyer community,
-        and help shape the future of creator commerce.
+            <p className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-slate-300 md:mt-10 md:text-2xl md:leading-9">
 
-      </p>
+              Launch your own branded auction storefront, grow a loyal buyer
+              community, and help shape the future of creator commerce.
 
-      {/* Buttons */}
+            </p>
 
-      <div className="mt-14 flex flex-col items-center justify-center gap-5 sm:flex-row">
+            {/* Buttons */}
 
-        <a
-          href="#apply"
-          className="rounded-full bg-gradient-to-r from-emerald-500 to-green-400 px-10 py-5 text-lg font-bold text-white shadow-[0_0_35px_rgba(16,185,129,.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_55px_rgba(16,185,129,.65)]"
-        >
-          Claim Your Founding Spot
-        </a>
+            <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row md:mt-14">
 
-        <a
-          href="#benefits"
-          className="rounded-full border border-slate-700 px-10 py-5 text-lg font-semibold text-slate-200 transition hover:border-emerald-400 hover:text-white"
-        >
-          Explore the Benefits
-        </a>
+              <a
+                href="#apply"
+                className="rounded-full bg-gradient-to-r from-emerald-500 to-green-400 px-10 py-5 text-lg font-bold text-white shadow-[0_0_35px_rgba(16,185,129,.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_55px_rgba(16,185,129,.65)]"
+              >
+                Claim Your Founding Spot
+              </a>
 
-      </div>
+              <a
+                href="#benefits"
+                className="rounded-full border border-slate-700 px-10 py-5 text-lg font-semibold text-slate-200 transition hover:border-emerald-400 hover:text-white"
+              >
+                Explore the Benefits
+              </a>
+
+            </div>
 
       {/* ================= TRUST METRICS ================= */}
 
