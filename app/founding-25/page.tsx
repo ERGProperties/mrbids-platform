@@ -399,6 +399,8 @@ export default function FoundingCreatorsPage() {
 
           <tbody className="divide-y divide-slate-800 bg-slate-900">
 
+            {/* Branded Storefront */}
+
             <tr>
 
               <td className="px-8 py-6 text-white">
@@ -406,14 +408,20 @@ export default function FoundingCreatorsPage() {
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-emerald-400">✓</span>
+                <svg className="mx-auto h-7 w-7 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-emerald-400">✓</span>
+                <svg className="mx-auto h-7 w-7 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </td>
 
             </tr>
+
+            {/* Featured Placement */}
 
             <tr>
 
@@ -422,14 +430,20 @@ export default function FoundingCreatorsPage() {
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-red-500">✕</span>
+                <svg className="mx-auto h-7 w-7 text-red-500" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                </svg>
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-emerald-400">✓</span>
+                <svg className="mx-auto h-7 w-7 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </td>
 
             </tr>
+
+            {/* Reduced Selling Fees */}
 
             <tr>
 
@@ -438,14 +452,20 @@ export default function FoundingCreatorsPage() {
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-red-500">✕</span>
+                <svg className="mx-auto h-7 w-7 text-red-500" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                </svg>
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-emerald-400">✓</span>
+                <svg className="mx-auto h-7 w-7 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </td>
 
             </tr>
+
+            {/* Early Access */}
 
             <tr>
 
@@ -454,14 +474,20 @@ export default function FoundingCreatorsPage() {
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-red-500">✕</span>
+                <svg className="mx-auto h-7 w-7 text-red-500" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                </svg>
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-emerald-400">✓</span>
+                <svg className="mx-auto h-7 w-7 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </td>
 
             </tr>
+
+            {/* Feedback */}
 
             <tr>
 
@@ -470,14 +496,20 @@ export default function FoundingCreatorsPage() {
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-red-500">✕</span>
+                <svg className="mx-auto h-7 w-7 text-red-500" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                </svg>
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-emerald-400">✓</span>
+                <svg className="mx-auto h-7 w-7 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </td>
 
             </tr>
+
+            {/* Performance Partnership */}
 
             <tr>
 
@@ -486,11 +518,15 @@ export default function FoundingCreatorsPage() {
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-red-500">✕</span>
+                <svg className="mx-auto h-7 w-7 text-red-500" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                </svg>
               </td>
 
               <td className="text-center">
-                <span className="text-2xl font-bold text-emerald-400">✓</span>
+                <svg className="mx-auto h-7 w-7 text-emerald-400" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </td>
 
             </tr>
