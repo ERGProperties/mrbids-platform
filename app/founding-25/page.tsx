@@ -27,7 +27,7 @@ export default function FoundingCreatorsPage() {
               </span>
 
               <span className="text-xs font-semibold uppercase tracking-[0.20em] text-emerald-300 md:text-sm md:tracking-[0.30em]">
-                Exclusive Invitation • Only 25 Founding Creators
+                Only 25 Founding Creator Spots Available
               </span>
 
             </div>
@@ -36,11 +36,11 @@ export default function FoundingCreatorsPage() {
 
             <h1 className="text-4xl font-black leading-[1.08] tracking-tight text-white sm:text-5xl md:text-7xl">
 
-              Become One of the
+              Build Your Own
 
               <span className="mt-5 block bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-500 bg-clip-text pb-2 text-transparent md:mt-6 md:pb-3">
 
-                MrBids Founding 25
+                MrBids Storefront
 
               </span>
 
@@ -50,8 +50,9 @@ export default function FoundingCreatorsPage() {
 
             <p className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-slate-300 md:mt-10 md:text-2xl md:leading-9">
 
-              Launch your own branded auction storefront, grow a loyal buyer
-              community, and help shape the future of creator commerce.
+              Join the first 25 Founding Creators, launch your own branded
+              auction storefront, and start building a community that competes
+              for every product you sell.
 
             </p>
 
@@ -59,12 +60,12 @@ export default function FoundingCreatorsPage() {
 
             <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row md:mt-14">
 
-              <a
-                href="#apply"
+              <Link
+                href="/marketplace-sell"
                 className="rounded-full bg-gradient-to-r from-emerald-500 to-green-400 px-10 py-5 text-lg font-bold text-white shadow-[0_0_35px_rgba(16,185,129,.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_55px_rgba(16,185,129,.65)]"
               >
-                Claim Your Founding Spot
-              </a>
+                Create Your Free Storefront
+              </Link>
 
               <a
                 href="#benefits"
@@ -75,73 +76,71 @@ export default function FoundingCreatorsPage() {
 
             </div>
 
-      {/* ================= TRUST METRICS ================= */}
+            {/* ================= TRUST METRICS ================= */}
 
-<div className="mt-24 grid grid-cols-1 gap-8 border-t border-slate-800 pt-14 md:grid-cols-3">
+            <div className="mt-24 grid grid-cols-1 gap-8 border-t border-slate-800 pt-14 md:grid-cols-3">
 
-  {/* Founding Spots */}
+              {/* Founding Spots */}
 
-  <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center backdrop-blur">
+              <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center backdrop-blur">
 
-    <div className="text-5xl font-black text-emerald-400">
-      25
-    </div>
+                <div className="text-5xl font-black text-emerald-400">
+                  25
+                </div>
 
-    <div className="mt-3 text-lg font-bold text-white">
-      Founding Creator Spots
-    </div>
+                <div className="mt-3 text-lg font-bold text-white">
+                  Founding Creator Spots
+                </div>
 
-    <p className="mt-3 text-sm leading-6 text-slate-400">
-      An exclusive group helping shape the future of the platform.
-    </p>
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  Available on a first-come, first-served basis.
+                </p>
 
-  </div>
+              </div>
 
-  {/* Storefront */}
+              {/* Storefront */}
 
-  <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center backdrop-blur">
+              <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center backdrop-blur">
 
-    <div className="mb-3 text-5xl">
-      🏪
-    </div>
+                <div className="mb-3 text-5xl">
+                  🏪
+                </div>
 
-    <div className="text-lg font-bold text-white">
-      Branded Storefronts
-    </div>
+                <div className="text-lg font-bold text-white">
+                  Your Own Storefront
+                </div>
 
-    <p className="mt-3 text-sm leading-6 text-slate-400">
-      Every creator receives a personalized auction storefront built for their
-      community.
-    </p>
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  Launch your branded storefront and begin selling in minutes.
+                </p>
 
-  </div>
+              </div>
 
-  {/* Live Auctions */}
+              {/* Live Auctions */}
 
-  <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center backdrop-blur">
+              <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-8 text-center backdrop-blur">
 
-    <div className="mb-3 text-5xl">
-      🔴
-    </div>
+                <div className="mb-3 text-5xl">
+                  🔴
+                </div>
 
-    <div className="text-lg font-bold text-white">
-      LIVE Auctions
-    </div>
+                <div className="text-lg font-bold text-white">
+                  LIVE Auctions
+                </div>
 
-    <p className="mt-3 text-sm leading-6 text-slate-400">
-      Create excitement with real-time bidding, countdown timers, and engaged
-      buyers.
-    </p>
+                <p className="mt-3 text-sm leading-6 text-slate-400">
+                  Turn followers into bidders with exciting real-time auctions.
+                </p>
 
-  </div>
+              </div>
 
-</div>
+            </div>
 
-    </div>
+          </div>
 
-  </div>
+        </div>
 
-</section>
+      </section>
 
 {/* ================= WHY CREATORS JOIN ================= */}
 
@@ -559,13 +558,13 @@ export default function FoundingCreatorsPage() {
       </p>
 
       <h2 className="text-4xl font-black text-white md:text-6xl">
-        Your Journey Starts Here
+        Launch Your Creator Storefront
       </h2>
 
       <p className="mt-8 text-xl leading-9 text-slate-300">
-        Becoming a Founding Creator is straightforward. We&apos;ll help you get your
-        storefront ready so you can focus on creating great content and connecting
-        with your audience.
+        Getting started takes just a few minutes. Create your account, build your
+        storefront, and begin selling through exciting LIVE auctions while
+        Founding Creator spots are still available.
       </p>
 
     </div>
@@ -581,12 +580,12 @@ export default function FoundingCreatorsPage() {
         </div>
 
         <h3 className="text-2xl font-bold text-white">
-          Apply
+          Create Your Account
         </h3>
 
         <p className="mt-5 leading-8 text-slate-300">
-          Complete a short application so we can learn more about your content,
-          audience, and the products you sell.
+          Create your free MrBids account and immediately claim your opportunity
+          to become one of our first Founding Creators.
         </p>
 
       </div>
@@ -600,12 +599,12 @@ export default function FoundingCreatorsPage() {
         </div>
 
         <h3 className="text-2xl font-bold text-white">
-          Get Approved
+          Build Your Storefront
         </h3>
 
         <p className="mt-5 leading-8 text-slate-300">
-          If you&apos;re selected, we&apos;ll invite you into the Founding 25 program and
-          begin setting up your creator storefront.
+          Customize your storefront, connect Stripe for payouts, and get ready to
+          showcase your products.
         </p>
 
       </div>
@@ -619,12 +618,12 @@ export default function FoundingCreatorsPage() {
         </div>
 
         <h3 className="text-2xl font-bold text-white">
-          Launch
+          Launch Your First Auction
         </h3>
 
         <p className="mt-5 leading-8 text-slate-300">
-          List your first products, announce your auctions to your community,
-          and begin building momentum.
+          List your products, invite your audience, and create excitement through
+          real-time bidding.
         </p>
 
       </div>
@@ -638,12 +637,12 @@ export default function FoundingCreatorsPage() {
         </div>
 
         <h3 className="text-2xl font-bold text-white">
-          Grow
+          Grow Your Community
         </h3>
 
         <p className="mt-5 leading-8 text-slate-300">
-          Continue growing your audience, hosting auctions, and helping shape the
-          future of MrBids as the platform expands.
+          Build loyal bidders, host more LIVE auctions, and grow alongside the
+          first generation of MrBids creators.
         </p>
 
       </div>
@@ -728,16 +727,19 @@ export default function FoundingCreatorsPage() {
       </div>
 
       <div className="rounded-3xl border border-slate-800 bg-slate-950 p-8">
-        <h3 className="text-xl font-bold text-white">
-          What happens after I&apos;m selected?
-        </h3>
 
-        <p className="mt-4 leading-8 text-slate-300">
-          We&apos;ll guide you through setting up your branded storefront, help you
-          prepare your first auctions, and introduce you to the tools available
-          to Founding Creators.
-        </p>
-      </div>
+  <h3 className="text-xl font-bold text-white">
+    What happens after I create my account?
+  </h3>
+
+  <p className="mt-4 leading-8 text-slate-300">
+    After creating your free account, you'll build your branded storefront,
+    connect Stripe for secure payouts, and begin creating your first LIVE
+    auctions. Founding Creator benefits are available on a first-come,
+    first-served basis while spots remain available.
+  </p>
+
+</div>
 
       <div className="rounded-3xl border border-slate-800 bg-slate-950 p-8">
         <h3 className="text-xl font-bold text-white">
@@ -781,77 +783,53 @@ export default function FoundingCreatorsPage() {
         <div className="mb-6 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2">
 
           <span className="text-sm font-bold uppercase tracking-[0.30em] text-emerald-300">
-            Limited to 25 Founding Creators
+            Only 25 Founding Creator Spots Available
           </span>
 
         </div>
 
         <h2 className="text-4xl font-black text-white md:text-6xl">
-          Ready to Build Something Bigger?
+          Ready to Launch Your Storefront?
         </h2>
 
-        <p className="mx-auto mt-8 max-w-2xl text-xl leading-9 text-slate-300">
-          If you&apos;re passionate about creating great content, selling unique products,
-          and helping shape the future of creator commerce, we&apos;d love to hear from you.
+        <p className="mx-auto mt-8 max-w-3xl text-xl leading-9 text-slate-300">
+
+          Create your free MrBids account, build your branded storefront,
+          and start hosting LIVE auctions for your community.
+
+          <br /><br />
+
+          Founding Creator benefits are available on a first-come,
+          first-served basis while all 25 spots remain available.
+
         </p>
 
       </div>
 
-      {/* FORM */}
+      {/* CTA */}
 
-      <form className="mt-16 space-y-8">
+      <div className="mt-16 text-center">
 
-        <div className="grid gap-6 md:grid-cols-2">
-
-          <input
-            type="text"
-            placeholder="Full Name"
-            className="rounded-2xl border border-slate-700 bg-slate-950 px-6 py-5 text-white outline-none transition focus:border-emerald-400"
-          />
-
-          <input
-            type="email"
-            placeholder="Email Address"
-            className="rounded-2xl border border-slate-700 bg-slate-950 px-6 py-5 text-white outline-none transition focus:border-emerald-400"
-          />
-
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2">
-
-          <input
-            type="text"
-            placeholder="Primary Social Profile"
-            className="rounded-2xl border border-slate-700 bg-slate-950 px-6 py-5 text-white outline-none transition focus:border-emerald-400"
-          />
-
-          <input
-            type="text"
-            placeholder="What Do You Sell?"
-            className="rounded-2xl border border-slate-700 bg-slate-950 px-6 py-5 text-white outline-none transition focus:border-emerald-400"
-          />
-
-        </div>
-
-        <textarea
-          rows={5}
-          placeholder="Tell us a little about yourself and your audience..."
-          className="w-full rounded-2xl border border-slate-700 bg-slate-950 px-6 py-5 text-white outline-none transition focus:border-emerald-400"
-        />
-
-        <button
-          type="submit"
-          className="w-full rounded-full bg-gradient-to-r from-emerald-500 to-green-400 px-10 py-5 text-lg font-bold text-white shadow-[0_0_35px_rgba(16,185,129,.45)] transition hover:scale-[1.02]"
+        <Link
+          href="/marketplace-sell"
+          className="inline-flex rounded-full bg-gradient-to-r from-emerald-500 to-green-400 px-12 py-6 text-xl font-bold text-white shadow-[0_0_45px_rgba(16,185,129,.45)] transition duration-300 hover:scale-105"
         >
-          Request My Invitation
-        </button>
+          Create My Free Storefront
+        </Link>
 
-      </form>
+        <p className="mx-auto mt-8 max-w-2xl text-lg leading-8 text-slate-400">
 
-      <p className="mt-8 text-center text-sm text-slate-500">
-        We&apos;ll review every application personally and contact selected creators
-        with next steps.
-      </p>
+          It only takes a few minutes to get started.
+
+          <br /><br />
+
+          Once your storefront is ready, you'll be able to create auctions,
+          build your audience, and grow alongside the first generation of
+          MrBids creators.
+
+        </p>
+
+      </div>
 
     </div>
 
@@ -881,11 +859,11 @@ export default function FoundingCreatorsPage() {
 
     <h2 className="mt-10 text-5xl font-black leading-tight text-white md:text-7xl">
 
-      This Isn&apos;t Just Another Marketplace.
+      Build Your Brand.
 
       <span className="mt-4 block bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-500 bg-clip-text text-transparent">
 
-        It&apos;s Your Opportunity To Help Build One.
+        Build Your Community.
 
       </span>
 
@@ -893,38 +871,35 @@ export default function FoundingCreatorsPage() {
 
     <p className="mx-auto mt-10 max-w-3xl text-xl leading-9 text-slate-300">
 
-      Every marketplace starts with a small group of people who believe in
-      something bigger.
+      The next generation of creator commerce won't be built by waiting.
 
       <br /><br />
 
-      We&apos;re looking for creators who want more than another place to sell.
-
-      We&apos;re looking for creators who want to help shape the future of live
-      auctions.
+      Create your storefront, launch your first LIVE auction, and become one of
+      the first creators helping shape the future of MrBids.
 
     </p>
 
     <div className="mt-16">
 
-      <a
-        href="#apply"
+      <Link
+        href="/marketplace-sell"
         className="inline-flex rounded-full bg-gradient-to-r from-emerald-500 to-green-400 px-12 py-6 text-xl font-bold text-white shadow-[0_0_45px_rgba(16,185,129,.45)] transition duration-300 hover:scale-105"
       >
-        Request Your Invitation
-      </a>
+        Create My Free Storefront
+      </Link>
 
     </div>
 
     <p className="mt-8 text-sm uppercase tracking-[0.30em] text-slate-500">
 
-      Limited to 25 Founding Creators
+      First-Come • First-Served • Only 25 Founding Creator Spots
 
     </p>
 
   </div>
 
-            </section>
+</section>
 
     </>
   );
