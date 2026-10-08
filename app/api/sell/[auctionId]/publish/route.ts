@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next";
+import { NextResponse } from "next/server";
 import { generateAuctionSlug } from "@/lib/sell/generateAuctionSlug";
 import { submitToIndexNow } from "@/lib/indexnow";
 
