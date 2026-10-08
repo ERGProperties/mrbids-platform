@@ -1,10 +1,103 @@
+import type { Metadata } from "next";
 import MarketplaceAuctionCard from "@/components/MarketplaceAuctionCard";
-
 import Link from "next/link";
-
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+const SITE_URL = "https://mrbids.com";
+
+const categories = [
+  {
+    label: "Jewelry",
+    slug: "jewelry",
+  },
+  {
+    label: "Electronics",
+    slug: "electronics",
+  },
+  {
+    label: "Sneakers",
+    slug: "sneakers",
+  },
+  {
+    label: "Collectibles",
+    slug: "collectibles",
+  },
+  {
+    label: "Liquidation",
+    slug: "liquidation",
+  },
+  {
+    label: "Luxury Items",
+    slug: "luxury-items",
+  },
+  {
+    label: "Storage Finds",
+    slug: "storage-finds",
+  },
+];
+
+function formatCategory(
+  value: string
+) {
+  return value
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (char) =>
+      char.toUpperCase()
+    );
+}
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: {
+    category?: string;
+  };
+}): Promise<Metadata> {
+  const category =
+    searchParams.category;
+
+  const categoryName = category
+    ? formatCategory(category)
+    : null;
+
+  const title = categoryName
+    ? `${categoryName} Auctions | MrBids`
+    : "Live Marketplace Auctions | MrBids";
+
+  const description = categoryName
+    ? `Browse LIVE ${categoryName.toLowerCase()} auctions on MrBids. Discover unique items, view current bidding activity, and bid online.`
+    : "Browse LIVE marketplace auctions on MrBids. Discover unique items across jewelry, electronics, sneakers, collectibles, luxury items, liquidation, and more.";
+
+  return {
+    title,
+    description,
+
+    alternates: {
+      canonical: `${SITE_URL}/marketplace-auctions`,
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+    },
+
+    openGraph: {
+      type: "website",
+      url: `${SITE_URL}/marketplace-auctions`,
+      siteName: "MrBids",
+      title,
+      description,
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 export default async function MarketplaceAuctionsPage({
   searchParams,
@@ -13,8 +106,8 @@ export default async function MarketplaceAuctionsPage({
     category?: string;
   };
 }) {
-
-  const category = searchParams.category;
+  const category =
+    searchParams.category;
 
   // LIVE AUCTIONS
   const liveAuctions =
@@ -68,16 +161,63 @@ export default async function MarketplaceAuctionsPage({
       take: 6,
     });
 
-  const renderAuctionCard = (auction: any) => (
-  <MarketplaceAuctionCard
-    key={auction.id}
-    auction={auction}
-  />
-);
+  const renderAuctionCard = (
+    auction: any
+  ) => (
+    <MarketplaceAuctionCard
+      key={auction.id}
+      auction={auction}
+    />
+  );
 
-return (
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: category
+      ? `${formatCategory(
+          category
+        )} Auctions | MrBids`
+      : "Live Marketplace Auctions | MrBids",
+    description: category
+      ? `Browse LIVE ${formatCategory(
+          category
+        ).toLowerCase()} auctions on MrBids.`
+      : "Browse LIVE marketplace auctions on MrBids.",
+    url: `${SITE_URL}/marketplace-auctions`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "MrBids",
+      url: SITE_URL,
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems:
+        liveAuctions.length,
+      itemListElement:
+        liveAuctions.map(
+          (auction, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: `${SITE_URL}/marketplace-auctions/${auction.id}`,
+            name:
+              auction.title ||
+              "Marketplace Auction",
+          })
+        ),
+    },
+  };
 
+  return (
     <main className="min-h-screen bg-white">
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            structuredData
+          ).replace(/</g, "\\u003c"),
+        }}
+      />
 
       {/* HERO */}
       <section className="max-w-7xl mx-auto px-6 pt-24 pb-14">
@@ -90,11 +230,9 @@ return (
 
           <h1 className="text-4xl md:text-7xl font-semibold leading-[1.02]">
             {category
-              ? `${category
-                  .replace(/-/g, " ")
-                  .replace(/\b\w/g, (char) =>
-                    char.toUpperCase()
-                  )} Auctions`
+              ? `${formatCategory(
+                  category
+                )} Auctions`
               : "Discover LIVE Marketplace Auctions"}
           </h1>
 
@@ -108,6 +246,7 @@ return (
           </p>
 
         </div>
+
       </section>
 
       {/* CATEGORY FILTERS */}
@@ -128,53 +267,28 @@ return (
               All
             </Link>
 
-            {[
-              {
-                label: "Jewelry",
-                slug: "jewelry",
-              },
-              {
-                label: "Electronics",
-                slug: "electronics",
-              },
-              {
-                label: "Sneakers",
-                slug: "sneakers",
-              },
-              {
-                label: "Collectibles",
-                slug: "collectibles",
-              },
-              {
-                label: "Liquidation",
-                slug: "liquidation",
-              },
-              {
-                label: "Luxury Items",
-                slug: "luxury-items",
-              },
-              {
-                label: "Storage Finds",
-                slug: "storage-finds",
-              },
-            ].map((item) => (
+            {categories.map(
+              (item) => (
 
-              <Link
-                key={item.slug}
-                href={`/marketplace-auctions?category=${item.slug}`}
-                className={`px-5 py-2 rounded-full border text-sm font-medium transition ${
-                  category === item.slug
-                    ? "bg-black text-white border-black"
-                    : "bg-white text-black border-gray-300 hover:border-black"
-                }`}
-              >
-                {item.label}
-              </Link>
+                <Link
+                  key={item.slug}
+                  href={`/marketplace-auctions?category=${item.slug}`}
+                  className={`px-5 py-2 rounded-full border text-sm font-medium transition ${
+                    category === item.slug
+                      ? "bg-black text-white border-black"
+                      : "bg-white text-black border-gray-300 hover:border-black"
+                  }`}
+                >
+                  {item.label}
+                </Link>
 
-            ))}
+              )
+            )}
 
           </div>
+
         </div>
+
       </section>
 
       {/* LIVE AUCTIONS */}
@@ -195,6 +309,7 @@ return (
               </h2>
 
             </div>
+
           </div>
 
           {liveAuctions.length === 0 ? (
@@ -215,8 +330,11 @@ return (
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
 
-              {liveAuctions.map((auction) =>
-                renderAuctionCard(auction)
+              {liveAuctions.map(
+                (auction) =>
+                  renderAuctionCard(
+                    auction
+                  )
               )}
 
             </div>
@@ -224,6 +342,7 @@ return (
           )}
 
         </div>
+
       </section>
 
       {/* RECENTLY ENDED */}
@@ -246,22 +365,26 @@ return (
                 </h2>
 
               </div>
+
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 opacity-90">
 
-              {endedAuctions.map((auction) =>
-                renderAuctionCard(auction)
+              {endedAuctions.map(
+                (auction) =>
+                  renderAuctionCard(
+                    auction
+                  )
               )}
 
             </div>
+
           </div>
+
         </section>
 
       )}
 
     </main>
-
   );
-
 }
