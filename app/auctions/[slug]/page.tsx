@@ -8,6 +8,8 @@ import AskQuestion from "@/components/auction/AskQuestion";
 import AnswerQuestion from "@/components/auction/AnswerQuestion";
 import AuctionMessages from "@/components/auction/AuctionMessages";
 
+const SITE_URL = "https://mrbids.com";
+
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -34,7 +36,20 @@ function getWatchingCount(bidCount: number) {
 
 function normalizeImages(images: unknown): string[] {
   if (!Array.isArray(images)) return [];
-  return images.filter((img): img is string => typeof img === "string");
+
+  return images.filter(
+    (img): img is string => typeof img === "string"
+  );
+}
+
+function getAbsoluteUrl(path: string | null | undefined) {
+  if (!path) return null;
+
+  try {
+    return new URL(path, SITE_URL).toString();
+  } catch {
+    return null;
+  }
 }
 
 function buildStructuredData(
@@ -42,11 +57,18 @@ function buildStructuredData(
   highestBid: number,
   image: string | null
 ) {
+  const auctionUrl = `${SITE_URL}/auctions/${auction.slug}`;
+
+  const isLive = auction.status === "LIVE";
+
   return {
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
     name: auction.title,
-    description: auction.description,
+    description:
+      auction.description ||
+      "Real estate auction on MrBids.",
+    url: auctionUrl,
     image: image ? [image] : [],
     address: {
       "@type": "PostalAddress",
@@ -56,9 +78,12 @@ function buildStructuredData(
     },
     offers: {
       "@type": "Offer",
+      url: auctionUrl,
       priceCurrency: "USD",
       price: highestBid,
-      availability: "https://schema.org/InStock",
+      availability: isLive
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
     },
   };
 }
@@ -76,34 +101,105 @@ export async function generateMetadata({
       cityStateZip: true,
       description: true,
       coverImage: true,
+      startingBid: true,
+      status: true,
     },
   });
 
   if (!auction) {
-    return { title: "Auction Not Found | MrBids" };
+    return {
+      title: "Auction Not Found | MrBids",
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
   }
 
   const title =
     auction.title ||
     `${auction.addressLine ?? ""} ${auction.cityStateZip ?? ""}`.trim();
 
-  const description =
-    auction.description?.slice(0, 160) ||
+  const location = [
+    auction.addressLine,
+    auction.cityStateZip,
+  ]
+    .filter(Boolean)
+    .join(", ");
+
+  const startingBid =
+    auction.startingBid != null
+      ? formatCurrency(auction.startingBid)
+      : null;
+
+  const baseDescription =
+    auction.description?.replace(/\s+/g, " ").trim() ||
     "Live real estate auction with transparent bidding and soft-close protection.";
 
+  const auctionDescription = [
+    baseDescription,
+    location ? `Located at ${location}.` : "",
+    startingBid
+      ? `Starting bid: ${startingBid}.`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const description =
+    auctionDescription.length > 160
+      ? `${auctionDescription.slice(0, 157).trimEnd()}...`
+      : auctionDescription;
+
+  const canonicalUrl =
+    `${SITE_URL}/auctions/${params.slug}`;
+
+  const imageUrl =
+    getAbsoluteUrl(auction.coverImage);
+
+  const pageTitle =
+    `${title} | Live Real Estate Auction | MrBids`;
+
   return {
-    title: `${title} | Live Real Estate Auction | MrBids`,
+    title: pageTitle,
     description,
-    openGraph: {
-      title: `${title} | MrBids`,
-      description,
-      images: auction.coverImage ? [auction.coverImage] : [],
+
+    alternates: {
+      canonical: canonicalUrl,
     },
+
+    robots: {
+      index: true,
+      follow: true,
+    },
+
+    openGraph: {
+      type: "website",
+      url: canonicalUrl,
+      siteName: "MrBids",
+      title: pageTitle,
+      description,
+      ...(imageUrl
+        ? {
+            images: [
+              {
+                url: imageUrl,
+                alt: `${title} - MrBids real estate auction`,
+              },
+            ],
+          }
+        : {}),
+    },
+
     twitter: {
       card: "summary_large_image",
-      title: `${title} | MrBids`,
+      title: pageTitle,
       description,
-      images: auction.coverImage ? [auction.coverImage] : [],
+      ...(imageUrl
+        ? {
+            images: [imageUrl],
+          }
+        : {}),
     },
   };
 }
@@ -127,7 +223,9 @@ export default async function AuctionPage({
 
   if (!auction) notFound();
 
-  const questions = await getQuestionsForAuction(auction.id);
+  const questions = await getQuestionsForAuction(
+    auction.id
+  );
 
   const highestBid =
     auction.bids[0]?.amount ??
@@ -135,24 +233,43 @@ export default async function AuctionPage({
     auction.startingBid ??
     0;
 
-  const minimumBid = highestBid + (auction.bidIncrement ?? 0);
+  const minimumBid =
+    highestBid + (auction.bidIncrement ?? 0);
 
   const images = normalizeImages(auction.images);
-  const image = auction.coverImage || images[0] || null;
 
-  const structuredData = buildStructuredData(
-    auction,
-    highestBid,
-    image
-  );
+  const image =
+    auction.coverImage ||
+    images[0] ||
+    null;
 
-  const latestBid = await prisma.bid.findFirst({
-    where: { auctionId: auction.id },
-    orderBy: { createdAt: "desc" },
-    select: { createdAt: true },
-  });
+  const absoluteImage =
+    getAbsoluteUrl(image);
 
-  const watchingCount = getWatchingCount(auction.bidCount);
+  const structuredData =
+    buildStructuredData(
+      auction,
+      highestBid,
+      absoluteImage
+    );
+
+  const latestBid =
+    await prisma.bid.findFirst({
+      where: {
+        auctionId: auction.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        createdAt: true,
+      },
+    });
+
+  const watchingCount =
+    getWatchingCount(
+      auction.bidCount
+    );
 
   return (
     <main className="bg-gray-50 min-h-screen">
@@ -160,7 +277,9 @@ export default async function AuctionPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData),
+          __html: JSON.stringify(
+            structuredData
+          ).replace(/</g, "\\u003c"),
         }}
       />
 
@@ -182,13 +301,19 @@ export default async function AuctionPage({
           </div>
 
           <div className="text-sm text-gray-200">
-            {getMomentumText(latestBid?.createdAt)}
+            {getMomentumText(
+              latestBid?.createdAt
+            )}
           </div>
 
           <div className="text-sm text-gray-200">
             ARV:{" "}
             <span className="text-white font-semibold">
-              {auction.arv ? formatCurrency(auction.arv) : "Not provided"}
+              {auction.arv
+                ? formatCurrency(
+                    auction.arv
+                  )
+                : "Not provided"}
             </span>
           </div>
 
@@ -202,30 +327,44 @@ export default async function AuctionPage({
           slug: auction.slug,
           title: auction.title,
           addressLine: auction.addressLine,
-          cityStateZip: auction.cityStateZip,
-          description: auction.description,
-          propertyType: auction.propertyType,
+          cityStateZip:
+            auction.cityStateZip,
+          description:
+            auction.description,
+          propertyType:
+            auction.propertyType,
           beds: auction.beds,
           baths: auction.baths,
           sqft: auction.sqft,
-          yearBuilt: auction.yearBuilt, // ✅ FIXED HERE
+          yearBuilt:
+            auction.yearBuilt,
           arv: auction.arv,
           images,
           image,
           highestBid,
-          bidCount: auction.bidCount,
-          endAt: auction.endAt
-            ? auction.endAt.toISOString()
-            : null,
-          bidIncrement: auction.bidIncrement,
-          startingBid: auction.startingBid,
+          bidCount:
+            auction.bidCount,
+          endAt:
+            auction.endAt
+              ? auction.endAt.toISOString()
+              : null,
+          bidIncrement:
+            auction.bidIncrement,
+          startingBid:
+            auction.startingBid,
           leadingBidderId:
-            auction.bids[0]?.bidderId ?? null,
-          winnerId: auction.winnerId,
-          sellerId: auction.sellerId,
-          status: auction.status,
-          seller: auction.seller,
-          winner: auction.winner,
+            auction.bids[0]
+              ?.bidderId ?? null,
+          winnerId:
+            auction.winnerId,
+          sellerId:
+            auction.sellerId,
+          status:
+            auction.status,
+          seller:
+            auction.seller,
+          winner:
+            auction.winner,
         }}
         minimumBid={minimumBid}
       />
@@ -234,10 +373,15 @@ export default async function AuctionPage({
       {auction.bidCount > 0 && (
         <div className="max-w-6xl mx-auto px-6 pb-10">
           <section className="bg-white rounded-2xl border shadow-sm p-6">
+
             <h2 className="text-lg font-semibold mb-4">
               Bid History
             </h2>
-            <BidHistoryServer auctionId={auction.id} />
+
+            <BidHistoryServer
+              auctionId={auction.id}
+            />
+
           </section>
         </div>
       )}
@@ -257,7 +401,10 @@ export default async function AuctionPage({
           )}
 
           {questions.map((q) => (
-            <div key={q.id} className="border-b py-3">
+            <div
+              key={q.id}
+              className="border-b py-3"
+            >
               <p className="font-medium">
                 Q: {q.question}
               </p>
@@ -267,12 +414,16 @@ export default async function AuctionPage({
                   A: {q.answer}
                 </p>
               ) : (
-                <AnswerQuestion questionId={q.id} />
+                <AnswerQuestion
+                  questionId={q.id}
+                />
               )}
             </div>
           ))}
 
-          <AskQuestion auctionId={auction.id} />
+          <AskQuestion
+            auctionId={auction.id}
+          />
 
         </section>
       </div>
@@ -284,7 +435,9 @@ export default async function AuctionPage({
             id="auction-messages"
             className="bg-white rounded-2xl border shadow-sm p-6 mt-6"
           >
-            <AuctionMessages auctionId={auction.id} />
+            <AuctionMessages
+              auctionId={auction.id}
+            />
           </section>
         </div>
       )}
