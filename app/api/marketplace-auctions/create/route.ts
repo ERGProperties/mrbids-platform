@@ -6,6 +6,8 @@ import { prisma } from "@/lib/prisma";
 
 import { authOptions } from "@/lib/authOptions";
 
+import { submitToIndexNow } from "@/lib/indexnow";
+
 export async function POST(
   req: Request
 ) {
@@ -238,6 +240,13 @@ export async function POST(
         },
 
       });
+
+    // =========================
+    // Notify IndexNow
+    // =========================
+    await submitToIndexNow(
+      `https://mrbids.com/marketplace-auctions/${auction.id}`
+    );
 
     return NextResponse.json({
       success: true,

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextResponse } from "next";
 import { generateAuctionSlug } from "@/lib/sell/generateAuctionSlug";
+import { submitToIndexNow } from "@/lib/indexnow";
 
 /**
  * ⭐ Auto cover image builder
@@ -53,7 +54,7 @@ export async function POST(
     !auction.propertyType ||
     !auction.description ||
     !auction.durationDays ||
-    auction.durationDays <= 0 || // 🔥 FIX
+    auction.durationDays <= 0 ||
     !Array.isArray(auction.images) ||
     auction.images.length === 0
   ) {
@@ -136,6 +137,15 @@ export async function POST(
       coverImage,
     },
   });
+
+  // =========================
+  // Notify IndexNow
+  // =========================
+  if (updated.slug) {
+    await submitToIndexNow(
+      `https://mrbids.com/auctions/${updated.slug}`
+    );
+  }
 
   return NextResponse.json({
     success: true,
